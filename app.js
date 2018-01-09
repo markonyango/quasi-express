@@ -7,12 +7,20 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const fs = require('fs');
 const compression = require('compression');
+const session = require('express-session');
+const flash = require('connect-flash');
+
+// Passport requirements
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
 
+// Import Routes
 const index = require('./routes/index');
 const users = require('./routes/users');
 const projects = require('./routes/projects');
 
+// Initialize Express App
 var app = express();
 
 // view engine setup
@@ -23,12 +31,36 @@ app.set('view engine', 'hbs');
 // Use GZip compression on responses
 app.use(compression());
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// Bodyparser and Cookieparser middleware
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Express session - this must come after the cookieParser()
+app.use(session({
+  secret: 'secret',
+  saveUninitialized: true,
+  resave: true
+}));
+
+// Passport initialization
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Connect Flash middleware
+app.use(flash());
+
+// Global Vars
+app.use(function (req, res, next) {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
+  next();
+});
+
+// Set static public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
