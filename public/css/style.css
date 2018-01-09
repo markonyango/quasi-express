@@ -1,6 +1,6 @@
-* .btn, .breadcrumb, form * {
+/* * .btn, .breadcrumb, form * {
   border-radius: 0px !important;
-}
+} */
 
 .dropdown-menu button {
   cursor: pointer;

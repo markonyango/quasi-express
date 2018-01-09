@@ -8,8 +8,9 @@ router.get('/', function(req, res) {
         if (error) {
             console.log("Something went wrong here");
         } else {
-            console.log(projects);
-            res.render('projects', {title: 'Projects', routePath: 'projects', data: projects});
+            req.flash('success_msg','Viewing all projects');
+            // res.redirect('/');
+            res.render('projects', {title: 'Projects', routePath: 'projects', message: req.flash('success_msg')});
         }
     });
 });

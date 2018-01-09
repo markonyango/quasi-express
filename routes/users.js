@@ -68,19 +68,10 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
-verbose = function (req, res, next) {
-  console.log(req.body);
-  next();
-}
-
-router.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }), verbose,
+router.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }),
   function (req, res, next) {
 
     res.redirect('/');
-
-    // const email = req.body.email;
-    // const password = req.body.password;
-
 
   });
 
