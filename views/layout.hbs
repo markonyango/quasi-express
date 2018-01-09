@@ -1,11 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    {{> header }}
+
+<head>
+  <title>{{title}}</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+  <link rel='stylesheet' href='/stylesheets/fa-svg-with-js.css' />
+  <script src="/js/fontawesome-all.min.js"></script>
+</head>
+
+<body>
+  {{> header}}
+
+  <div class="container-fluid" id="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="active">
+        {{ routePath }}
+      </li>
+    </ol>
+  </div>
+
+  <div class="container-fluid" id="main">
     {{{body}}}
-  </body>
+  </div>
+
+  <div class="spacer"></div>
+
+  <footer id="footer" class="fixed-bottom">
+    <p>&copy; Mark Onyango 2017</p>
+  </footer>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>

@@ -1,34 +1,27 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const fs = require('fs');
+const compression = require('compression');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+
+const index = require('./routes/index');
+const users = require('./routes/users');
+const projects = require('./routes/projects');
 
 var app = express();
 
 // view engine setup
+hbs.registerPartials(__dirname + '/views/partials');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-var partialsDir = __dirname + '/views/partials';
-var filenames = fs.readdirSync(partialsDir);
-
-filenames.forEach(function (filename) {
-  var matches = /^([^.]+).hbs$/.exec(filename);
-  if (!matches) {
-    return;
-  }
-  var name = matches[1];
-  var template = fs.readFileSync(partialsDir + '/' + filename, 'utf8');
-  hbs.registerPartial(name, template);
-});
-
+// Use GZip compression on responses
+app.use(compression());
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -40,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/projects', projects);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

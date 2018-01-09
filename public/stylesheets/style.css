@@ -1,8 +1,103 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+* .btn, .breadcrumb, form * {
+  border-radius: 0px !important;
 }
 
-a {
-  color: #00B7FF;
+.dropdown-menu button {
+  cursor: pointer;
+}
+
+body {
+  background: #f4f4f4;
+}
+
+/* Side Panel repaint */
+.list-group-item.active {
+  background-color: #333333!important;
+  border-color: #333333!important;
+}
+
+#footer {
+  background: #333333;
+  color: #ffffff;
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 10px;
+  line-height: 10px;
+}
+
+.spacer {
+  margin-bottom: 41px;
+}
+
+/* Header */
+
+#header {
+  background: #333333;
+  color: #ffffff;
+  /* padding-bottom: 10px; */
+  margin-bottom: 15px;
+  vertical-align: center;
+}
+
+/* Progress Bars */
+
+.progress-bar {
+  background: #333333;
+  color: #ffffff;
+}
+
+/* Breadcrumb */
+
+.breadcrumb {
+  margin-top: 15px;
+  background: #cccccc;
+  color: #333333;
+}
+
+.breadcrumb a {
+  color: #333333;
+}
+
+/* Navbar logout hover styling */
+.logout a:hover {
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+/* Tablets */
+@media only screen and (max-width: 768px) {
+  #footer {
+      display: none;
+  }
+
+  #breadcrumb {
+      display: none;
+  }
+}
+
+/* Small screens */
+@media only screen and (max-width: 990px) {
+  #footer {
+      display: none;
+  }
+
+  #breadcrumb {
+      display: none;
+  }
+
+  nav {
+      margin-bottom: 15px !important;
+  }
+
+  /* #main > .row > div {
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+      margin-left: 5px !important;
+      margin-right: 5px !important;
+  } */
 }
