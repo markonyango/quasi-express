@@ -7,21 +7,18 @@
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <div class="navbar-nav mr-auto">
       <a class="nav-item nav-link" href="/">Home</a>
+      {{#if user}}
       <a class="nav-item nav-link" href="/projects">Projects</a>
+      {{else}}
       <a class="nav-item nav-link" href="/users/login">Login</a>
       <a class="nav-item nav-link" href="/users/register">Register</a>
-
-      <span class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" id="dropdown01" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">Dropdown</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <button type="button" class="dropdown-item" data-toggle="modal" data-target="#addUser">Add User</button>
-        </div>
-      </span>
+      {{/if}}
     </div>
+    {{#if user}}
     <div class="navbar-nav ml-auto logout">
-      <span class="navbar-text">Welcome</span>
-      <a class="nav-item nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <span class="navbar-text">Welcome {{user.email}}</span>
+      <a class="nav-item nav-link" href="/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
+    {{/if}}
   </div>
 </nav>

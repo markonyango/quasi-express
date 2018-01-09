@@ -36,51 +36,58 @@ router.get('/login', function (req, res, next) {
   res.render('login', { title: 'Login', routePath: 'login' })
 });
 
-passport.use(new LocalStrategy(
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+},
   function (email, password, done) {
-    console.log("Using local strategy");
     User.findOne({ email: email }, function (err, user) {
-      if (err) { throw err; }
+      if (err) return done(err);
       if (!user) {
-        return done(null, false, {message: 'email not found'});
+        return done(null, false, { message: 'Wrong credentials' });
       }
-      this.comparePassword(password, function (err, isMatch) {
-        if (err) throw err;
+      user.comparePassword(password, function (err, isMatch) {
+        if (err) return done(err);
         if (isMatch) {
-          console.log("User is a match!");
           return done(null, user);
         } else {
-          return done(null, false, {message: 'Wrong password'});
+          return done(null, false, { message: 'Wrong credentials' });
         }
       });
     });
   })
 );
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
     done(err, user);
   });
 });
 
-verbose = function(req, res, next) {
+verbose = function (req, res, next) {
   console.log(req.body);
   next();
 }
 
-router.post('/login', verbose, passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }),
+router.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }), verbose,
   function (req, res, next) {
 
-    res.redirect('/').json({state: 'logged in'});
+    res.redirect('/');
 
     // const email = req.body.email;
     // const password = req.body.password;
 
 
   });
+
+router.get('/logout', function (req, res) {
+  req.logout();
+  req.flash('success_msg', 'You are now logged out');
+  res.redirect('/users/login');
+});
 
 module.exports = router;

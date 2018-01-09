@@ -7,7 +7,12 @@
 }
 
 body {
-  background: #f4f4f4;
+  background: #a3a0a0 !important;
+}
+
+/* Create margin from main container to navbar */
+#main {
+  margin-top: 25px;
 }
 
 /* Side Panel repaint */
@@ -46,7 +51,7 @@ body {
   color: #ffffff;
 }
 
-/* Breadcrumb */
+/* Breadcrumb
 
 .breadcrumb {
   margin-top: 15px;
@@ -56,7 +61,7 @@ body {
 
 .breadcrumb a {
   color: #333333;
-}
+} */
 
 /* Navbar logout hover styling */
 .logout a:hover {

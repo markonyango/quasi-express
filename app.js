@@ -7,7 +7,9 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const fs = require('fs');
 const compression = require('compression');
+const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 
 // Passport requirements
@@ -39,9 +41,14 @@ app.use(cookieParser());
 
 // Express session - this must come after the cookieParser()
 app.use(session({
-  secret: 'secret',
-  saveUninitialized: true,
-  resave: true
+  secret: 'supermegasecretkeythatnobodyshalleverfindout',
+  saveUninitialized: false,
+  resave: true,
+  store: new MongoStore({
+    url: 'mongodb://192.168.0.248:27017/quasi-express',
+    touchAfter: 24 * 3600,
+    ttl: 2 * 24 * 3600
+  })
 }));
 
 // Passport initialization
@@ -68,14 +75,14 @@ app.use('/users', users);
 app.use('/projects', projects);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
