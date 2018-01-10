@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon -w . ./bin/www",
-    "server": "DEBUG=express:* node ./bin/www",
+    "server": "DEBUG=express:* nodemon ./bin/www",
     "windows": "set DEBUG=express:* & nodemon ./bin/www"
   },
   "dependencies": {

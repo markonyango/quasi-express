@@ -10,9 +10,8 @@
 </head>
 
 <body>
-  {{> header}}
-
-  {{!-- <div class="container-fluid" id="breadcrumb">
+  {{> header}} {{!--
+  <div class="container-fluid" id="breadcrumb">
     <ol class="breadcrumb">
       <li class="active">
         {{ routePath }}
@@ -21,24 +20,14 @@
   </div> --}}
 
   <div class="container" id="main">
-    <div class="row">
-      <div class="col-lg-12">
-        {{#if success_msg}}
-        <div class="alert alert-success">{{success_msg}}</div>
-        {{/if}} {{#if error_msg}}
-        <div class="alert alert-danger">{{error_msg}}</div>
-        {{/if}} {{#if error}}
-        <div class="alert alert-danger">{{error}}</div>
-        {{/if}}
-      </div>
-    </div>
+    {{> alerts}}
     {{{body}}}
   </div>
 
   <div class="spacer"></div>
 
   <footer id="footer" class="fixed-bottom">
-    <p>&copy; Mark Onyango 2017</p>
+    &copy; Mark Onyango 2017
   </footer>
   <script src="/js/jquery.min.js"></script>
   <script src="/js/bootstrap.bundle.min.js"></script>

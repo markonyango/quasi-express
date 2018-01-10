@@ -41,7 +41,7 @@ app.use(cookieParser());
 // Express session - this must come after the cookieParser()
 app.use(session({
   secret: 'supermegasecretkeythatnobodyshalleverfindout',
-  saveUninitialized: false,
+  saveUninitialized: true,
   resave: true,
   store: new MongoStore({
     url: 'mongodb://192.168.0.248:27017/quasi-express',
