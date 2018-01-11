@@ -1,3 +1,15 @@
-<p>Projects works!</p>
-{{message}}
-<button type="button" class="btn btn-secondary btn-sm">Add Project</button>
+{{#if projects}}
+<ul class="list-group">
+{{#each projects}}
+    <li>{{this.name}} - {{this.settings}}</li>
+{{/each}}
+</ul>
+{{/if}}
+<p>&nbsp;</p>
+<button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">Add Project</button>
+
+
+
+
+<!-- Modal -->
+{{> add_project}}

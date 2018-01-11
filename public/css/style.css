@@ -3,6 +3,10 @@ body {
   font-size: 100%;
 }
 
+body * {
+  border-radius: 0px !important;
+}
+
 /* Create margin from main container to navbar */
 #main {
   margin-top: 25px;

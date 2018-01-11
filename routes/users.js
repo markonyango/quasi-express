@@ -7,7 +7,7 @@ const User = require('../server/schema/user');
 
 /* GET users listing. */
 router.get('/register', function (req, res, next) {
-  res.render('register', { title: 'Registration', routePath: 'register' });
+  res.render('register', { title: 'Registration' });
 });
 
 router.post('/register', function (req, res, next) {
@@ -17,23 +17,21 @@ router.post('/register', function (req, res, next) {
   // Validation - later maybe
 
   // newUser is the document that will enter the 'users' collection
-  const newUser = new User({
-    email: email,
-    password: password
-  });
+  const newUser = new User({ email: email, password: password });
 
   newUser.save(function (err) {
     if (err) {
-      res.status(500).json({ error: err });
+      req.flash('error_msg', err);
+      res.redirect('/register');
     } else {
-      res.render('register', { title: 'Registration', routePath: 'register', data: newUser.email });
+      res.render('register', { title: 'Registration', data: newUser.email });
     }
   });
 
 });
 
 router.get('/login', function (req, res, next) {
-  res.render('login', { title: 'Login', routePath: 'login' })
+  res.render('login', { title: 'Login' })
 });
 
 passport.use(new LocalStrategy({

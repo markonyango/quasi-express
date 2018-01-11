@@ -3,14 +3,12 @@ const router = express.Router();
 
 const Project = require('../server/schema/project');
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     Project.find({}, function (error, projects) {
         if (error) {
-            console.log("Something went wrong here");
+            res.render('projects', { title: 'Projects', error: error });
         } else {
-            // req.flash('success_msg','Viewing all projects');
-            // res.redirect('/');
-            res.render('projects', {title: 'Projects', routePath: 'projects', success_msg: 'So ein Kack!'});
+            res.render('projects', { title: 'Projects', projects: projects, script: 'js/add_project.js' });
         }
     });
 });
