@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon -w . ./bin/www",
-    "server": "DEBUG=express:* nodemon ./bin/www",
-    "windows": "set DEBUG=express:* & nodemon ./bin/www"
+    "start": "nodemon -e js,hbs ./bin/www",
+    "debug": "DEBUG=express:* nodemon ./bin/www",
+    "debugwin": "set DEBUG=express:* & nodemon ./bin/www"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
