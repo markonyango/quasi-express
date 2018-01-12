@@ -10,17 +10,41 @@
       <div class="modal-body">
         <form id="add_project_form">
           <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Name</label>
-            <input class="col-sm-8 form-control" type="text" name="name" id="name" placeholder="Projectname...">
+            <label class="col-sm-2 col-form-label">Name</label>
+            <input class="col-sm-9 form-control" type="text" name="name" id="name" placeholder="Projectname...">
           </div>
           <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Type</label>
-            <select class="col-sm-8 form-control" type="select" name="type" id="type" placeholder="Projecttype...">
+            <label class="col-sm-2 col-form-label">Type</label>
+            <select class="col-sm-9 form-control" type="select" name="type" id="type" placeholder="Projecttype...">
               <option value="qa">Quality Assessment</option>
               <option value="dea">Differential Expression Analysis</option>
             </select>
           </div>
-
+          <fieldset class="form-group" id="options_dea" style="display: none">
+            <div class="row">
+              <label class="col-form-label col-sm-2 pt-0">Options</label>
+              <div class="col-sm-9">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" id="gridRadios1" value="option1">
+                  <label class="form-check-label" for="gridRadios1">
+                    Options 1
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" id="gridRadios2" value="option2">
+                  <label class="form-check-label" for="gridRadios2">
+                    Options 2
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" id="gridRadios3" value="option3">
+                  <label class="form-check-label" for="gridRadios3">
+                    Options 3
+                  </label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
         </form>
       </div>
       <div class="modal-footer">

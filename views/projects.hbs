@@ -1,9 +1,13 @@
 {{#if projects}}
-<ul class="list-group">
+<table class="table table-hover table-sm table-responsive-sm">
+    <th>Project name</th>
+    <th>Type</th>
+    <th>Options</th>
+    <th>Status</th>
 {{#each projects}}
-    <li>{{this.name}} - {{this.settings}}</li>
+    <tr><td>{{this.name}}</td> <td>n/a</td> <td>{{this.settings}}</td> <td style="color: rgb(25, 153, 25)">done</td></tr>
 {{/each}}
-</ul>
+</table>
 {{/if}}
 <p>&nbsp;</p>
 <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">Add Project</button>
