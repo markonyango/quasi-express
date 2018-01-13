@@ -11,7 +11,7 @@
         <form id="add_project_form">
           <div class="form-group row">
             <label class="col-sm-2 col-form-label">Name</label>
-            <input class="col-sm-9 form-control" type="text" name="projectname" placeholder="Projectname...">
+            <input class="col-sm-9 form-control" type="text" name="projectname" placeholder="Projectname..." required>
           </div>
           <div class="form-group row">
             <label class="col-sm-2 col-form-label">Type</label>
@@ -26,19 +26,19 @@
               <label class="col-form-label col-sm-2 pt-0">Options</label>
               <div class="col-sm-9">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="gridRadios"value="option1">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" value="option1">
                   <label class="form-check-label" for="gridRadios1">
                     Options 1
                   </label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="gridRadios"value="option2">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" value="option2">
                   <label class="form-check-label" for="gridRadios2">
                     Options 2
                   </label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="gridRadios"value="option3">
+                  <input class="form-check-input" type="checkbox" name="gridRadios" value="option3">
                   <label class="form-check-label" for="gridRadios3">
                     Options 3
                   </label>
@@ -53,6 +53,11 @@
           <div class="form-group row">
             <input type="submit" class="offset-sm-2 btn btn-primary btn-sm">
             <button type="button" class="ml-5 btn btn-danger btn-sm">Cancel</button>
+          </div>
+          <div class="form-group row">
+            <div class="progress offset-sm-2 col-sm-9 pl-0 pr-0" style="display: none">
+              <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
           </div>
         </form>
       </div>

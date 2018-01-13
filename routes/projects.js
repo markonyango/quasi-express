@@ -17,7 +17,9 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-router.get('/', function (req, res) {
+router.get('/', async function (req, res) {
+    var prom = await test();
+    console.log(prom);
     Project.find({}, function (error, projects) {
         if (error) {
             res.render('projects', { title: 'Projects', error: error });
@@ -28,10 +30,17 @@ router.get('/', function (req, res) {
 });
 
 
-router.post('/upload', upload.array('qa_files'), function(req, res) {
-    // console.log(req.body, req.files, req.file);
-    // req.flash('success_msg',req.body);
-    res.status(200).json(req.body);
+router.post('/upload', upload.array('qa_files'), function (req, res) {
+    res.status(500).json(err);
 });
+
+
+const test = function () {
+    return new Promise(resolve => {
+        Project.find({}, function (error, projects) {
+            resolve(projects);
+        });
+    });
+}
 
 module.exports = router;
