@@ -17,10 +17,9 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-router.get('/', async function (req, res) {
-    var prom = await test();
-    console.log(prom);
-    Project.find({}, function (error, projects) {
+router.get('/', function (req, res) {
+    const uid = req.session.passport.user;
+    Project.find({ uid: uid }, function (error, projects) {
         if (error) {
             res.render('projects', { title: 'Projects', error: error });
         } else {
@@ -30,17 +29,49 @@ router.get('/', async function (req, res) {
 });
 
 
-router.post('/upload', upload.array('qa_files'), function (req, res) {
-    res.status(500).json(err);
+router.post('/upload', upload.array('files'), function (req, res) {
+
+    const files = req.files;
+    const projectname = req.body.projectname;
+    const projecttype = req.body.projecttype;
+    const settings = ['option1', 'option2'];
+    const status = 'queued';
+    const uid = req.body.uid;
+
+    var project = new Project({
+        projectname: projectname,
+        projecttype: projecttype,
+        settings: settings,
+        status: status,
+        files: [],
+        uid: uid,
+        created: Date.now()
+    });
+
+    for (const file of files) {
+        project.files.push(file.filename);
+    }
+
+    project.save()
+        .then(res.sendStatus(200))
+        .catch(error => res.send(500).json(error));
 });
 
 
-const test = function () {
-    return new Promise(resolve => {
-        Project.find({}, function (error, projects) {
-            resolve(projects);
+router.get('/:id', function (req, res) {
+    // Project child process spawning stuff 
+    const id = req.params.id;
+    Project.find({_id: id})
+        .then(async (project) => {
+            await project.start();
+            res.render('project', {project: project});
+        })
+        .catch(error => {
+            req.flash('error',error.message);
+            res.redirect('/projects');
         });
-    });
-}
+
+});
+
 
 module.exports = router;

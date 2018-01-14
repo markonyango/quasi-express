@@ -1,12 +1,21 @@
 {{#if projects}}
 <table class="table table-hover table-sm table-responsive-sm">
-    <th>Project name</th>
-    <th>Type</th>
-    <th>Options</th>
+    <th>Project Name</th>
+    <th>Project Type</th>
+    <th>Settings</th>
+    <th>Files</th>
+    <th>Created at</th>
     <th>Status</th>
-{{#each projects}}
-    <tr><td>{{this.name}}</td> <td>n/a</td> <td>{{this.settings}}</td> <td style="color: rgb(25, 153, 25)">done</td></tr>
-{{/each}}
+    {{#each projects}}
+    <tr>
+        <td><a href="/projects/{{_id}}">{{this.projectname}}</a></td>
+        <td>{{this.projecttype}}</td>
+        <td>{{this.settings}}</td>
+        <td>{{this.files}}</td>
+        <td>{{this.created}}</td>
+        <td>{{this.status}}</td>
+    </tr>
+    {{/each}}
 </table>
 {{/if}}
 <p>&nbsp;</p>
