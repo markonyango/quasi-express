@@ -61,13 +61,15 @@ router.post('/upload', upload.array('files'), function (req, res) {
 router.get('/:id', function (req, res) {
     // Project child process spawning stuff 
     const id = req.params.id;
-    Project.find({_id: id})
-        .then(async (project) => {
-            await project.start();
-            res.render('project', {project: project});
+    Project.findOne({ _id: id })
+        .then(async project => {
+            console.log('Before');
+            await project.startjob();
+            console.log('After')
+            res.render('project', { title: 'Project', project: project });
         })
         .catch(error => {
-            req.flash('error',error.message);
+            req.flash('error', error.message);
             res.redirect('/projects');
         });
 
