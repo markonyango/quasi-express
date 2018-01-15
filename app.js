@@ -6,14 +6,17 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const fs = require('fs');
 const compression = require('compression');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 
+// Register Custom HandlebarsHelpers
+require('./handlebar_helpers');
+
 // Passport requirements
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+// const LocalStrategy = require('passport-local').Strategy;
 
 
 // Import Routes
@@ -32,8 +35,10 @@ app.set('view engine', 'hbs');
 // Use GZip compression on responses
 app.use(compression());
 
+// Morgan middleware setup
+const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), {flags: 'a'});
+app.use(logger('dev',{stream: morganlog}));
 // Bodyparser and Cookieparser middleware
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -81,7 +86,7 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

@@ -11,7 +11,8 @@ var storage = multer.diskStorage({
         cb(null, './uploads/')
     },
     filename: function (req, file, cb) {
-        cb(null, '[' + Date.now() + ']-' + file.originalname)
+        const uid = req.session.passport.user;
+        cb(null, '[' + uid + ',' + Date.now() + ']-' + file.originalname)
     }
 });
 const upload = multer({ storage: storage });
@@ -19,13 +20,24 @@ const upload = multer({ storage: storage });
 
 router.get('/', function (req, res) {
     const uid = req.session.passport.user;
-    Project.find({ uid: uid }, function (error, projects) {
-        if (error) {
-            res.render('projects', { title: 'Projects', error: error });
-        } else {
-            res.render('projects', { title: 'Projects', projects: projects, script: 'js/add_project.js' });
-        }
-    });
+
+    if (req.query.json === 'true') {
+        Project.find({ uid: uid }, function (error, projects) {
+            if (error) {
+                res.send(500).json(error);
+            } else {
+                res.status(200).json(projects);
+            }
+        });
+    } else {
+        Project.find({ uid: uid }, function (error, projects) {
+            if (error) {
+                res.render('projects', { title: 'Projects', error: error });
+            } else {
+                res.render('projects', { title: 'Projects', projects: projects, script: 'js/projects.js' });
+            }
+        });
+    }
 });
 
 
@@ -58,21 +70,32 @@ router.post('/upload', upload.array('files'), function (req, res) {
 });
 
 
-router.get('/:id', function (req, res) {
-    // Project child process spawning stuff 
+router.get('/:id', async function (req, res) {
+    // View project details
     const id = req.params.id;
-    Project.findOne({ _id: id })
-        .then(async project => {
-            console.log('Before');
-            await project.startjob();
-            console.log('After')
-            res.render('project', { title: 'Project', project: project });
-        })
-        .catch(error => {
-            req.flash('error', error.message);
-            res.redirect('/projects');
-        });
+    if (req.query.json === 'true') {
+        const project = await Project.findOne({_id: id});
+        res.status(200).json(project);
+    } else {
+        Project.findOne({ _id: id })
+            .then(async project => {
+                console.log('Before');
+                await project.startjob();
+                console.log('After')
+                res.render('project', { title: 'Project', project: project });
+            })
+            .catch(error => {
+                req.flash('error', error.message);
+                res.redirect('/projects');
+            });
+    }
 
+});
+
+router.put('/:id', function (req, res) {
+    // Project child process spawning stuff 
+    // Process status updating - start, stop aka cancel
+    res.redirect('/');
 });
 
 

@@ -1,6 +1,7 @@
 const mongoose = require('../server');
 const { spawn } = require('child_process');
-const cp = require('child_process');
+const { exec } = require('child_process');
+const path = require('path');
 
 const types = new Map([
     ['qa', 'Quality Assessment'],
@@ -34,6 +35,10 @@ var project = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
+    process_id: {
+        type: Number,
+        default: 0
+    },
     created: {
         type: Date,
         default: Date.now
@@ -47,19 +52,28 @@ project.pre('save', function(next) {
     next();
 });
 
-project.methods.startjob = async function () {
-    const child = spawn('node',['test.js']);
-    console.log(child.pid);
+project.methods.startjob = function () {
+    var child;
+    if(process.platform.search('^win') !== -1) {
+        child = spawn('ping',['-n 10 heise.de'],{shell: true});
+    } else {
+        child = spawn('ping',['-c 10 heise.de']);
+    }
+
+    const fs = require('fs');
+    const out = fs.createWriteStream(path.join(__dirname, 'outfile.txt'));
+
+    child.stdout.pipe(out);
     
     child.stdout.on('data', (data) => {
-        console.log(`data: ${data.toString()}`);
+        console.log(`data (${data.toString().length} | ${data.byteLength}): ${data.toString()}`);
         if(data.includes('5')) {
-            if(process.platform.search('^win') !== -1){
+            if(process.platform.search('^win') !== -1 && !child.killed){
                 try {
-                    cp.exec('taskkill /PID ' + child.pid + '/F /T', function (error, stdout, sterr){
-                        console.log(`error: ${error}`);
-                        console.log(`stdout: ${stdout}`);
-                        console.log(`stderr: ${stderr}`);
+                    exec('taskkill /PID ' + child.pid + ' /F /T', function (error, stdout, stderr){
+                        error ? console.log(`error: ${error}`) : '';
+                        stdout ? console.log(`stdout: ${stdout}`) : '';
+                        stderr ? console.log(`stderr: ${stderr}`) : '';
                     });
                 } catch (error) {
                     console.log(error);
@@ -70,9 +84,9 @@ project.methods.startjob = async function () {
             }
         }
     });
-    child.on('exit', (status) => console.log(`child exit status: ${status}`));
+    child.on('exit', (status, signal) => console.log(`child exit status: ${status} and signal ${signal}`));
     child.on('close', (code, signal) => console.log(`child closed with code ${code} and signal ${signal}`));
     child.on('error', (error) => console.log(`child exited with error: ${error}`));
 }
 
-const Project = module.exports = mongoose.model('Project', project);
+module.exports = mongoose.model('Project', project);

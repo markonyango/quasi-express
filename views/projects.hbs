@@ -1,23 +1,38 @@
 {{#if projects}}
-<table class="table table-hover table-sm table-responsive-sm">
-    <th>Project Name</th>
-    <th>Project Type</th>
-    <th>Settings</th>
-    <th>Files</th>
-    <th>Created at</th>
-    <th>Status</th>
+<table class="table table-hover table-sm table-responsive-sm table-light">
+    <thead class='thead-dark'>
+        <th>Project Name</th>
+        <th>Project Type</th>
+        <th>Settings</th>
+        <th>Files</th>
+        <th>Created at</th>
+        <th>Status</th>
+    </thead>
     {{#each projects}}
-    <tr>
-        <td><a href="/projects/{{_id}}">{{this.projectname}}</a></td>
+    <tr data-toggle="collapse" data-target="#{{this._id}}" class="clickable">
+        <td>
+            <a href="/projects/{{_id}}">{{this.projectname}}</a>
+        </td>
         <td>{{this.projecttype}}</td>
         <td>{{this.settings}}</td>
         <td>{{this.files}}</td>
-        <td>{{this.created}}</td>
+        <td>{{formatDatum this.created}}</td>
         <td>{{this.status}}</td>
+    </tr>
+    <tr>
+        <td colspan="6" class="pt-0 pb-0">
+            <div class="collapse" id="{{this._id}}">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+                clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+                consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
+                sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no
+                sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
+        </td>
     </tr>
     {{/each}}
 </table>
 {{/if}}
+
 <p>&nbsp;</p>
 <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">Add Project</button>
 
