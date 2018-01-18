@@ -23,6 +23,7 @@ const passport = require('passport');
 const index = require('./routes/index');
 const users = require('./routes/users');
 const projects = require('./routes/projects');
+const settings = require('./routes/settings');
 
 // Initialize Express App
 var app = express();
@@ -36,11 +37,11 @@ app.set('view engine', 'hbs');
 app.use(compression());
 
 // Morgan middleware setup
-const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), {flags: 'a'});
-app.use(logger('dev',{stream: morganlog}));
+const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
+app.use(logger('dev', { stream: morganlog }));
 // Bodyparser and Cookieparser middleware
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Express session - this must come after the cookieParser()
@@ -76,6 +77,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/settings', ensureAuthenticated, settings)
 app.use('/projects', ensureAuthenticated, projects);
 
 // catch 404 and forward to error handler
@@ -98,7 +100,7 @@ app.use(function (err, req, res) {
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {
-  if(req.isAuthenticated()) {
+  if (req.isAuthenticated()) {
     return next();
   } else {
     req.flash('error_msg', 'You are not logged in');

@@ -79,9 +79,7 @@ router.get('/:id', async function (req, res) {
     } else {
         Project.findOne({ _id: id })
             .then(async project => {
-                console.log('Before');
                 await project.startjob();
-                console.log('After')
                 res.render('project', { title: 'Project', project: project });
             })
             .catch(error => {

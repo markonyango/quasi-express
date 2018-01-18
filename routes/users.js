@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const mongoose = require('mongoose');
 
 const User = require('../server/schema/user');
 
@@ -53,7 +54,7 @@ passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'passwor
 );
 
 passport.serializeUser(function (user, done) {
-  done(null, user.id);
+  done(null, user);
 });
 
 passport.deserializeUser(function (id, done) {
@@ -74,5 +75,7 @@ router.get('/logout', function (req, res) {
   req.flash('success_msg', 'You are now logged out');
   res.redirect('/users/login');
 });
+
+
 
 module.exports = router;

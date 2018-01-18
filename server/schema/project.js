@@ -18,9 +18,9 @@ var project = new Schema({
         type: String,
         required: true
     },
-    settings: { 
-        type: [], 
-        required: true 
+    settings: {
+        type: [],
+        required: true
     },
     files: {
         type: [],
@@ -28,7 +28,7 @@ var project = new Schema({
     },
     status: {
         type: String,
-        enum: ['running','queued','done','failed'],
+        enum: ['running', 'queued', 'done', 'failed'],
         required: true
     },
     uid: {
@@ -45,32 +45,49 @@ var project = new Schema({
     }
 });
 
-project.pre('save', function(next) {
-    var project = this;
-    project.projecttype = types.get(project.projecttype);
+project.pre('save',
+    next => {
+        var project = this;
+        if (types.has(project.projecttype)) {
+            project.projecttype = types.get(project.projecttype);
+        }
 
-    next();
-});
+        next();
+    }, error => {
+        console.log(error);
+    });
 
 project.methods.startjob = function () {
-    var child;
-    if(process.platform.search('^win') !== -1) {
-        child = spawn('ping',['-n 10 heise.de'],{shell: true});
+    var child,
+        project = this;
+
+    if (process.platform.search('^win') !== -1) {
+        child = spawn('ping', ['-n 10 heise.de'], { shell: true });
     } else {
-        child = spawn('ping',['-c 10 heise.de']);
+        child = spawn('ping', ['-c 10 heise.de'], { shell: true });
     }
+
+    child.once('data', () => { project.status = 'running'; project.save() });
 
     const fs = require('fs');
     const out = fs.createWriteStream(path.join(__dirname, 'outfile.txt'));
 
-    child.stdout.pipe(out);
-    
+    //child.stdout.pipe(out);
+
+    out.on('error', (error) => console.log(`Error occured:\n${error}`));
+    out.on('pipe', (src) => console.log(src + 'piped'));
+    out.on('unpipe', (src) => console.log(src + 'unpiped'));
+    out.on('finish', () => console.log('Out: finish'));
+    out.on('end', () => console.log('Out: end'));
+
+
     child.stdout.on('data', (data) => {
-        console.log(`data (${data.toString().length} | ${data.byteLength}): ${data.toString()}`);
-        if(data.includes('5')) {
-            if(process.platform.search('^win') !== -1 && !child.killed){
+        process.stdout.write(`data (${data.toString().length} | ${data.byteLength}): ${data.toString()}`);
+        out.write(data);
+        if (data.includes('5')) {
+            if (process.platform.search('^win') !== -1 && !child.killed) {
                 try {
-                    exec('taskkill /PID ' + child.pid + ' /F /T', function (error, stdout, stderr){
+                    exec('taskkill /PID ' + child.pid + ' /F /T', function (error, stdout, stderr) {
                         error ? console.log(`error: ${error}`) : '';
                         stdout ? console.log(`stdout: ${stdout}`) : '';
                         stderr ? console.log(`stderr: ${stderr}`) : '';
@@ -78,14 +95,28 @@ project.methods.startjob = function () {
                 } catch (error) {
                     console.log(error);
                 }
-                
+
             } else {
                 process.kill(child.pid, 'SIGKILL');
             }
         }
     });
-    child.on('exit', (status, signal) => console.log(`child exit status: ${status} and signal ${signal}`));
-    child.on('close', (code, signal) => console.log(`child closed with code ${code} and signal ${signal}`));
+    // child.on('exit', (code, signal) => console.log(`child exit code: ${code} and signal ${signal}`));
+    child.on('exit', (code, signal) => {
+        switch(code) {
+            case 0:
+            out.write(`child closed with code ${code} and signal ${signal}`,(data) => console.log(`write function: ${data}`));
+            out.close();
+            break;
+
+            default:
+            out.write(`child (${child.pid}) did not go down quietly! Exit code was ${code} - ${signal}`,(data) => console.log(data));
+            out.close();
+            break;
+        }
+            
+        
+    });
     child.on('error', (error) => console.log(`child exited with error: ${error}`));
 }
 

@@ -1,0 +1,29 @@
+<div class="container">
+    <h2>Settings for {{user.email}}</h2>
+    <form style="width: 75%" id="form_settings" name="form_settings" method="POST" action="/settings">
+        <div class="form-group row">
+            <label class="col-sm-4 col-form-label">Path to Rscript executable:</label>
+            <input class="col-sm-8 form-control" type="text" name="rpath" {{#if user.settings.r_path}} value="{{user.settings.r_path}}"
+                {{else}} placeholder="Absolute path to your R installation directory" {{/if}}>
+        </div>
+        <div class="form-goup row">
+            <label class="col-sm-4 col-form-lable">Where to store files:</label>
+            <input class="col-sm-8 form-control" type="text" name="savepath" {{#if user.settings.save_path}} value="{{user.settings.save_path}}"
+                {{else}} placeholder="Absolute path to your save folder" {{/if}}>
+        </div>
+        <div class="form-group row pt-3">
+            <button class="offset-sm-4 btn btn-sm btn-success" type="submit">Save Settings</button>
+        </div>
+        <div class="form-group row">
+            <div class="offset-sm-4 alert alert-success alert-sm alert-dismissible fade p-1" role="alert" id="ret_status">
+                <span class="small text-muted">New settings saved!</span>
+            </div>
+        </div>
+    </form>
+    <p class="pt-5">
+        <form id="form_remove_user">
+            <button type="submit" class="btn btn-sm btn-danger">Remove Account</button>
+            <span class="font-weight-bold ml-3">All your data will be removed permanently!</span>
+        </form>
+    </p>
+</div>
