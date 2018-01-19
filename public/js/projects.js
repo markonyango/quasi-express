@@ -35,7 +35,6 @@ $(document).ready(function () {
             },
             complete: function () {
                 console.log("Completed upload");
-                $('span[name="status"]').text("Completed upload");
             },
             success: function (res) {
                 console.log("Form data was successfully uploaded", res);
@@ -48,7 +47,7 @@ $(document).ready(function () {
             },
             error: function (res) {
                 console.log(res);
-                $('span[name="status"]').text("Upload returned with an error! Check the console.");
+                $('span[name="status"]').text(res.responseJSON.message);
             },
             xhr: function () {
                 // get the native XmlHttpRequest object
@@ -65,5 +64,80 @@ $(document).ready(function () {
                 return xhr;
             }
         });
-    })
+    });
+
+    // Starting and Stoping projects
+    $('button[name="start_project"]').click(function() {
+        const pid = $(this)[0].attributes.pid.value;
+        
+        $.ajax({
+            type: 'PUT',
+            url: '/projects/' + pid + '/start',
+            dataType: 'json',
+
+            success: function(...data) {
+                // The server responds with 3 items in the data aray: 
+                // the project object from the MongoDB, "success" and the response object
+                const project = data[0];
+                
+                project.status === 'running' ? window.location = '/projects' : alert('Could not start project. Contact admin.');
+            },
+            error: function(error) {
+                console.log('error: ', + error);
+            },
+            complete: function() {
+                // console.log('complete: ', + data);
+            }
+        });
+    });
+
+    $('button[name="stop_project"]').click(function() {
+        const pid = $(this)[0].attributes.pid.value;
+        
+        $.ajax({
+            type: 'PUT',
+            url: '/projects/' + pid + '/stop',
+            dataType: 'json',
+
+            success: function(...data) {
+                // The server responds with 3 items in the data aray: 
+                // the project object from the MongoDB, "success" and the response object
+                const project = data[0];
+                
+                project.status === 'stopped' ? window.location = '/projects' : alert('Could not stop project. Contact admin.');
+            },
+            error: function(error) {
+                console.log('error: ', + error);
+            },
+            complete: function() {
+                // console.log('complete: ', + data);
+            }
+        });
+    });
+
+    $('button[name="remove_project"]').click(function() {
+        const pid = $(this)[0].attributes.pid.value;
+        
+        $.ajax({
+            type: 'PUT',
+            url: '/projects/' + pid + '/remove',
+            dataType: 'json',
+
+            success: function(...data) {
+                // The server responds with 3 items in the data aray: 
+                // the project object from the MongoDB, "success" and the response object
+                // data.forEach(item => console.log(item));
+                const project = data[0];
+                
+                project._id === pid && data[1] === 'success' ? window.location = '/projects' : alert('Could not remove project. Contact admin.');
+            },
+            error: function(error) {
+                console.log('error: ', + error);
+            },
+            complete: function() {
+                // console.log('complete: ', + data);
+            }
+        });
+    });
+
 });

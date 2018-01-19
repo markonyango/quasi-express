@@ -37,26 +37,27 @@ body * {
 }
 
 /* Progress Bars */
-
 .progress-bar {
   background: #333333;
   color: #ffffff;
 }
 
-/* Breadcrumb
-
-.breadcrumb {
-  margin-top: 15px;
-  background: #cccccc;
-  color: #333333;
-}
-
-.breadcrumb a {
-  color: #333333;
-} */
-
 /* Navbar logout hover styling */
 .logout a:hover {
+  cursor: pointer;
+}
+
+
+
+
+/* Projects styling */
+button[name="start_project"],button[name="stop_project"],
+button[name="remove_project"] {
+  padding: 0;
+  margin: 0px 0px 0px 10px !important;
+  text-decoration: none;
+  border: none;
+  background-color: rgba(255, 255, 255, 0);
   cursor: pointer;
 }
 
@@ -75,6 +76,7 @@ body * {
   #breadcrumb {
       display: none;
   }
+
 }
 
 /* Small screens */
@@ -90,11 +92,18 @@ body * {
   nav {
       margin-bottom: 15px !important;
   }
+}
 
-  /* #main > .row > div {
-      padding-left: 5px !important;
-      padding-right: 5px !important;
-      margin-left: 5px !important;
-      margin-right: 5px !important;
-  } */
+@media only screen and (max-width: 1100px) {
+  td[name="files"],th[name="files"],
+  td[name="created_at"],th[name="created_at"] {
+    display: none !important;
+  }
+}
+
+@media only screen and (max-width: 360px) {
+  td[name="settings"],th[name="settings"],
+  td[name="projecttype"],th[name="projecttype"] {
+    display: none !important;
+  }
 }

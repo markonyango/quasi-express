@@ -28,7 +28,7 @@ var project = new Schema({
     },
     status: {
         type: String,
-        enum: ['running', 'queued', 'done', 'failed'],
+        enum: ['running', 'queued', 'done', 'failed', 'stopped'],
         required: true
     },
     uid: {
@@ -46,7 +46,7 @@ var project = new Schema({
 });
 
 project.pre('save',
-    next => {
+    function(next)  {
         var project = this;
         if (types.has(project.projecttype)) {
             project.projecttype = types.get(project.projecttype);

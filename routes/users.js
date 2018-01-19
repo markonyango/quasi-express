@@ -15,19 +15,30 @@ router.post('/register', function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
-  // Validation - later maybe
+  // Validation
+  req.check('email', 'Invalid email address').isEmail();
+  req.check('password', 'Password must be at least 6 characters long').isLength({ min: 6 });
 
-  // newUser is the document that will enter the 'users' collection
-  const newUser = new User({ email: email, password: password });
+  var errors = req.validationErrors();
+  if (errors) {
+    var error_msg = '';
+    errors.forEach(err => error_msg += err.msg + '; ');
+    req.flash('error_msg',error_msg);
+    res.redirect('/users/register');
+  } else {
 
-  newUser.save(function (err) {
-    if (err) {
-      req.flash('error_msg', err);
-      res.redirect('/register');
-    } else {
-      res.render('register', { title: 'Registration', data: newUser.email });
-    }
-  });
+    // newUser is the document that will enter the 'users' collection
+    const newUser = new User({ email: email, password: password });
+
+    newUser.save(function (err) {
+      if (err) {
+        req.flash('error_msg', err);
+        res.redirect('/register');
+      } else {
+        res.render('register', { title: 'Registration', data: newUser.email });
+      }
+    });
+  }
 
 });
 

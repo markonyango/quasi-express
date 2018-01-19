@@ -11,7 +11,7 @@ var storage = multer.diskStorage({
         cb(null, './uploads/')
     },
     filename: function (req, file, cb) {
-        const uid = req.session.passport.user;
+        const uid = req.session.passport.user._id;
         cb(null, '[' + uid + ',' + Date.now() + ']-' + file.originalname)
     }
 });
@@ -41,7 +41,7 @@ router.get('/', function (req, res) {
 });
 
 
-router.post('/upload', upload.array('files'), function (req, res) {
+router.post('/upload', upload.array('files'), async function (req, res) {
 
     const files = req.files;
     const projectname = req.body.projectname;
@@ -64,9 +64,16 @@ router.post('/upload', upload.array('files'), function (req, res) {
         project.files.push(file.filename);
     }
 
-    project.save()
-        .then(res.sendStatus(200))
-        .catch(error => res.send(500).json(error));
+    console.log(project);
+
+    try {
+        const result = await project.save();
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+        // .then(res.sendStatus(200))
+        // .catch(error => res.status(500).json(error));
 });
 
 
@@ -74,7 +81,7 @@ router.get('/:id', async function (req, res) {
     // View project details
     const id = req.params.id;
     if (req.query.json === 'true') {
-        const project = await Project.findOne({_id: id});
+        const project = await Project.findOne({ _id: id });
         res.status(200).json(project);
     } else {
         Project.findOne({ _id: id })
@@ -90,10 +97,29 @@ router.get('/:id', async function (req, res) {
 
 });
 
-router.put('/:id', function (req, res) {
+router.put('/:id/:action', async function (req, res) {
     // Project child process spawning stuff 
     // Process status updating - start, stop aka cancel
-    res.redirect('/');
+    // res.redirect('/');
+    const pid = req.params.id;
+    const action = req.params.action;
+
+    const project = await Project.findById(pid);
+
+    if (action === 'start') {
+        project.status = 'running';
+        const result = await project.save();
+        res.json(result);
+    } else if (action === 'stop') {
+        project.status = 'stopped';
+        const result = await project.save();
+        res.json(result);
+    } else if (action === 'remove') {
+        const result = await project.remove();
+        console.log(result);
+        res.json(result);
+    }
+
 });
 
 

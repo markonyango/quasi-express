@@ -1,36 +1,39 @@
 {{#if projects}}
-<table class="table table-hover table-sm table-responsive-sm table-light">
-    <thead class='thead-dark'>
-        <th>Project Name</th>
-        <th>Project Type</th>
-        <th>Settings</th>
-        <th>Files</th>
-        <th>Created at</th>
-        <th>Status</th>
-    </thead>
-    {{#each projects}}
-    <tr data-toggle="collapse" data-target="#{{this._id}}" class="clickable">
-        <td>
-            <a href="/projects/{{_id}}">{{this.projectname}}</a>
-        </td>
-        <td>{{this.projecttype}}</td>
-        <td>{{this.settings}}</td>
-        <td>{{this.files}}</td>
-        <td>{{formatDatum this.created}}</td>
-        <td>{{this.status}}</td>
-    </tr>
-    <tr>
-        <td colspan="6" class="pt-0 pb-0">
-            <div class="collapse" id="{{this._id}}">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-                clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
-                consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-                sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no
-                sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
-        </td>
-    </tr>
-    {{/each}}
-</table>
+<div class="table-responsive-sm">
+    <table class="table table-hover table-sm table-light">
+        <thead class='thead-dark'>
+            <th>Project Name</th>
+            <th name="projecttype">Project Type</th>
+            <th name="settings">Settings</th>
+            <th name="files">Files</th>
+            <th name="created_at">Created at</th>
+            <th name="status">Status</th>
+        </thead>
+        {{#each projects}}
+        <tr>
+            <td>
+                <i class="fas fa-plus-square" data-toggle="collapse" data-target="#{{this._id}}" class="clickable"></i>
+                <a href="/projects/{{_id}}" class="ml-2">{{this.projectname}}</a>
+            </td>
+            <td name="projecttype">{{this.projecttype}}</td>
+            <td name="settings">{{this.settings}}</td>
+            <td name="files">{{this.files}}</td>
+            <td name="created_at">{{formatDatum this.created}}</td>
+            <td name="status">{{status this.status this._id}}</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="pt-0 pb-0">
+                <div class="collapse" id="{{this._id}}">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
+                    et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                    Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor
+                    sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
+                    aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
+                    kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
+            </td>
+        </tr>
+        {{/each}}
+    </table>
+</div>
 {{/if}}
 
 <p>&nbsp;</p>

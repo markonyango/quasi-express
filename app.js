@@ -10,6 +10,7 @@ const compression = require('compression');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
+const expressValidator = require('express-validator');
 
 // Register Custom HandlebarsHelpers
 require('./handlebar_helpers');
@@ -43,6 +44,7 @@ app.use(logger('dev', { stream: morganlog }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(expressValidator());
 
 // Express session - this must come after the cookieParser()
 app.use(session({
