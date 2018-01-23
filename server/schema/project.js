@@ -45,7 +45,7 @@ var project = new Schema({
 });
 
 project.pre('save',
-    function(next)  {
+    function (next) {
         var project = this;
         if (types.has(project.projecttype)) {
             project.projecttype = types.get(project.projecttype);
@@ -62,11 +62,16 @@ project.methods.startjob = async function () {
 
     project.status = 'running';
     const res = await project.save();
-    console.log(res);
-    
-    const job_handler = path.join(__dirname,'../run_project.js');
+
+    const job_handler = path.join(__dirname, '../run_project.js');
     forked = fork(job_handler);
-    forked.send('Hello');
+    forked.send(res.projectname);
+    forked.on('exit', () => {
+        project.status = 'done';
+        project.save()
+    });
+
+    return res;
 }
 
 module.exports = mongoose.model('Project', project);

@@ -1,9 +1,12 @@
-// const path = require('path');
-// const fs = require('fs');
+const path = require('path');
+const fs = require('fs');
+const job = require('./job');
 
 process.on('message', function (msg) {
   console.log(msg);
-  process.exit(0);
+  setTimeout(() => {
+    process.exit(0);
+  }, 10000);
 });
 
 process.on('exit', function (code, signal) {
@@ -17,3 +20,7 @@ process.on('exit', function (code, signal) {
     break;
 }
 });
+
+const quality_assessment = function() {
+
+}

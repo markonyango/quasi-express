@@ -72,8 +72,8 @@ router.post('/upload', upload.array('files'), async function (req, res) {
     } catch (error) {
         res.status(500).json(error);
     }
-        // .then(res.sendStatus(200))
-        // .catch(error => res.status(500).json(error));
+    // .then(res.sendStatus(200))
+    // .catch(error => res.status(500).json(error));
 });
 
 
@@ -84,15 +84,12 @@ router.get('/:id', async function (req, res) {
         const project = await Project.findOne({ _id: id });
         res.status(200).json(project);
     } else {
-        Project.findOne({ _id: id })
-            .then(async project => {
-                await project.startjob();
-                res.render('project', { title: 'Project', project: project });
-            })
-            .catch(error => {
-                req.flash('error', error.message);
-                res.redirect('/projects');
-            });
+        const project = await Project.findOne({ _id: id })
+        res.render('project', { title: 'Project', project: project });
+        // project.catch(error => {
+        //     req.flash('error', error.message);
+        //     res.redirect('/projects');
+        // });
     }
 
 });
