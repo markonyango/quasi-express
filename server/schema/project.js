@@ -58,8 +58,8 @@ project.pre('save',
     });
 
 project.methods.startjob = function () {
-    var child,
-        project = this;
+    var child;
+    var project = this;
 
     if (process.platform.search('^win') !== -1) {
         child = spawn('ping', ['-n 10 heise.de'], { shell: true });
