@@ -107,8 +107,7 @@ router.put('/:id/:action', async function (req, res) {
     const project = await Project.findById(pid);
 
     if (action === 'start') {
-        project.status = 'running';
-        const result = await project.save();
+        const result = await project.startjob();
         res.json(result);
     } else if (action === 'stop') {
         project.status = 'stopped';
