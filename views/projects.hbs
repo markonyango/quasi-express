@@ -23,12 +23,16 @@
         </tr>
         <tr>
             <td colspan="6" class="pt-0 pb-0">
-                <div class="collapse" id="{{this._id}}">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-                    et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                    Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor
-                    sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
-                    aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
-                    kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
+                <div class="collapse" id="{{this._id}}">
+                    <ul class="list-unstyled small mt-2 ml-2 mb-2">
+                        <li>Project Type: {{this.projecttype}}</li>
+                        <li>Status: {{this.status}}</li>
+                        <li>Proccess ID: {{this.pid}}</li>
+                        <li>Settings: {{this.settings}}</li>
+                        <li>Files: {{this.files}}</li>
+                        <li>Created at: {{formatDatum this.created}}</li>
+                    </ul>
+                </div>
             </td>
         </tr>
         {{/each}}

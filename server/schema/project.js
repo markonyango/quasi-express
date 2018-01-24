@@ -34,7 +34,7 @@ var project = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    process_id: {
+    pid: {
         type: Number,
         default: 0
     },
@@ -60,18 +60,35 @@ project.methods.startjob = async function () {
     var forked;
     var project = this;
 
-    project.status = 'running';
-    const res = await project.save();
-
     const job_handler = path.join(__dirname, '../run_project.js');
     forked = fork(job_handler);
-    forked.send(res.projectname);
+
     forked.on('exit', () => {
         project.status = 'done';
         project.save()
     });
 
+    project.pid = forked.pid;
+    project.status = 'running';
+    const res = await project.save();
+
     return res;
+}
+
+project.methods.stopjob = async function () {
+    var project = this;
+
+    project.status = 'stopped';
+    project.pid = 0;
+    const res = await project.save();
+
+    return res;
+}
+
+project.methods.remove = async function () {
+    var project = this;
+
+    project.remove()
 }
 
 module.exports = mongoose.model('Project', project);

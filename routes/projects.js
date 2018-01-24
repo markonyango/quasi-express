@@ -107,8 +107,7 @@ router.put('/:id/:action', async function (req, res) {
         const result = await project.startjob();
         res.json(result);
     } else if (action === 'stop') {
-        project.status = 'stopped';
-        const result = await project.save();
+        const result = await project.stopjob();
         res.json(result);
     } else if (action === 'remove') {
         const result = await project.remove();
