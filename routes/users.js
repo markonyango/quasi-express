@@ -3,15 +3,16 @@ const router = express.Router();
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const mongoose = require('mongoose');
+const to = require('../catchError');
 
 const User = require('../server/schema/user');
 
 /* GET users listing. */
-router.get('/register', function (req, res, next) {
+router.get('/register', function (req, res) {
   res.render('register', { title: 'Registration' });
 });
 
-router.post('/register', function (req, res, next) {
+router.post('/register', function (req, res) {
   const email = req.body.email;
   const password = req.body.password;
 
@@ -23,26 +24,26 @@ router.post('/register', function (req, res, next) {
   if (errors) {
     var error_msg = '';
     errors.forEach(err => error_msg += err.msg + '; ');
-    req.flash('error_msg',error_msg);
+    req.flash('error_msg', error_msg);
     res.redirect('/users/register');
   } else {
 
     // newUser is the document that will enter the 'users' collection
     const newUser = new User({ email: email, password: password });
 
-    newUser.save(function (err) {
-      if (err) {
-        req.flash('error_msg', err);
-        res.redirect('/register');
-      } else {
-        res.render('register', { title: 'Registration', data: newUser.email });
-      }
-    });
+    let [error, res] = to(newUser.save());
+
+    if (error) {
+      req.flash('error_msg', 'Something went wrong while registering you: ' + error);
+      res.redirect('/register');
+    } else {
+      res.render('register', { title: 'Registration', data: newUser.email });
+    }
   }
 
 });
 
-router.get('/login', function (req, res, next) {
+router.get('/login', function (req, res) {
   res.render('login', { title: 'Login' })
 });
 
