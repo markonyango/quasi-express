@@ -1,16 +1,17 @@
-const app = require('./app');
 const { assert } = require('chai');
-const path = require('path');
+const fetch = require('node-fetch');
+const to = require('./catchError');
+const fs = require('fs');
+const FormData = require('form-data');
 
-describe('App', function() {
-  it('should have view folder', function() {
-    const result = app.settings.views;
-    assert.equal(path.join(__dirname, 'views'), result);
-  });
+const project_routes = require('./tests/project-routes');
+const user_routes = require('./tests/user-routes');
 
-  describe('Routes', function() {
-    it('Project Route GET / returns MongoDB object', function() {
-      //blahbla
-    });
+describe('App', function () {
+  describe('Routes', function () {
+    describe('Users', user_routes);
+    describe('Projects', project_routes);
   });
 });
+
+

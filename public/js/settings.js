@@ -12,7 +12,7 @@ $(document).ready(function() {
 
         $.ajax({
             type: 'POST',
-            url: '/settings/remove',
+            url: '/users/remove',
             data: formData ? formData : form.serialize,
             processData: false, 
             contentType: false,

@@ -1,37 +1,38 @@
-const path = require('path');
-const fs = require('fs');
-const { spawn } = require('child_process');
 
-const job = spawn()
+const payload = {
+  msg: '',
+  result: 0
+}
 
 process.on('message', function (msg) {
 
-  console.log(msg);
-  setTimeout(() => {
-    process.exit(0);
-  }, 10000);
-});
-
-process.on('exit', function (code, signal) {
-  switch (code) {
-    case 0:
-      console.log(`child closed with code ${code} and signal ${signal}`);
+  switch (msg) {
+    case 'start':
+      console.log('Starting the job...');
+      start_job();
+      break;
+    case 'stop':
+      console.log('Stopping the job...');
+      process.exit(0);
+      break;
+    case 'ping':
+      console.log('pong');
       break;
 
     default:
-      console.log(`child (${process.pid}) did not go down quietly! Exit code was ${code} - ${signal}`);
+      console.log('Nothing to do here...Exiting');
+      process.exit(1);
       break;
   }
 });
 
-const quality_assessment = function () {
 
-}
+const start_job = function () {
+  setTimeout(() => {
 
-const start_job = function(){
+    payload.msg = 'Done'
+    payload.result = 0;
 
-}
-
-const kill_job = function(pid) {
-  job.kill('SIGKILL')
+    process.send(payload)
+  }, 5000);
 }

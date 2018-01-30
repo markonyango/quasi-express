@@ -6,17 +6,19 @@ const mongoose = require('mongoose');
 const to = require('../catchError');
 
 const User = require('../server/schema/user');
+const Project = require('../server/schema/project');
 
 /* GET users listing. */
 router.get('/register', function (req, res) {
   res.render('register', { title: 'Registration' });
 });
 
-router.post('/register', function (req, res) {
+router.post('/register', async function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
   // Validation
+  req.check('email', 'Email address is empty').isLength({ min: 1 });
   req.check('email', 'Invalid email address').isEmail();
   req.check('password', 'Password must be at least 6 characters long').isLength({ min: 6 });
 
@@ -24,20 +26,29 @@ router.post('/register', function (req, res) {
   if (errors) {
     var error_msg = '';
     errors.forEach(err => error_msg += err.msg + '; ');
-    req.flash('error_msg', error_msg);
-    res.redirect('/users/register');
+    if (req.query.json === 'true') {
+      res.json(error_msg);
+    } else {
+      req.flash('error_msg', error_msg);
+      res.redirect('/users/register');
+    }
   } else {
 
     // newUser is the document that will enter the 'users' collection
     const newUser = new User({ email: email, password: password });
 
-    let [error, res] = to(newUser.save());
+    let [error, result] = await to(newUser.save());
 
-    if (error) {
-      req.flash('error_msg', 'Something went wrong while registering you: ' + error);
-      res.redirect('/register');
+    if (req.query.json === 'true') {
+      res.json(result);
     } else {
-      res.render('register', { title: 'Registration', data: newUser.email });
+
+      if (error) {
+        req.flash('error_msg', 'Something went wrong while registering you: ' + error);
+        res.redirect('/register');
+      } else {
+        res.render('register', { title: 'Registration', data: newUser.email });
+      }
     }
   }
 
@@ -86,6 +97,43 @@ router.get('/logout', function (req, res) {
   req.logout();
   req.flash('success_msg', 'You are now logged out');
   res.redirect('/users/login');
+});
+
+router.post('/remove', async function (req, res) {
+
+  // If JSON was requested
+  if (req.query.json === 'true') {
+    const uid = req.body.uid;
+    let [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
+    
+    if (error) {
+      res.json(error)
+    } else {
+      res.json(deleteProjects)
+    }
+  } else {
+
+    const uid = req.session.passport.user._id;
+    let [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
+
+    if (error) {
+      req.flash('error_msg', 'Something went wrong while deleting your projects: ' + error);
+      res.redirect('/');
+    } else {
+      let ret;
+      [error, ret] = await to(User.findByIdAndRemove(uid));
+
+      if (error) {
+        req.flash('error_msg', 'Something went wrong while deleting your profile: ' + error);
+        res.redirect('/');
+      } else {
+        req.clearCookie = true;
+        req.flash('success_msg', 'Your account has been successfully deleted.');
+        res.redirect('/');
+        req.session.destroy();
+      }
+    }
+  }
 });
 
 

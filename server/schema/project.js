@@ -1,6 +1,8 @@
 const mongoose = require('../server');
 const { fork } = require('child_process');
 const path = require('path');
+const to = require('../../catchError');
+const colors = require('colors');
 
 const types = new Map([
     ['qa', 'Quality Assessment'],
@@ -62,33 +64,76 @@ project.methods.startjob = async function () {
 
     const job_handler = path.join(__dirname, '../run_project.js');
     forked = fork(job_handler);
+    forked.send('start');
 
-    forked.on('exit', () => {
-        project.status = 'done';
-        project.save()
+
+    // Create the listener that will respond to user-triggered stop events
+    process.on('stop', function (project_id) {
+        project_id.toString() === project._id.toString() ? forked.send('stop') : null;
     });
+
+    // Creating the listener that will wait until the child_process is done
+    forked.on('exit', async (code, signal) => {
+        if (code === 0) {
+            project.status = 'done';
+            let [error, result] = await to(project.save());
+            error ? console.log('Something went wrong while updating projects status to done: ' + error) : null;
+        } else {
+            project.status = 'failed';
+            let [error, result] = await to(project.save());
+            error ? console.log('Something went wrong while updating projects status to done: ' + error) : null;
+            console.log(`child ${forked.pid} closed with code ${code} and signal ${signal}`);
+        }
+    });
+
+    // Creating the listener that will catch any errors from the child_process
+    forked.on('error', async (msg) => {
+        project.status = 'failed';
+        let [error, result] = await to(project.save());
+        error ? console.log('Something went wrong while updating projects status to failed: ' + error) : null;
+
+        console.log('Something went wrong while trying to start the child_process: ' + msg);
+    });
+
+    // Create the listener that reacts to messages from the child
+    forked.on('message', async function (msg) {
+        if (msg.msg && msg.msg === 'Done') {
+            console.log(msg);
+        }
+    })
 
     project.pid = forked.pid;
     project.status = 'running';
-    const res = await project.save();
+    let [error, res] = await to(project.save());
 
-    return res;
+    return error ? error : res;
 }
 
 project.methods.stopjob = async function () {
     var project = this;
 
     project.status = 'stopped';
-    project.pid = 0;
-    const res = await project.save();
+    project.pid = null;
+    process.emit('stop', project._id);
 
-    return res;
+    let [error, res] = await to(project.save());
+
+    error ? console.log('Something went wrong while trying to stop your project: ' + error) : console.log(`${project._id} stopped`.red);
+
+    return error ? error : res;
 }
 
-project.methods.remove = async function () {
+project.methods.removejob = async function () {
     var project = this;
 
-    project.remove()
+    if (project.status === 'running') {
+        console.log('Stopping project before deletion...')
+        process.emit('stop', project._id);
+    }
+
+    let [error, res] = await to(project.remove());
+
+    return error ? error : res;
 }
 
 module.exports = mongoose.model('Project', project);

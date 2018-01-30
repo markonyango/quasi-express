@@ -104,7 +104,7 @@ $(document).ready(function () {
                 // the project object from the MongoDB, "success" and the response object
                 const project = data[0];
                 
-                project.status === 'stopped' ? window.location = '/projects' : alert('Could not stop project. Contact admin.');
+                project.status === 'stopped' ? window.location = '/projects' : console.log('Could not stop project. Contact admin.' + JSON.stringify(data));
             },
             error: function(error) {
                 console.log('error: ', + error);
@@ -128,6 +128,9 @@ $(document).ready(function () {
                 // the project object from the MongoDB, "success" and the response object
                 // data.forEach(item => console.log(item));
                 const project = data[0];
+                data.forEach(function(item) {
+                    console.log(item)
+                })
                 
                 project._id === pid && data[1] === 'success' ? window.location = '/projects' : alert('Could not remove project. Contact admin.');
             },

@@ -27,6 +27,8 @@ Handlebars.registerHelper('status', (status, id) => {
             return new Handlebars.SafeString(safeString);
             
         case 'stopped':
-            return new Handlebars.SafeString('<button pid="' + id + '"name="start_project"><i class="fas fa-play" style="color:green"></i></button>') // TODO: Change this!!!!!
+            var safeString =    '<button pid="' + id + '"name="start_project"><i class="fas fa-play" style="color:green"></i></button>' +
+                                '<button pid="' + id + '" name="remove_project"><i class="fas fa-trash-alt"></i></button>';
+            return new Handlebars.SafeString(safeString);
     }
 });

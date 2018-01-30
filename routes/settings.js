@@ -42,31 +42,4 @@ router.post('/', async function (req, res) {
     }
 });
 
-
-router.post('/remove', async function (req, res) {
-    const uid = req.session.passport.user._id;
-    let error, deleteProjects;
-
-    [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
-
-    if (error) {
-        req.flash('error_msg', 'Something went wrong while deleting your projects: ' + error);
-        res.redirect('/');
-    } else {
-        let ret;
-        [error, ret] = await to(User.findByIdAndRemove(uid));
-
-        if (error) {
-            req.flash('error_msg', 'Something went wrong while deleting your profile: ' + error);
-            res.redirect('/');
-        } else {
-            req.clearCookie = true;
-            req.flash('success_msg', 'Your account has been successfully deleted.');
-            res.redirect('/');
-            req.session.destroy();
-        }
-    }
-});
-
-
 module.exports = router;

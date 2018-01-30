@@ -38,8 +38,11 @@ app.set('view engine', 'hbs');
 app.use(compression());
 
 // Morgan middleware setup
-const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
-app.use(logger('dev', { stream: morganlog }));
+// const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
+// app.use(logger('dev', { stream: morganlog }));
+app.use(logger('dev',{
+  skip: function(req,res) { return /^\/js|^\/css|^\/ico/.test(req.url) }
+}));
 // Bodyparser and Cookieparser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -80,11 +83,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/settings', ensureAuthenticated, settings)
-app.use('/projects', ensureAuthenticated, projects);
+app.use('/projects', projects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  var err = new Error('Not Found');
+  var err = new Error(`Requested route (${req.originalUrl}) could not be found!`);
   err.status = 404;
   next(err);
 });
