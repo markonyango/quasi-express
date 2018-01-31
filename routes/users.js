@@ -104,12 +104,19 @@ router.post('/remove', async function (req, res) {
   // If JSON was requested
   if (req.query.json === 'true') {
     const uid = req.body.uid;
+    
     let [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
     
     if (error) {
       res.json(error)
     } else {
-      res.json(deleteProjects)
+      let [error, deleteUser] = await to(User.findOneAndRemove({ _id: mongoose.Types.ObjectId(uid) }));
+      
+      if (error) {
+        res.json(error);
+      } else {
+        res.json(deleteUser);
+      }
     }
   } else {
 

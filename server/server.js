@@ -10,4 +10,6 @@ mongoose.connect('mongodb://192.168.0.248:27017/quasi-express',
     }
 );
 
+mongoose.connection.on('disconnected', () => console.log('MongoDB connection shut down.'))
+
 module.exports = mongoose;
