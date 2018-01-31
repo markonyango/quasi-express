@@ -1,6 +1,5 @@
 const { assert } = require('chai');
 const fetch = require('node-fetch');
-const FormData = require('form-data');
 const to = require('../catchError');
 
 const User = require('../server/schema/user')
@@ -49,12 +48,15 @@ function user_routes() {
     if (user) {
       var body = { uid: user._id }
 
-      const res = await fetch('http://localhost:3000/users/remove?json=true', {
+      var res = await fetch('http://localhost:3000/users/remove?json=true', {
         method: 'POST',
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
       })
       assert.equal(res.status, 200)
+      res = await res.json()
+      assert.hasAllKeys(res, ['email', 'password', '_id', '__v', 'role'])
+      assert.equal(res.email, testuser)
     } else {
       new Error('No such user found')
     }

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const to = require('../catchError');
-const colors = require('colors');
 
 const Project = require('../server/schema/project');
 
