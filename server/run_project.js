@@ -1,12 +1,9 @@
+var projectsettings;
+var usersettings;
 
-const payload = {
-  msg: '',
-  result: 0
-}
+process.on('message', function (payload) {
 
-process.on('message', function (msg) {
-
-  switch (msg) {
+  switch (payload.msg) {
     case 'start':
       console.log('Starting the job...');
       start_job();
@@ -18,7 +15,10 @@ process.on('message', function (msg) {
     case 'ping':
       console.log('pong');
       break;
-
+    case 'settings':
+      projectsettings = payload.projectsettings;
+      usersettings = payload.usersettings;
+      break;
     default:
       console.log('Nothing to do here...Exiting');
       process.exit(1);
@@ -28,6 +28,12 @@ process.on('message', function (msg) {
 
 
 const start_job = function () {
+  
+  const payload = {
+    msg: '',
+    result: 0
+  }
+
   setTimeout(() => {
 
     payload.msg = 'Done'

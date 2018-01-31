@@ -58,18 +58,19 @@ project.pre('save',
         console.log(error);
     });
 
-project.methods.startjob = async function () {
+project.methods.startjob = async function (usersettings) {
     var forked;
     var project = this;
 
     const job_handler = path.join(__dirname, '../run_project.js');
     forked = fork(job_handler);
-    forked.send('start');
+    forked.send({ msg: 'settings', projectsettings: project.settings, usersettings: usersettings })
+    forked.send({ msg: 'start' });
 
 
     // Create the listener that will respond to user-triggered stop events
     process.on('stop', function (project_id) {
-        project_id.toString() === project._id.toString() ? forked.send('stop') : null;
+        project_id.toString() === project._id.toString() ? forked.send({ msg: 'stop' }) : null;
     });
 
     // Creating the listener that will wait until the child_process is done

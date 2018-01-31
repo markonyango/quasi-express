@@ -1,5 +1,5 @@
 const { assert } = require('chai');
-const fetch = require('node-fetch');
+const fetch = require('fetch-cookie')(require('node-fetch'));
 const to = require('../catchError');
 const fs = require('fs');
 const FormData = require('form-data');
@@ -10,7 +10,7 @@ const uid = '5a54c8c217cdf72718ca1420';
 var project_id = '';
 
 function project_routes() {
-
+  // console.log(cookie);
   it('Project Route POST /projects/upload creates test project', async function () {
     const form = new FormData;
     form.append('projectname', 'Test Project');
