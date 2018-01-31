@@ -40,8 +40,8 @@ app.use(compression());
 // Morgan middleware setup
 // const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
 // app.use(logger('dev', { stream: morganlog }));
-app.use(logger('dev',{
-  skip: function(req,res) { return /^\/js|^\/css|^\/ico/.test(req.url) }
+app.use(logger('dev', {
+  skip: function (req, res) { return /^\/js|^\/css|^\/ico/.test(req.url) }
 }));
 // Bodyparser and Cookieparser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -112,5 +112,17 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/users/login');
   }
 }
+
+var gracefulExit = function () {
+  require('./server/server').connection.close(function () {
+    console.log('Mongoose connection shut down by killing the Node app.');
+    process.exit(0);
+  })
+}
+
+process
+  .on('SIGINT', gracefulExit)
+  .on('SIGTERM', gracefulExit)
+  .on('SIGUSR2', gracefulExit)
 
 module.exports = app;
