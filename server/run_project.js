@@ -40,7 +40,7 @@ const start_job = function () {
   let r_path = usersettings.r_path;
   let save_path = usersettings.save_path;
 
-  fs.open(save_path, 'w', (err, fd) => {
+  fs.open(save_path, 'r', (err, fd) => {
     if (err) {
       if (err.code === 'ENOENT') {
         console.error(save_path + ' does not exist'.red);
@@ -52,7 +52,10 @@ const start_job = function () {
 
     console.log(`${save_path} is readable`.cyan);
     const out = spawn(path.join(__dirname, '../test.R'));
+    const logfile = fs.createWriteStream(path.join(save_path, 'logfile.txt'), {flags: 'a', encoding: 'utf8'});
 
+    // All stdout will go into this logfile in 'append' mode
+    out.stdout.pipe(logfile);
 
     out.stderr.on('data', (data) => console.log(data.toString()));
     out.stdout.on('data', (data) => console.log(data.toString().cyan));
