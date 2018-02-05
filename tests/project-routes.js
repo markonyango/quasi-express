@@ -54,9 +54,18 @@ async function project_routes() {
     assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
   });
 
-  it('Project Route PUT /projects/:id/start starts job', async function () {
-    var res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT');
-    assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
+  it('Project Route PUT /projects/:id/start starts job', function (done) {
+    // Since we are adding a timeout at the end of this test, we need to increase max. timeout
+    this.timeout(2500);
+    makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT')
+    .then(res => {
+      assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
+      setTimeout(() => {
+        // Give the test operation time to finish on its own before the next test is started
+        done()
+      },200)
+    })
+    .catch(error => assert.isNull(error))
   });
 
   it('Project Route PUT /projects/:id/:action can remove test project', async function () {
