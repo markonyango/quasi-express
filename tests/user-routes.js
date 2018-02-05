@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 const to = require('../catchError');
 
 const User = require('../server/schema/user')
-const server = require('../server/server')
 
 const testuser = 'test@user.com'
 const password = 'testuser'
@@ -61,11 +60,6 @@ function user_routes() {
       new Error('No such user found')
     }
   })
-
-  after(function(){
-    server.disconnect();
-    server.connection.close();
-  });
 }
 
 module.exports = user_routes;

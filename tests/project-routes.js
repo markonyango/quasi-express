@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const to = require('../catchError');
 const fs = require('fs');
 const FormData = require('form-data');
-const createUser = require('./createUser')
+const createUser = require('./createUser');
 
 
 // Set up some global test variables
@@ -20,7 +20,13 @@ async function project_routes() {
   // 
   before(async () => {
     opts.headers.cookie = await createUser();
-  })
+  });
+
+  after( async () => {
+    const Project = require ('../server/schema/project');
+    var projects = await Project.deleteMany({uid: uid});
+    assert.equal(projects.deletedCount,0, 'Leftover documents from the testrun were found!');
+  });
 
   it('Project Route POST /projects/upload creates test project', async function () {
     const form = new FormData;
