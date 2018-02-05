@@ -3,14 +3,25 @@ const fetch = require('node-fetch');
 const to = require('../catchError');
 const fs = require('fs');
 const FormData = require('form-data');
+const createUser = require('./createUser')
 
 
 // Set up some global test variables
 const uid = '5a54c8c217cdf72718ca1420';
 var project_id = '';
+const opts = {
+  headers: {
+    cookie: ''
+  }
+}
 
-function project_routes() {
+async function project_routes() {
   
+  // 
+  before(async () => {
+    opts.headers.cookie = await createUser();
+  })
+
   it('Project Route POST /projects/upload creates test project', async function () {
     const form = new FormData;
     form.append('projectname', 'Test Project');
@@ -48,8 +59,8 @@ function project_routes() {
   });
 
 
-  async function makeGetRequest(url, method, body) {
-    let [error, res] = await to(fetch(url, { method: method, body: body }));
+  async function makeGetRequest(url, method, body, headers) {
+    let [error, res] = await to(fetch(url, { method: method, body: body, headers: headers }));
     await assert.isNull(error, 'There was an error while making the request to the API (' + url + '): ' + error);
     await assert.equal(res.status, 200);
     res = await res.json()

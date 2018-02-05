@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 var createUser = async function () {
     var body = { 'email': 'mark', 'password': 'mark' }
 
@@ -10,7 +12,7 @@ var createUser = async function () {
     })
 
     res = await res.headers._headers['set-cookie'][0];
-    cookie = await res.split(';', 1)[0]
+    return await res.split(';', 1)[0]
 }
 
-module.exports = createUser;
+module.exports = createUser

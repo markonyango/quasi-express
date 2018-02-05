@@ -4,6 +4,7 @@ const multer = require('multer');
 const to = require('../catchError');
 
 const Project = require('../server/schema/project');
+const User = require('../server/schema/user');
 
 
 // Where do the file uploads go to
@@ -35,8 +36,7 @@ router.get('/', async function (req, res) {
     const uid = req.query.test === 'true' ? '5a54c8c217cdf72718ca1420' : req.session.passport.user;
 
     if (req.query.json === 'true') {
-        let error, projects;
-        [error, projects] = await to(Project.find({ uid: uid }));
+        let [error, projects] = await to(Project.find({ uid: uid }));
 
         if (error) {
             res.send(500).json(error)
@@ -44,8 +44,7 @@ router.get('/', async function (req, res) {
             res.status(200).json(projects);
         }
     } else {
-        let error, projects;
-        [error, projects] = await to(Project.find({ uid: uid }));
+        let [error, projects] = await to(Project.find({ uid: uid }));
         if (error) {
             req.flash('error_msg', 'Something went wrong while getting the list of projects: ' + error);
             res.redirect('/projects');
@@ -80,8 +79,7 @@ router.post('/upload', upload.array('files'), async function (req, res) {
         project.files.push(file.filename);
     }
 
-    let error, result;
-    [error, result] = await to(project.save());
+    let [error, result] = await to(project.save());
     error ? res.status(500).json(error) : res.status(200).json(result);
 });
 
@@ -96,17 +94,14 @@ router.get('/:id', async function (req, res) {
     // View project details
     const id = req.params.id;
     if (req.query.json === 'true') {
-
         var [error, project] = await to(Project.findOne({ _id: id, uid: uid }));
-
         if (error) {
             res.json(error)
         } else {
             res.status(200).json(project);
         }
     } else {
-        let error, project;
-        [error, project] = await to(Project.findOne({ _id: id, uid: uid }));
+        var [error, project] = await to(Project.findOne({ _id: id, uid: uid }));
         if (error) {
             req.flash('error', error);
             res.redirect('/projects');
@@ -127,8 +122,7 @@ router.put('/:id/:action', async function (req, res) {
     const pid = req.params.id;
     const action = req.params.action;
 
-    let error, project;
-    [error, project] = await to(Project.findOne({ _id: pid, uid: uid }));
+    let [error, project] = await to(Project.findOne({ _id: pid, uid: uid }));
 
     if (error) {
         req.flash('error_msg', 'There was a mistake with your PUT request: ' + error)
@@ -137,16 +131,19 @@ router.put('/:id/:action', async function (req, res) {
         let error, result;
         switch (action) {
             case 'start':
-                [error, result] = await to(project.startjob());
+                var usersettings;
+                const user = await User.findOne({_id: uid}).catch(error => console.log(error));
+                usersettings = await user.settings;
+                [error, result] = await to(project.startjob(usersettings));
                 error ? res.json(error) : res.json(result);
                 break;
             case 'stop':
                 [error, result] = await to(project.stopjob());
                 error ? res.json(error) : res.json(result);
                 break;
-            case 'remove':                
+            case 'remove':
                 [error, result] = await to(project.removejob());
-                
+
                 error ? res.json(error) : res.json(result);
                 break;
             default:

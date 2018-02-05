@@ -29,6 +29,20 @@ process.on('message', function (payload) {
 
 const start_job = function () {
   
+  let r_path = usersettings.r_path;
+  let save_path = usersettings.save_path;
+
+  let { spawn } = require('child_process');
+  let path = require('path')
+
+  const out = spawn(path.join(r_path,'Rscript.exe'), [path.join(__dirname,'../test.R')])
+  
+
+  out.stderr.on('data', (data) => console.log(data))
+  out.stdout.on('data', (data) => console.log(data))
+  out.on('close', (code) => console.log(`Exiting with code ${code}`))
+  out.on('error', (error) => console.log(error))
+  
   const payload = {
     msg: '',
     result: 0

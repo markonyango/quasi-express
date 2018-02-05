@@ -2,7 +2,6 @@ const mongoose = require('../server');
 const { fork } = require('child_process');
 const path = require('path');
 const to = require('../../catchError');
-const colors = require('colors');
 
 const types = new Map([
     ['qa', 'Quality Assessment'],
@@ -20,7 +19,7 @@ var project = new Schema({
         required: true
     },
     settings: {
-        type: [],
+        type: {},
         required: true
     },
     files: {
@@ -33,8 +32,9 @@ var project = new Schema({
         required: true
     },
     uid: {
-        type: Schema.Types.ObjectId,
-        required: true
+        type: Schema.ObjectId,
+        required: true,
+        ref: 'User'
     },
     pid: {
         type: Number,
@@ -59,12 +59,14 @@ project.pre('save',
     });
 
 project.methods.startjob = async function (usersettings) {
-    var forked;
     var project = this;
-
     const job_handler = path.join(__dirname, '../run_project.js');
-    forked = fork(job_handler);
-    forked.send({ msg: 'settings', projectsettings: project.settings, usersettings: usersettings })
+    const forked = fork(job_handler);
+    forked.send({ 
+        msg: 'settings', 
+        projectsettings: project.settings, 
+        usersettings: usersettings
+    });
     forked.send({ msg: 'start' });
 
 
@@ -100,6 +102,7 @@ project.methods.startjob = async function (usersettings) {
     forked.on('message', async function (msg) {
         if (msg.msg && msg.msg === 'Done') {
             console.log(msg);
+            forked.send({ msg: 'stop' })
         }
     })
 
@@ -135,6 +138,27 @@ project.methods.removejob = async function () {
     let [error, res] = await to(project.remove());
 
     return error ? error : res;
+}
+
+/*
+    @description Sets the settings of the current project document and saves the changes
+    @param {object} Object containing projects settings
+    @return Promise of the save function
+*/
+project.methods.setSettings = async function (settings) {
+    var project = this;
+
+    project.settings = settings;
+    return await project.save();
+}
+
+/*
+    @description Gets the settings of the current project document
+    @return Object containing the settings of the project document
+*/
+project.methods.getSettings = async function () {
+    var project = this;
+    return project.settings
 }
 
 module.exports = mongoose.model('Project', project);
