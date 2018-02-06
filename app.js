@@ -82,7 +82,7 @@ app.use(function (req, res, next) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Favicon middleware
-app.use(favicon(path.join(__dirname, 'public','favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'ico', 'favicon.ico')));
 
 app.use('/', index);
 app.use('/users', users);
