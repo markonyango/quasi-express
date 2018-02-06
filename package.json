@@ -32,6 +32,7 @@
     "passport-http": "^0.3.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.4.0",
+    "rxjs": "^5.5.6",
     "serve-favicon": "^2.4.5"
   },
   "devDependencies": {
