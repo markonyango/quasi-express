@@ -11,6 +11,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const expressValidator = require('express-validator');
+const favicon = require('serve-favicon');
 
 // Register Custom HandlebarsHelpers
 require('./handlebar_helpers');
@@ -79,6 +80,9 @@ app.use(function (req, res, next) {
 
 // Set static public folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Favicon middleware
+app.use(favicon(path.join(__dirname, 'public','favicon.ico')));
 
 app.use('/', index);
 app.use('/users', users);
