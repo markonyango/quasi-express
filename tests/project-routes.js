@@ -31,11 +31,11 @@ async function project_routes() {
   it('Project Route POST /projects/upload creates test project', async function () {
     const form = new FormData;
     form.append('projectname', 'Test Project');
-    form.append('projecttype', 'dea');
+    form.append('projecttype', 'qa');
     form.append('settings', 'null');
     form.append('status', 'queued');
     form.append('uid', uid);
-    form.append('files', fs.createReadStream('test.js'));
+    form.append('files', fs.createReadStream('test.fastq'));
 
     var res = await makeGetRequest('http://localhost:3000/projects/upload', 'POST', form);
     project_id = res._id;
@@ -59,7 +59,7 @@ async function project_routes() {
     this.timeout(2500);
     makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT')
     .then(res => {
-      assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
+      assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings'],res);
       setTimeout(() => {
         // Give the test operation time to finish on its own before the next test is started
         done()

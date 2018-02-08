@@ -19,15 +19,24 @@ var stopjob = async function () {
 
 var startjob = async function (usersettings) {
     var project = this;
-    const job_handler = path.join(__dirname, '../run_project.js');
-    const forked = fork(job_handler);
-    forked.send({ 
-        msg: 'settings', 
-        projectsettings: project.settings, 
-        usersettings: usersettings
-    });
-    forked.send({ msg: 'start' });
 
+    // Which Executor should be forked, according to the project type
+    const job_handler = path.join(__dirname, 'executors/qa.js');
+
+    // Fork Executor into new Node instance. IPC channel will be opened
+    const forked = fork(job_handler);
+
+    // Send this document via IPC to the forked child
+    // but populate the 'uid' path with the user settings first
+    try {
+        await project.populate('uid', 'settings').execPopulate()
+    } catch (error) {
+        console.log('Could not populate document: ' + error)
+    }
+    forked.send({
+        msg: 'project',
+        document: project
+    });
 
     // Create the listener that will respond to user-triggered stop events
     process.on('stop', function (project_id) {
@@ -59,7 +68,7 @@ var startjob = async function (usersettings) {
 
     // Create the listener that reacts to messages from the child
     forked.on('message', async function (msg) {
-        if (msg.msg && msg.msg === 'Done') {
+        if (msg.msg && msg.msg === 'done') {
             console.log('Recieved \'done\'')
             forked.send({ msg: 'stop' })
         }
@@ -68,6 +77,11 @@ var startjob = async function (usersettings) {
     project.pid = forked.pid;
     project.status = 'running';
     let [error, res] = await to(project.save());
+    
+    // Give the forked child the 'go-ahead'
+    // Send start here so we don't create race conditions
+    // for project.save() with the EventListeners
+    forked.send({ msg: 'start' });
 
     return error ? error : res;
 }

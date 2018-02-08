@@ -2,9 +2,9 @@ $(document).ready(function () {
 
     // Form evaluation stuff
     $('select[name="projecttype"]').on('change', function (event) {
-        const selected = $('select[name="projecttype"] option:selected').val();
+        const selected_projecttype = $('select[name="projecttype"] option:selected').val();
 
-        if (selected === 'dea') { $('#options_dea').show('fast', 'swing'); }
+        if (selected_projecttype === 'dea') { $('#options_dea').show('fast', 'swing'); }
         else { $('#options_dea').hide(); }
     });
 
