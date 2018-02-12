@@ -19,9 +19,19 @@ var stopjob = async function () {
 
 var startjob = async function (usersettings) {
     var project = this;
+    var job_handler;
 
     // Which Executor should be forked, according to the project type
-    const job_handler = path.join(__dirname, 'executors/qa.js');
+    switch (project.projecttype) {
+        case 'Quality Assessment':
+            job_handler = path.join(__dirname, 'executors/qa.js');
+            break;
+        default:
+            const error = new Error('Could not identify the project type of the project to be started.')
+            throw error;
+            break;
+    }
+
 
     // Fork Executor into new Node instance. IPC channel will be opened
     const forked = fork(job_handler);
@@ -31,7 +41,7 @@ var startjob = async function (usersettings) {
     try {
         await project.populate('uid', 'settings').execPopulate()
     } catch (error) {
-        console.log('Could not populate document: ' + error)
+        console.error('Could not populate document: ' + error)
     }
     forked.send({
         msg: 'project',
@@ -68,16 +78,24 @@ var startjob = async function (usersettings) {
 
     // Create the listener that reacts to messages from the child
     forked.on('message', async function (msg) {
-        if (msg.msg && msg.msg === 'done') {
-            console.log('Recieved \'done\'')
-            forked.send({ msg: 'stop' })
+        switch (msg.msg) {
+            case 'done':
+                console.log('Recieved \'done\'');
+                forked.send({ msg: 'stop' });
+                break;
+            case 'error':
+                console.error('Recieved \'error\'. Killing job'.red.bold);
+                forked.send({ msg: 'kill' });
+                break;
+            default:
+                break;
         }
     })
 
     project.pid = forked.pid;
     project.status = 'running';
     let [error, res] = await to(project.save());
-    
+
     // Give the forked child the 'go-ahead'
     // Send start here so we don't create race conditions
     // for project.save() with the EventListeners
