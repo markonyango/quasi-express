@@ -23,8 +23,8 @@ var userSchema = new Schema({
         default: 'User'
     },
     settings: {
-        r_path: { type: String },
-        save_path: { type: String }
+        rPath: { type: String },
+        savePath: { type: String }
     }
 });
 

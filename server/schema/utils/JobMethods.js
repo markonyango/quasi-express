@@ -1,6 +1,7 @@
 const { fork } = require('child_process');
 const path = require('path');
-const to = require('../../catchError');
+const to = require('../../../catchError');
+const color = require('colors');
 
 
 var stopjob = async function () {
@@ -24,7 +25,10 @@ var startjob = async function (usersettings) {
     // Which Executor should be forked, according to the project type
     switch (project.projecttype) {
         case 'Quality Assessment':
-            job_handler = path.join(__dirname, 'executors/qa.js');
+            job_handler = path.join(__dirname, '../executors/qa.js');
+            break;
+        case 'Differential Expression Analysis':
+            job_handler = path.join(__dirname, '../executors/qa.js');
             break;
         default:
             const error = new Error('Could not identify the project type of the project to be started.')
@@ -53,20 +57,6 @@ var startjob = async function (usersettings) {
         project_id.toString() === project._id.toString() ? forked.send({ msg: 'stop' }) : null;
     });
 
-    // Creating the listener that will wait until the child_process is done
-    forked.on('exit', async (code, signal) => {
-        if (code === 0) {
-            project.status = 'done';
-            let [error, result] = await to(project.save());
-            error ? console.log('Something went wrong while updating projects status to done: ' + error) : '';
-        } else {
-            project.status = 'failed';
-            let [error, result] = await to(project.save());
-            error ? console.log('Something went wrong while updating projects status to done: ' + error) : null;
-            console.log(`child ${forked.pid} closed with code ${code} and signal ${signal}`);
-        }
-    });
-
     // Creating the listener that will catch any errors from the child_process
     forked.on('error', async (msg) => {
         project.status = 'failed';
@@ -82,10 +72,22 @@ var startjob = async function (usersettings) {
             case 'done':
                 console.log('Recieved \'done\'');
                 forked.send({ msg: 'stop' });
+                project.status = 'done';
+                try {
+                    await project.save();
+                } catch (error) {
+                    console.log('Something went wrong while updating projects status to failed: ' + error);
+                }
                 break;
             case 'error':
-                console.error('Recieved \'error\'. Killing job'.red.bold);
+                console.error(`Recieved 'error': ${msg.error}. Killing job`.red.bold);
                 forked.send({ msg: 'kill' });
+                project.status = 'failed';
+                try {
+                    await project.save();
+                } catch (error) {
+                    console.log('Something went wrong while updating projects status to failed: ' + error);
+                }
                 break;
             default:
                 break;

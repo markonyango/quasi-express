@@ -1,5 +1,6 @@
 const { assert } = require('chai');
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
 const fetch = require('node-fetch');
 const User = require('../server/schema/user');
 const Project = require('../server/schema/project');
@@ -22,26 +23,50 @@ function project_execution() {
     form.append('settings', 'null');
     form.append('status', 'queued');
     form.append('uid', uid);
-    form.append('files', fs.createReadStream('test.R'));
+    form.append('files', fs.createReadStream('test.fastq'));
 
     var res = await makeGetRequest('http://localhost:3000/projects/upload', 'POST', form);
     project_id = res._id;
     assert.equal(res.projectname, 'Test Project')
     assert.equal(res.status, 'queued')
     assert.equal(res.pid, 0);
-    project = await Project.findOne({_id: res._id}).populate('uid','settings');
+    project = await Project.findOne({ _id: res._id }).populate('uid', 'settings');
   });
 
-  after( async() => {
-    var projects = await Project.deleteMany({uid: uid});
+  after(async () => {
+    var projects = await Project.deleteMany({ uid: uid });
     assert.equal(projects.deletedCount, 1, 'Number of projectes to be cleaned up should be 1...');
   });
 
   it('Save folder exists and is readable', async function () {
-    fs.open(project.uid.settings.save_path, 'r', (err, fd) => {
+    fs.open(project.uid.settings.savePath, 'r', (err, fd) => {
       assert.isNull(err, 'Upload folder seems unreadable');
       assert.notEqual(err, 'ENOENT', 'Upload folder does not exist');
     });
+  });
+
+  it('Output files are being written to the save folder', function (done) {
+    this.timeout(10000);
+    makeGetRequest('http://localhost:3000/projects/' + project._id + '/start?test=true', 'PUT')
+      .then(res => {
+        assert.equal(res.status, 'running', 'Project should be running but isn\'t');
+        setTimeout(() => {
+
+          fs.readdir(path.join(res.uid.settings.savePath, res._id))
+            .then(files => {
+              assert.isAbove(files.length, 0, 'There are not output files in the save folder.');
+              console.log(files)
+              files.forEach(file => {
+                console.log(file.includes('test.fastq'))
+              })
+            })
+            .catch(error => assert.isNull(error, 'Something went wrong while reading the output folder!'))
+          
+          done()
+
+        }, 1500);
+      })
+      .catch(error => assert.isNull(error, 'Something went wrong with makeGetRequest!'));
   });
 
 

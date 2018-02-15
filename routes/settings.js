@@ -25,13 +25,13 @@ router.get('/', async function (req, res) {
 
 router.post('/', async function (req, res) {
     const username = req.body.username,
-        r_path = req.body.rpath,
-        save_path = req.body.savepath;
+        rPath = req.body.rpath,
+        savePath = req.body.savepath;
 
     const uid = req.session.passport.user._id;
 
     let error, user;
-    [error, user] = await to(User.findByIdAndUpdate(uid, { settings: { r_path: r_path, save_path: save_path }, username: username }));
+    [error, user] = await to(User.findByIdAndUpdate(uid, { settings: { rPath: rPath, savePath: savePath }, username: username }));
 
     if (error) {
         req.flash('error_msg', 'Something went wrong while saving your new settings: ' + error);

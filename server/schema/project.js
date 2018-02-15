@@ -2,11 +2,12 @@ const mongoose = require('../server');
 const { fork } = require('child_process');
 const path = require('path');
 const to = require('../../catchError');
-const { startjob, stopjob, removejob, setSettings, getSettings } = require('./methods.js');
+const { startjob, stopjob, removejob, setSettings, getSettings } = require('./utils/JobMethods');
 
 const types = new Map([
     ['qa', 'Quality Assessment'],
-    ['dea', 'Differential Expression Analysis']
+    ['dea', 'Differential Expression Analysis'],
+    ['align', 'Alignment']
 ]);
 
 var Schema = mongoose.Schema;

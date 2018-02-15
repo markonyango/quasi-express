@@ -34,40 +34,39 @@ var sub = Rx.Observable.zip(
       check = check ? await job.setSaveFolder() : false;
       check = check ? await job.setLogFile() : false;
 
-      if (check) {
-        for (var file of document.files) {
-          try {
-            // Get the absolute path to the file
-            const filePath = path.join(uploadPath, file);
+      for (var file of job.files) {
+        try {
+          // Get the absolute path to the file
+          const filePath = path.join(uploadPath, file);
 
-            // Execute the Quality Assessment for this file
-            // Output gets saved to stdout AFTER the program finishes
-            const { stdout } = await exec('qa ' + filePath);
-            job.logfile.write(stdout);
+          // Execute the Alignment for this file
+          // Output gets saved to stdout AFTER the program finishes
+          const { stdout } = await exec('qa ' + filePath);
+          job.logfile.write(stdout);
 
-            // Move output files to the savePath folder
-            await job.saveOutput(
-              filePath,
-              filePath + '_base_dist.txt',
-              filePath + '_boxplotdata.txt',
-              filePath + '_length_dist.txt',
-              filePath + '_phred_dist.txt',
-            );
+          // Move output files to the savePath folder
+          job.saveOutput(
+            filePath + '_base_dist.txt',
+            filePath + '_boxplotdata.txt',
+            filePath + '_length_dist.txt',
+            filePath + '_phred_dist.txt',
+          );
 
-          } catch (error) {
-            job.logfile.write(error.toString());
-            process.send({ msg: 'error', error: `${error}` });
-          }
+          // Delete original files from the uploads folder
+          await fs.remove(filePath);
+        } catch (error) {
+          job.logfile.write(error);
+          process.send({ msg: 'error', error: `${error}` });
         }
-
-        // Tell the parent that we are done with the job
-        process.send({ msg: 'done' });
-
-        // Properly close the logfile at the end
-        job.logfile.end();
-      } else {
-        process.send({ msg: 'error', error: 'Could not set up logfile. Check your permissions!' });
       }
+
+      // Tell the parent that we are done with the job
+      // TODO: Make sure this can only be reached if every
+      // file was truly processed
+      process.send({ msg: 'done' });
+
+      // Properly close the logfile at the end
+      job.logfile.end();
     },
     error => console.log(new Error(error))
   )

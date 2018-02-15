@@ -17,12 +17,12 @@
             <legend class="col-form-label">System Settings</legend>
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">Path to Rscript executable:</label>
-                <input class="col-sm-8 form-control" type="text" name="rpath" {{#if user.settings.r_path}} value="{{user.settings.r_path}}"
+                <input class="col-sm-8 form-control" type="text" name="rpath" {{#if user.settings.rPath}} value="{{user.settings.rPath}}"
                     {{else}} placeholder="Absolute path to your R installation directory" {{/if}}>
             </div>
             <div class="form-goup row">
                 <label class="col-sm-4 col-form-lable">Where to store files:</label>
-                <input class="col-sm-8 form-control" type="text" name="savepath" {{#if user.settings.save_path}} value="{{user.settings.save_path}}"
+                <input class="col-sm-8 form-control" type="text" name="savepath" {{#if user.settings.savePath}} value="{{user.settings.savePath}}"
                     {{else}} placeholder="Absolute path to your save folder" {{/if}}>
             </div>
         </fieldset>

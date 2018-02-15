@@ -16,16 +16,16 @@ const opts = {
 }
 
 async function project_routes() {
-  
+
   // 
   before(async () => {
     opts.headers.cookie = await createUser();
   });
 
-  after( async () => {
-    const Project = require ('../server/schema/project');
-    var projects = await Project.deleteMany({uid: uid});
-    assert.equal(projects.deletedCount,0, 'Leftover documents from the testrun were found!');
+  after(async () => {
+    const Project = require('../server/schema/project');
+    var projects = await Project.deleteMany({ uid: uid });
+    assert.equal(projects.deletedCount, 0, 'Leftover documents from the testrun were found!');
   });
 
   it('Project Route POST /projects/upload creates test project', async function () {
@@ -54,23 +54,23 @@ async function project_routes() {
     assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
   });
 
-  it('Project Route PUT /projects/:id/start starts job', function (done) {
-    // Since we are adding a timeout at the end of this test, we need to increase max. timeout
-    this.timeout(2500);
-    makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT')
-    .then(res => {
-      assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings'],res);
-      setTimeout(() => {
-        // Give the test operation time to finish on its own before the next test is started
-        done()
-      },200)
-    })
-    .catch(error => assert.isNull(error))
+  it('Project Route PUT /projects/:id/start starts job', async function () {  
+    try {
+      // Start the project and make sure the status is 'running'
+      let res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT')
+      assert.equal(res.status, 'running', 'Project is not running but it should be!');
+    } catch (error) {
+      assert.isNull(error, 'makeGetRequest failed! ' + error);
+    }
+
   });
 
-  it('Project Route PUT /projects/:id/:action can remove test project', async function () {
-    var res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '/remove?test=true', 'PUT');
-    assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
+  it('Project Route PUT /projects/:id/:action can remove test project', function (done) {
+    makeGetRequest('http://localhost:3000/projects/' + project_id + '/remove?test=true', 'PUT')
+    .then(res => {
+      assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings'])
+      done()
+    })
   });
 
 
