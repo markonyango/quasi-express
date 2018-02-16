@@ -12,6 +12,7 @@ const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const expressValidator = require('express-validator');
 const favicon = require('serve-favicon');
+const cors = require('cors');
 
 // Register Custom HandlebarsHelpers
 require('./handlebar_helpers');
@@ -29,6 +30,9 @@ const settings = require('./routes/settings');
 
 // Initialize Express App
 var app = express();
+
+// Make sure CORS is enabled on this server
+app.use(cors());
 
 // view engine setup
 hbs.registerPartials(__dirname + '/views/partials');
