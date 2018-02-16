@@ -2,6 +2,8 @@ const { fork } = require('child_process');
 const path = require('path');
 const to = require('../../../catchError');
 const color = require('colors');
+const fs = require('fs-extra');
+const { uploadPath } = require('../../../settings');
 
 
 var stopjob = async function () {
@@ -13,12 +15,12 @@ var stopjob = async function () {
 
     let [error, res] = await to(project.save());
 
-    error ? console.log('Something went wrong while trying to stop your project: ' + error) : console.log(`${project._id} stopped`.red);
+    error ? console.log(`Something went wrong while trying to stop your project: ${error}`.red) : console.log(`${project._id} stopped`.red);
 
     return error ? error : res;
 }
 
-var startjob = async function (usersettings) {
+var startjob = async function () {
     var project = this;
     var job_handler;
 
@@ -32,8 +34,7 @@ var startjob = async function (usersettings) {
             break;
         default:
             const error = new Error('Could not identify the project type of the project to be started.')
-            throw error;
-            break;
+            return error;
     }
 
 
@@ -45,7 +46,7 @@ var startjob = async function (usersettings) {
     try {
         await project.populate('uid', 'settings').execPopulate()
     } catch (error) {
-        console.error('Could not populate document: ' + error)
+        console.error(`Could not populate document: ${error}`.red)
     }
     forked.send({
         msg: 'project',
@@ -61,9 +62,9 @@ var startjob = async function (usersettings) {
     forked.on('error', async (msg) => {
         project.status = 'failed';
         let [error, result] = await to(project.save());
-        error ? console.log('Something went wrong while updating projects status to failed: ' + error) : null;
-
-        console.log('Something went wrong while trying to start the child_process: ' + msg);
+        error ?
+            console.log(`Something went wrong while updating projects status to failed: ${error}`.red) : 
+            console.log(`Something went wrong while trying to start the child_process: ${msg}`.red);
     });
 
     // Create the listener that reacts to messages from the child
@@ -76,17 +77,17 @@ var startjob = async function (usersettings) {
                 try {
                     await project.save();
                 } catch (error) {
-                    console.log('Something went wrong while updating projects status to failed: ' + error);
+                    console.log(`Something went wrong while updating projects status to failed: ${error}`.red);
                 }
                 break;
             case 'error':
-                console.error(`Recieved 'error': ${msg.error}. Killing job`.red.bold);
+                console.error(`Recieved 'error': ${msg.error}. Killing job`.red);
                 forked.send({ msg: 'kill' });
                 project.status = 'failed';
                 try {
                     await project.save();
                 } catch (error) {
-                    console.log('Something went wrong while updating projects status to failed: ' + error);
+                    console.log(`Something went wrong while updating projects status to failed: ${error}`.red);
                 }
                 break;
             default:
@@ -110,8 +111,29 @@ var removejob = async function () {
     var project = this;
 
     if (project.status === 'running') {
-        console.log('Stopping project before deletion...')
+        console.log('Stopping project before deletion...'.red)
         process.emit('stop', project._id);
+    }
+
+    // Remove every file in the servers upload folder belonging to that project
+    try {
+        let files = await fs.readdir(uploadPath);
+        files.filter(file => file.indexOf(project._id) >= 0 ? true : false)
+        let promiseArray = [];
+        for (let file of files) {
+            promiseArray.push(fs.remove(path.join(uploadPath, file)))
+        }
+
+        try {
+            await Promise.all(promiseArray)
+        } catch (error) {
+            console.error(`Something went wrong while cleaning up the project ${project._id}: ${error}`.red)
+            return error;
+        }
+
+    } catch (error) {
+        console.error(`Something went wrong while cleaning up the project ${project._id}: ${error}`.red);
+        return error;
     }
 
     let [error, res] = await to(project.remove());
