@@ -4,6 +4,7 @@ const to = require('../../../catchError');
 const color = require('colors');
 const fs = require('fs-extra');
 const { uploadPath } = require('../../../settings');
+const getTime = require('./getTime');
 
 
 var stopjob = async function () {
@@ -15,7 +16,7 @@ var stopjob = async function () {
 
     let [error, res] = await to(project.save());
 
-    error ? console.log(`Something went wrong while trying to stop your project: ${error}`.red) : console.log(`${project._id} stopped`.red);
+    error ? console.error(`${getTime()} Something went wrong while trying to stop your project: ${error}`.red) : console.log(`${project._id} stopped`.red);
 
     return error ? error : res;
 }
@@ -46,7 +47,7 @@ var startjob = async function () {
     try {
         await project.populate('uid', 'settings').execPopulate()
     } catch (error) {
-        console.error(`Could not populate document: ${error}`.red)
+        console.error(`${getTime()} Could not populate document: ${error}`.red)
     }
     forked.send({
         msg: 'project',
@@ -61,33 +62,33 @@ var startjob = async function () {
     // Creating the listener that will catch any errors from the child_process
     forked.on('error', async (msg) => {
         project.status = 'failed';
-        let [error, result] = await to(project.save());
+        let error = await to(project.save());
         error ?
-            console.log(`Something went wrong while updating projects status to failed: ${error}`.red) : 
-            console.log(`Something went wrong while trying to start the child_process: ${msg}`.red);
+            console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red) : 
+            console.error(`${getTime()} Something went wrong while trying to start the child_process: ${msg}`.red);
     });
 
     // Create the listener that reacts to messages from the child
     forked.on('message', async function (msg) {
         switch (msg.msg) {
             case 'done':
-                console.log('Recieved \'done\'');
+                console.log(`${getTime()} Recieved 'done'`.cyan);
                 forked.send({ msg: 'stop' });
                 project.status = 'done';
                 try {
                     await project.save();
                 } catch (error) {
-                    console.log(`Something went wrong while updating projects status to failed: ${error}`.red);
+                    console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red);
                 }
                 break;
             case 'error':
-                console.error(`Recieved 'error': ${msg.error}. Killing job`.red);
+                console.error(`${getTime()} Recieved 'error': ${msg.error}. Killing job`.red);
                 forked.send({ msg: 'kill' });
                 project.status = 'failed';
                 try {
                     await project.save();
                 } catch (error) {
-                    console.log(`Something went wrong while updating projects status to failed: ${error}`.red);
+                    console.log(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red);
                 }
                 break;
             default:
@@ -111,7 +112,7 @@ var removejob = async function () {
     var project = this;
 
     if (project.status === 'running') {
-        console.log('Stopping project before deletion...'.red)
+        console.log(`${getTime()} Stopping project before deletion...`.cyan)
         process.emit('stop', project._id);
     }
 
@@ -127,12 +128,12 @@ var removejob = async function () {
         try {
             await Promise.all(promiseArray)
         } catch (error) {
-            console.error(`Something went wrong while cleaning up the project ${project._id}: ${error}`.red)
+            console.error(`${getTime()} Something went wrong while cleaning up the project ${project._id}: ${error}`.red)
             return error;
         }
 
     } catch (error) {
-        console.error(`Something went wrong while cleaning up the project ${project._id}: ${error}`.red);
+        console.error(`${getTime()} Something went wrong while cleaning up the project ${project._id}: ${error}`.red);
         return error;
     }
 

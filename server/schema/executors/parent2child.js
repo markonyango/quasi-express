@@ -1,5 +1,6 @@
 const Rx = require('rxjs/Rx');
 const colors = require('colors');
+const getTime = require('../utils/getTime');
 
 var projectSubject = new Rx.ReplaySubject();
 var startSubject = new Rx.Subject();
@@ -26,30 +27,23 @@ var parent2child = function (payload) {
       console.error(`${getTime()} Killing myself...`.magenta);
       process.exit(1);
     default:
-      console.log(`${getTime()} Bogus message recieved (msg: ${payload.msg})! Exiting immediately!`.red.bold.bgBlack);
+      console.log(`${getTime()} Bogus message recieved (msg: ${payload.msg})! Exiting immediately!`.red.bgBlack);
       process.exit(1);
       break;
   }
 }
 
-function getTime() {
-  let date = new Date()
-
-  let options = {
-    timeZone: 'Europe/Berlin',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    minute: '2-digit',
-    hour: '2-digit',
-    second: '2-digit'
+var onExit = function (code) {
+  if (code) {
+    console.log(`${getTime()} Process ${process.pid} is exiting with code ${code}`.red)
+  } else {
+    console.log(`${getTime()} Process ${process.pid} is exiting gracefully`.green)
   }
-
-  return `[ ${date.toLocaleDateString('de',options)} ]`
 }
 
 module.exports = {
   parent2child,
+  onExit,
   projectSubject,
   startSubject
 }
