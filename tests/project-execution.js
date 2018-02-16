@@ -6,6 +6,7 @@ const User = require('../server/schema/user');
 const Project = require('../server/schema/project');
 const FormData = require('form-data');
 const to = require('../catchError');
+const { uploadPath } = require('../settings');
 
 const opts = {
   headers: {
@@ -54,19 +55,21 @@ function project_execution() {
 
           fs.readdir(path.join(res.uid.settings.savePath, res._id))
             .then(files => {
-              assert.isAbove(files.length, 0, 'There are not output files in the save folder.');
-              console.log(files)
-              files.forEach(file => {
-                console.log(file.includes('test.fastq'))
-              })
+              assert.isAbove(files.length, 0, 'There are no output files in the save folder.');
             })
             .catch(error => assert.isNull(error, 'Something went wrong while reading the output folder!'))
-          
+
           done()
 
         }, 1500);
       })
       .catch(error => assert.isNull(error, 'Something went wrong with makeGetRequest!'));
+  });
+
+  it('Servers upload folder is void of any file belonging to the test project', async function () {
+    let files = await fs.readdir(uploadPath);
+    files.filter(file => file.indexOf(project._id) >= 0 ? true : false)
+    assert.isEmpty(files);
   });
 
 
