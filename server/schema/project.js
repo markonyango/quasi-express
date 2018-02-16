@@ -1,7 +1,4 @@
 const mongoose = require('../server');
-const { fork } = require('child_process');
-const path = require('path');
-const to = require('../../catchError');
 const { startjob, stopjob, removejob, setSettings, getSettings } = require('./utils/JobMethods');
 
 const types = new Map([
