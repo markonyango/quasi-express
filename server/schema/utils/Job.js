@@ -1,8 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path');
-const { uploadPath } = require('../../../settings');
 
-module.exports = Job = function (document) {
+module.exports = function (document) {
 
   this.document = document;
   this.savePath = '';
@@ -56,7 +55,7 @@ module.exports = Job = function (document) {
   this.saveOutput = async function (...files) {
     for (let file of files) {
       let filename = file.substring(file.lastIndexOf('/') + 1);
-      console.log(`Moving ${filename} to the save folder...`);
+      //console.log(`Moving ${filename} to the save folder...`);
       await fs.move(
         file,
         path.join(this.savePath, filename)

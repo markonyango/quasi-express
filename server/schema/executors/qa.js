@@ -4,10 +4,8 @@ const exec = util.promisify(require('child_process').exec);
 const Rx = require('rxjs/Rx');
 const colors = require('colors');
 const path = require('path');
-const fs = require('fs-extra');
 const Job = require('../utils/Job');
 const { uploadPath } = require('../../../settings');
-
 
 
 // This event listener will handle all commands that are sent to this child via IPC
@@ -59,7 +57,7 @@ var sub = Rx.Observable.zip(
             process.send({ msg: 'error', error: `${error}` });
           }
         }
-
+        
         // Tell the parent that we are done with the job
         process.send({ msg: 'done' });
 
