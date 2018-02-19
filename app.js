@@ -43,11 +43,17 @@ app.set('view engine', 'hbs');
 app.use(compression());
 
 // Morgan middleware setup
-// const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
-// app.use(logger('dev', { stream: morganlog }));
+const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
 app.use(logger('dev', {
-  skip: function (req, res) { return /^\/js|^\/css|^\/ico/.test(req.url) }
+  stream: morganlog,
+  skip: function (req) {
+    return /^\/js|^\/css|^\/ico/.test(req.url)
+  }
 }));
+// app.use(logger('dev', {
+//   skip: function (req) { return /^\/js|^\/css|^\/ico/.test(req.url) }
+// }));
+
 // Bodyparser and Cookieparser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -121,9 +127,9 @@ function ensureAuthenticated(req, res, next) {
   }
 }
 
-var gracefulExit = function () {
+var gracefulExit = function (signal) {
   require('./server/server').connection.close(function () {
-    console.log('Mongoose connection shut down by killing the Node app.');
+    console.log(`Mongoose connection shut down by killing the Node app. Signal: ${signal}`);
     process.exit(0);
   })
 }
