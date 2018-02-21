@@ -5,6 +5,10 @@ Handlebars.registerHelper('formatDatum', (data) => {
     return moment(data).format('D. MMM Y - HH:mm')
 });
 
+Handlebars.registerHelper('json', function(context) {
+    return JSON.stringify(context, null, 2);
+});
+
 Handlebars.registerHelper('status', (status, id) => {
     switch (status) {
         case 'running':

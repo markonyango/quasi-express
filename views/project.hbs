@@ -1,6 +1,8 @@
 {{#if project}}
-    <p>{{project.projectname}}</p>
-    <p>{{project.status}}</p>
+    <p>{{project.projectname}} - {{project.projecttype}}</p>
+    <p>Settings: <pre>{{{json project.settings}}}</pre></p>
+    <p>Files: {{project.files}}</p>
+    <p>Status: {{project.status}}</p>
 {{/if}}
 
 {{#if out}}

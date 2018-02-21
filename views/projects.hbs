@@ -24,7 +24,7 @@
                         <li>Project Type: {{this.projecttype}}</li>
                         <li>Status: {{this.status}}</li>
                         <li>Proccess ID: {{this.pid}}</li>
-                        <li>Settings: {{this.settings}}</li>
+                        <li>Settings: <pre>{{{json this.settings}}}</pre></li>
                         <li>Files: {{this.files}}</li>
                         <li>Created at: {{formatDatum this.created}}</li>
                     </ul>
