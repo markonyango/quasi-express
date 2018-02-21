@@ -23,7 +23,14 @@
   {{> header}}
 
   <div class="container-fluid" id="main">
-    {{> alerts}} {{{body}}}
+    <div class="row">
+      <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+        {{> sidebar}}
+      </div>
+      <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12">
+        {{> alerts}} {{{body}}}
+      </div>
+    </div>
   </div>
 
   <div class="spacer"></div>
