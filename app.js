@@ -63,13 +63,16 @@ app.use(expressValidator());
 // Express session - this must come after the cookieParser()
 app.use(session({
   secret: 'supermegasecretkeythatnobodyshalleverfindout',
-  saveUninitialized: true,
+  saveUninitialized: false,
   resave: true,
   store: new MongoStore({
     url: 'mongodb://192.168.0.248:27017/quasi-express',
     touchAfter: 24 * 3600,
     ttl: 2 * 24 * 3600
-  })
+  }),
+  cookie: {
+    httpOnly: false
+  }
 }));
 
 // Passport initialization
@@ -77,7 +80,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Connect Flash middleware
-app.use(flash());
+app.use(flash()); 
 
 // Global Vars
 app.use(function (req, res, next) {
@@ -85,6 +88,21 @@ app.use(function (req, res, next) {
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
   res.locals.user = req.user || null;
+  // Make server stats available
+  res.locals.stats = {
+    memoryUsage: {
+      heapTotal: Math.trunc(process.memoryUsage().heapTotal / 1024 /1024),
+      heapUsed: Math.trunc(process.memoryUsage().heapUsed / 1024 /1024),
+      rss: Math.trunc(process.memoryUsage().rss / 1024 / 1024)
+    },
+    cpuUsage: {
+      user: process.cpuUsage().user / 1e6,
+      system: process.cpuUsage().system / 1e6
+    },
+    uptime: Math.floor(process.uptime()),
+    nodeVersion: process.version,
+    platform: process.platform
+  };
   next();
 });
 
@@ -96,26 +114,8 @@ app.use(favicon(path.join(__dirname, 'public', 'ico', 'favicon.ico')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/settings', ensureAuthenticated, settings)
+app.use('/settings', settings);
 app.use('/projects', projects);
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  var err = new Error(`Requested route (${req.originalUrl}) could not be found!`);
-  err.status = 404;
-  next(err);
-});
-
-// error handler
-app.use(function (err, req, res) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {
@@ -127,16 +127,35 @@ function ensureAuthenticated(req, res, next) {
   }
 }
 
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  var err = new Error(`Requested route (${req.originalUrl}) could not be found!`);
+  err.status = 404;
+  next(err);
+});
+
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  
+  res.render('error');
+});
+
 var gracefulExit = function (signal) {
   require('./server/server').connection.close(function () {
     console.log(`Mongoose connection shut down by killing the Node app. Signal: ${signal}`);
-    process.exit(0);
-  })
-}
+    signal === 'SIGUSR2' ? process.kill(process.pid, 'SIGUSR2'): process.kill(process.pid, signal);
+  });
+};
 
 process
-  .on('SIGINT', gracefulExit)
-  .on('SIGTERM', gracefulExit)
-  .on('SIGUSR2', gracefulExit)
+  .once('SIGINT', gracefulExit)
+  .once('SIGTERM', gracefulExit)
+  .once('SIGUSR2', gracefulExit)
 
 module.exports = app;
