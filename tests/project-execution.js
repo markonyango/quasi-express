@@ -26,7 +26,7 @@ function project_execution() {
     form.append('uid', uid);
     form.append('files', fs.createReadStream('test.fastq'));
 
-    var res = await makeGetRequest('http://localhost:3000/projects/upload', 'POST', form);
+    var res = await makeGetRequest('http://localhost:3000/projects/upload?uid='+uid+'', 'POST', form);
     project_id = res._id;
     assert.equal(res.projectname, 'Test Project')
     assert.equal(res.status, 'queued')
@@ -48,7 +48,7 @@ function project_execution() {
 
   it('Output files are being written to the save folder', function (done) {
     this.timeout(10000);
-    makeGetRequest('http://localhost:3000/projects/' + project._id + '/start?test=true', 'PUT')
+    makeGetRequest('http://localhost:3000/projects/' + project._id + '/start?uid='+uid+'', 'PUT')
       .then(res => {
         assert.equal(res.status, 'running', 'Project should be running but isn\'t');
         setTimeout(() => {

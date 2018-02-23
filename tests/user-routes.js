@@ -27,21 +27,6 @@ function user_routes() {
     assert.equal(result.email, testuser);
   });
 
-  it('Testuser can successfully login', function () {
-    var body = { 'email': testuser, 'password': password }
-
-    fetch('http://localhost:3000/users/login', {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(res => res.text())
-      .then(res => {
-        assert.isTrue(/Hello\, welcome to QUASI\-Express/.test(res), 'Could not login')
-      })
-      .catch(error => assert.isNull(error, error))
-  })
-
   it('Testuser can successfully be removed again', async function () {
     const user = await User.findOne({ email: testuser });
     if (user) {

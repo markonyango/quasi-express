@@ -9,18 +9,9 @@ const createUser = require('./createUser');
 // Set up some global test variables
 const uid = '5a54c8c217cdf72718ca1420';
 var project_id = '';
-const opts = {
-  headers: {
-    cookie: ''
-  }
-}
+
 
 async function project_routes() {
-
-  // 
-  before(async () => {
-    opts.headers.cookie = await createUser();
-  });
 
   after(async () => {
     const Project = require('../server/schema/project');
@@ -37,7 +28,7 @@ async function project_routes() {
     form.append('uid', uid);
     form.append('files', fs.createReadStream('test.fastq'));
 
-    var res = await makeGetRequest('http://localhost:3000/projects/upload', 'POST', form);
+    var res = await makeGetRequest('http://localhost:3000/projects/upload?uid='+uid+'', 'POST', form);
     project_id = res._id;
     assert.equal(res.projectname, 'Test Project')
     assert.equal(res.status, 'queued')
@@ -45,19 +36,19 @@ async function project_routes() {
   });
 
   it('Project Route GET /projects returns at least one MongoDB object with all respective schema properties', async function () {
-    var res = await makeGetRequest('http://localhost:3000/projects?json=true&test=true', 'GET');
+    var res = await makeGetRequest('http://localhost:3000/projects?json=true&uid='+uid+'', 'GET');
     assert.hasAllKeys(res[0], ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
   });
 
   it('Project Route GET /projects/:id?json=true returns test project', async function () {
-    var res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '?json=true&test=true', 'GET');
+    var res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '?json=true&uid='+uid+'', 'GET');
     assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings']);
   });
 
   it('Project Route PUT /projects/:id/start starts job', async function () {  
     try {
       // Start the project and make sure the status is 'running'
-      let res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?test=true', 'PUT')
+      let res = await makeGetRequest('http://localhost:3000/projects/' + project_id + '/start?uid='+uid+'', 'PUT')
       assert.equal(res.status, 'running', 'Project is not running but it should be!');
     } catch (error) {
       assert.isNull(error, 'makeGetRequest failed! ' + error);
@@ -66,7 +57,7 @@ async function project_routes() {
   });
 
   it('Project Route PUT /projects/:id/:action can remove test project', function (done) {
-    makeGetRequest('http://localhost:3000/projects/' + project_id + '/remove?test=true', 'PUT')
+    makeGetRequest('http://localhost:3000/projects/' + project_id + '/remove?uid='+uid+'', 'PUT')
     .then(res => {
       assert.hasAllKeys(res, ['__v', '_id', 'uid', 'created', 'projectname', 'projecttype', 'status', 'pid', 'files', 'settings'])
       done()
