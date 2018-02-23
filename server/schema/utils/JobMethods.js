@@ -33,6 +33,9 @@ var startjob = async function () {
         case 'Differential Expression Analysis':
             job_handler = path.join(__dirname, '../executors/qa.js');
             break;
+        case 'Alignment':
+            job_handler = path.join(__dirname, '../executors/align.js');
+            break;
         default:
             const error = new Error('Could not identify the project type of the project to be started.')
             return error;
@@ -56,7 +59,9 @@ var startjob = async function () {
 
     // Create the listener that will respond to user-triggered stop events
     process.on('stop', function (project_id) {
-        project_id.toString() === project._id.toString() ? forked.send({ msg: 'stop' }) : null;
+        if ((project_id.toString() === project._id.toString()) && project.status === 'running') {
+            forked.send({ msg: 'stop' })
+        } else { }
     });
 
     // Creating the listener that will catch any errors from the child_process
@@ -64,7 +69,7 @@ var startjob = async function () {
         project.status = 'failed';
         let error = await to(project.save());
         error ?
-            console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red) : 
+            console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red) :
             console.error(`${getTime()} Something went wrong while trying to start the child_process: ${msg}`.red);
     });
 
@@ -75,8 +80,10 @@ var startjob = async function () {
                 console.log(`${getTime()} Recieved 'done'`.cyan);
                 forked.send({ msg: 'stop' });
                 project.status = 'done';
+                project.pid = null;
                 try {
                     await project.save();
+                    console.log(`${getTime()} Saving project status: ${project.status}`.cyan);
                 } catch (error) {
                     console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red);
                 }
@@ -85,10 +92,12 @@ var startjob = async function () {
                 console.error(`${getTime()} Recieved 'error': ${msg.error}. Killing job`.red);
                 forked.send({ msg: 'kill' });
                 project.status = 'failed';
+                project.pid = null;
                 try {
                     await project.save();
+                    console.error(`${getTime()} Saving project status: ${project.status}`.cyan);
                 } catch (error) {
-                    console.log(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red);
+                    console.error(`${getTime()} Something went wrong while updating projects status to failed: ${error}`.red);
                 }
                 break;
             default:

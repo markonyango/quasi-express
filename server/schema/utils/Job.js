@@ -73,7 +73,7 @@ module.exports = function (document) {
 
   this.preFlight = async function() {
     const checkSaveFolder = await this.setSaveFolder();
-    if(!checkSaveFolder) {
+    if(!checkSaveFolder || checkSaveFolder == undefined) {
       console.error(`Couldn't access your chosen save path. Make sure the permissions are set accordingly!`.red);
       return false;
     }

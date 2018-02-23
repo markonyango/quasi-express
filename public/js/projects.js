@@ -1,11 +1,41 @@
 $(document).ready(function () {
 
+    // Was Alignment reference list loaded already? Null if no, array if yes.
+    let references = null;
+
     // Form evaluation stuff
     $('select[name="projecttype"]').on('change', function (event) {
         const selected_projecttype = $('select[name="projecttype"] option:selected').val();
 
-        if (selected_projecttype === 'dea') { $('#options_dea').show('fast', 'swing'); }
-        else { $('#options_dea').hide(); }
+        if (selected_projecttype === 'dea') { 
+            $('#options_dea').show('fast', 'swing');
+        }
+        else { 
+            $('#options_dea').hide();
+        }
+
+        if (selected_projecttype === 'align') {
+            if (!references) {
+                fetch('/projects/references', { credentials: 'include' })
+                    .then(res => res.json())
+                    .then(res => {
+                        references = res;
+                        let referenceSelect = $('select[name="settings[reference]"]');
+                        $.each(references, function(i,item) {
+                            referenceSelect.append($('<option>', {
+                                value: item,
+                                text: item
+                            }));
+                        });
+                        $('#options_align').show('fast', 'swing');
+                    })
+                    .catch(error => console.log(error));
+            } else {
+                $('#options_align').show('fast', 'swing');
+            }
+        } else {
+            $('#options_align').hide();
+        }
     });
 
 
@@ -14,130 +44,93 @@ $(document).ready(function () {
         event.preventDefault();
 
         const form = $(this);
-        var formData = false;
+        var formData = new FormData(form[0]);
 
-        if (window.FormData) {
-            formData = new FormData(form[0]);
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '/projects/upload',
-            data: formData ? formData : form.serialize,
-            processData: false,
-            contentType: false,
-
-            beforeSend: function () {
-                $('.progress').parent().show();
-                $('span[name="status"]').show();
-                console.log("Starting to upload form data...");
-                $('span[name="status"]').text("Starting to upload form data...");
-            },
-            complete: function () {
-                console.log("Completed upload");
-            },
-            success: function (res) {
+        fetch('/projects/upload', { body: formData, method: 'POST', credentials: 'include' })
+            .then(res => res.json())
+            .then(res => {
                 console.log("Form data was successfully uploaded", res);
                 $('#exampleModal').modal('hide');
                 window.location = '/projects';
-            },
-            fail: function (res) {
-                console.log(res);
+            })
+            .catch(error => {
+                console.log(error);
                 $('span[name="status"]').text("Upload failed! Check the console.");
-            },
-            error: function (res) {
-                console.log(res);
-                $('span[name="status"]').text(res.responseJSON.message);
-            },
-            xhr: function () {
-                // get the native XmlHttpRequest object
-                var xhr = $.ajaxSettings.xhr();
-                // set the onprogress event handler
-                xhr.upload.onprogress = function (evt) {
-                    const progressbar = $('.progress-bar');
-                    var progress = Math.round(evt.loaded / evt.total * 100);
-                    progressbar.text(progress + '%');
-                    progressbar.attr('aria-valuenow', progress);
-                    progressbar.width(progress + '%');
-                };
-                // return the customized object
-                return xhr;
-            }
-        });
+            });
     });
 
     // Starting and Stoping projects
-    $('button[name="start_project"]').click(function() {
+    $('button[name="start_project"]').click(function () {
         const pid = $(this)[0].attributes.pid.value;
-        
+
         $.ajax({
             type: 'PUT',
             url: '/projects/' + pid + '/start',
             dataType: 'json',
 
-            success: function(...data) {
+            success: function (...data) {
                 // The server responds with 3 items in the data aray: 
                 // the project object from the MongoDB, "success" and the response object
                 const project = data[0];
-                
+
                 project.status === 'running' ? window.location = '/projects' : alert('Could not start project. Contact admin.');
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('error: ', + error);
             },
-            complete: function() {
+            complete: function () {
                 // console.log('complete: ', + data);
             }
         });
     });
 
-    $('button[name="stop_project"]').click(function() {
+    $('button[name="stop_project"]').click(function () {
         const pid = $(this)[0].attributes.pid.value;
-        
+
         $.ajax({
             type: 'PUT',
             url: '/projects/' + pid + '/stop',
             dataType: 'json',
 
-            success: function(...data) {
+            success: function (...data) {
                 // The server responds with 3 items in the data aray: 
                 // the project object from the MongoDB, "success" and the response object
                 const project = data[0];
-                
+
                 project.status === 'stopped' ? window.location = '/projects' : console.log('Could not stop project. Contact admin.' + JSON.stringify(data));
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('error: ', + error);
             },
-            complete: function() {
+            complete: function () {
                 // console.log('complete: ', + data);
             }
         });
     });
 
-    $('button[name="remove_project"]').click(function() {
+    $('button[name="remove_project"]').click(function () {
         const pid = $(this)[0].attributes.pid.value;
-        
+
         $.ajax({
             type: 'PUT',
             url: '/projects/' + pid + '/remove',
             dataType: 'json',
 
-            success: function(...data) {
+            success: function (...data) {
                 // The server responds with 3 items in the data aray: 
                 // the project object from the MongoDB, "success" and the response object
                 // data.forEach(item => console.log(item));
                 const project = data[0];
-                data.forEach(function(item) {
+                data.forEach(function (item) {
                     console.log(item)
                 })
-                
+
                 project._id === pid && data[1] === 'success' ? window.location = '/projects' : alert('Could not remove project. Contact admin.');
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('error: ', + error);
             },
-            complete: function() {
+            complete: function () {
                 // console.log('complete: ', + data);
             }
         });
