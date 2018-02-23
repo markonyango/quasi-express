@@ -9,6 +9,12 @@ Handlebars.registerHelper('json', function(context) {
     return JSON.stringify(context, null, 2);
 });
 
+Handlebars.registerHelper('html', function(context) {
+    context = context.replace(/\n/gi, "<br>");
+    
+    return context;
+});
+
 Handlebars.registerHelper('status', (status, id) => {
     switch (status) {
         case 'running':
