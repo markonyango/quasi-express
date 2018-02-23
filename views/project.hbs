@@ -1,10 +1,20 @@
 {{#if project}}
-    <p>{{project.projectname}} - {{project.projecttype}}</p>
-    <p>Settings: <pre>{{{json project.settings}}}</pre></p>
-    <p>Files: {{project.files}}</p>
-    <p>Status: {{project.status}}</p>
-{{/if}}
+<p>{{project.projectname}} - {{project.projecttype}}</p>
+<p>Settings:
+    <pre>{{{json project.settings}}}</pre>
+</p>
+<p>Files: {{project.files}}</p>
+<p>Status: {{project.status}}</p>
 
-{{#if out}}
-<pre>{{out}}</pre>
+{{#if log}}
+<div class="card">
+    <div class="card-header">Logfile</div>
+    <div class="card-body">
+        <div class="card-text">
+            {{{html log}}}
+        </div>
+    </div>
+</div> {{/if}}
+{{else}}
+<p>No project with this ID found!</p>
 {{/if}}
