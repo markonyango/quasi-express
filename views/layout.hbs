@@ -7,9 +7,7 @@
   <link rel='stylesheet' href='/css/style.css' />
   <link rel='stylesheet' href='/css/bootstrap.min.css' />
   <link rel='stylesheet' href='/css/fa-svg-with-js.css' />
-  <script src="/js/fontawesome-all.min.js"></script> 
-  
-  {{!-- FAVICON CODE --}}
+  <script src="/js/fontawesome-all.min.js"></script> {{!-- FAVICON CODE --}}
   <link rel="apple-touch-icon" sizes="180x180" href="/ico/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/ico/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/ico/favicon-16x16.png">
@@ -23,6 +21,7 @@
   {{> header}}
 
   <div class="container-fluid" id="main">
+    {{#if user}}
     <div class="row">
       <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
         {{> sidebar}}
@@ -31,6 +30,7 @@
         {{> alerts}} {{{body}}}
       </div>
     </div>
+    {{else}} {{> alerts}} {{{body}}} {{/if}}
   </div>
 
   <div class="spacer"></div>
