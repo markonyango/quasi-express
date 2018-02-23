@@ -1,3 +1,5 @@
+{{#if user}}<p>You are already logged in!</p>
+{{else}}
 <form method="POST" action="/users/login" style="max-width: 500px" class="mx-auto">
     <div class="form-group row">
         <label class="d-none d-sm-block col-sm-2 col-form-label">Email</label>
@@ -18,3 +20,4 @@
 
     </div>
 </form>
+{{/if}}
