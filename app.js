@@ -32,17 +32,19 @@ const settings = require('./routes/settings');
 var app = express();
 
 // Make sure CORS is enabled on this server
-let whitelist = ['http://localhost:3000', 'http://localhost:4200','http://127.0.0.1:5500'];
+let whitelist = ['http://localhost:3000', 'http://localhost:4200','http://127.0.0.1:5500', 'localhost:3000'];
 app.use(cors({
   credentials: true,
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      console.log(origin)
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
+  origin: /localhost|127\.0\.0\.1/
+  // origin: function (origin, callback) {
+  //   if (whitelist.indexOf(origin) !== -1) {
+  //     console.log(origin)
+  //     callback(null, true)
+  //   } else {
+  //     console.log(origin)
+  //     callback(new Error('Not allowed by CORS'))
+  //   }
+  // }
 }
 ));
 
@@ -128,6 +130,9 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/settings', settings);
 app.use('/projects', projects);
+app.use('/test', function(req, res, next) {
+  res.render('test', { title: 'QUASI-Express App Testsuite', css: 'https://cdnjs.cloudflare.com/ajax/libs/mocha/5.0.1/mocha.min.css' })
+});
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {

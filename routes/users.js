@@ -37,21 +37,24 @@ router.post('/register', async function (req, res, next) {
     // newUser is the document that will enter the 'users' collection
     const newUser = new User({ email: email, password: password });
 
-    let [error, result] = await to(newUser.save());
+    try {
+      let result = await newUser.save();
 
-    if (req.query.json === 'true') {
-      res.json(result);
-    } else {
-
-      if (error) {
-        req.flash('error_msg', 'Something went wrong while registering you: ' + error);
-        res.redirect('/register');
+      if (req.query.json === 'true') {
+        res.json(result)
       } else {
         res.render('register', { title: 'Registration', data: newUser.email });
       }
+    } catch (error) {
+      if (req.query.json === 'true') {
+        console.error(error)
+        res.json(error)
+      } else {
+        req.flash('error_msg', 'Something went wrong while registering you: ' + error);
+        res.redirect('/register');
+      }
     }
   }
-
 });
 
 router.get('/login', function (req, res) {
@@ -89,8 +92,13 @@ passport.deserializeUser(function (id, done) {
 router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }),
   function (req, res, next) {
 
-    let {_id, username, email, settings } = req.session.passport.user
-    res.json({_id, username, email, settings})
+    if (req.body.json) {
+      let { _id, email, role } = req.session.passport.user
+      res.json({ _id, email, role })
+    } else {
+      res.redirect('/')
+    }
+
 
   });
 
@@ -105,19 +113,16 @@ router.post('/remove', async function (req, res) {
   // If JSON was requested
   if (req.query.json === 'true') {
     const uid = req.body.uid;
-    
-    let [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
-    
-    if (error) {
+
+    try {
+      let deleteProjects = await Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) })
+      let deleteUser = await User.findOneAndRemove({ _id: mongoose.Types.ObjectId(uid) })
+      req.clearCookie = true
+      let {email, _id, role} = deleteUser
+      res.json({email, _id, role})
+      req.session.destroy()
+    } catch (error) {
       res.json(error)
-    } else {
-      let [error, deleteUser] = await to(User.findOneAndRemove({ _id: mongoose.Types.ObjectId(uid) }));
-      
-      if (error) {
-        res.json(error);
-      } else {
-        res.json(deleteUser);
-      }
     }
   } else {
 
