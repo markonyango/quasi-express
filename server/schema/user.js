@@ -1,5 +1,5 @@
 const mongoose = require('../server');
-const bcrypt = require('bcryptjs');
+const { save, comparePassword, initializeUser } = require('./utils/UserMethods')
 
 var Schema = mongoose.Schema;
 var userSchema = new Schema({
@@ -28,18 +28,8 @@ var userSchema = new Schema({
     }
 });
 
-userSchema.pre('save', function (next) {
-    var user = this;
-    bcrypt.hash(user.password, 10, function (err, hash) {
-        user.password = hash;
-        next();
-    });
-});
-
-userSchema.methods.comparePassword = function (password, cb) {
-    bcrypt.compare(password, this.password, function (err, isMatch) {
-        err ? cb(err) : cb(null, isMatch);
-    });
-}
+userSchema.pre('save', save);
+userSchema.methods.comparePassword = comparePassword;
+userSchema.methods.initializeUser = initializeUser;
 
 module.exports = mongoose.model('User', userSchema);

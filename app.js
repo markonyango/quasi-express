@@ -32,7 +32,19 @@ const settings = require('./routes/settings');
 var app = express();
 
 // Make sure CORS is enabled on this server
-app.use(cors());
+let whitelist = ['http://localhost:3000', 'http://localhost:4200','http://127.0.0.1:5500'];
+app.use(cors({
+  credentials: true,
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      console.log(origin)
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+));
 
 // view engine setup
 hbs.registerPartials(__dirname + '/views/partials');
@@ -80,7 +92,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Connect Flash middleware
-app.use(flash()); 
+app.use(flash());
 
 // Global Vars
 app.use(function (req, res, next) {
@@ -91,8 +103,8 @@ app.use(function (req, res, next) {
   // Make server stats available
   res.locals.stats = {
     memoryUsage: {
-      heapTotal: Math.trunc(process.memoryUsage().heapTotal / 1024 /1024),
-      heapUsed: Math.trunc(process.memoryUsage().heapUsed / 1024 /1024),
+      heapTotal: Math.trunc(process.memoryUsage().heapTotal / 1024 / 1024),
+      heapUsed: Math.trunc(process.memoryUsage().heapUsed / 1024 / 1024),
       rss: Math.trunc(process.memoryUsage().rss / 1024 / 1024)
     },
     cpuUsage: {
@@ -142,14 +154,14 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  
+
   res.render('error');
 });
 
 var gracefulExit = function (signal) {
   require('./server/server').connection.close(function () {
     console.log(`Mongoose connection shut down by killing the Node app. Signal: ${signal}`);
-    signal === 'SIGUSR2' ? process.kill(process.pid, 'SIGUSR2'): process.kill(process.pid, signal);
+    signal === 'SIGUSR2' ? process.kill(process.pid, 'SIGUSR2') : process.kill(process.pid, signal);
   });
 };
 

@@ -14,11 +14,15 @@ var stopjob = async function () {
     project.pid = null;
     process.emit('stop', project._id);
 
-    let [error, res] = await to(project.save());
-
-    error ? console.error(`${getTime()} Something went wrong while trying to stop your project: ${error}`.red) : console.log(`${project._id} stopped`.red);
-
-    return error ? error : res;
+    try{
+        await to(project.save());
+        console.log(`${project._id} stopped`.red);
+    } catch(error) {
+        console.error(`${getTime()} Something went wrong while trying to stop your project: ${error}`.red)
+        return error
+    }
+    
+    return res
 }
 
 var startjob = async function () {
@@ -48,20 +52,25 @@ var startjob = async function () {
     // Send this document via IPC to the forked child
     // but populate the 'uid' path with the user settings first
     try {
-        await project.populate('uid', 'settings').execPopulate()
+        await project.populate('uid', 'settings').execPopulate();
+
+        forked.send({
+            msg: 'project',
+            document: project
+        });
     } catch (error) {
-        console.error(`${getTime()} Could not populate document: ${error}`.red)
+        console.error(`${getTime()} Could not populate document: ${error}`.red);
+        return error
     }
-    forked.send({
-        msg: 'project',
-        document: project
-    });
+    
 
     // Create the listener that will respond to user-triggered stop events
     process.on('stop', function (project_id) {
         if ((project_id.toString() === project._id.toString()) && project.status === 'running') {
             forked.send({ msg: 'stop' })
-        } else { }
+        } else { 
+            console.error(`${getTime()} There is no process with that ID hence it can not be stopped!`.red)
+         }
     });
 
     // Creating the listener that will catch any errors from the child_process

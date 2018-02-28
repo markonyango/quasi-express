@@ -33,7 +33,7 @@ Rx.Observable.zip(
       let check = await job.preFlight();
 
       if (check) {
-        for (var file of document.files) {
+        /* for (var file of document.files) {
           try {
             // Get the absolute path to the file
             const filePath = path.join(uploadPath, file);
@@ -50,10 +50,20 @@ Rx.Observable.zip(
             job.logfile.write(error.toString());
             process.send({ msg: 'error', error: `saveOutput: ${error}` });
           }
+        } */
+        try {
+          var { stdout, stderr } = await exec(`${path.join(__dirname, "/R/qa.R")} ${uploadPath} ${[...document.files]}`)
+        } catch (error) {
+          console.log(`Execution error: ${error}`)
         }
-
-        // Tell the parent that we are done with the job
-        process.send({ msg: 'done' });
+        if (stderr || stdout === undefined) {
+          console.log(stderr)
+          process.send({ msg: 'error', error: stderr })
+        } else {
+          console.log(stdout)
+          // Tell the parent that we are done with the job
+          process.send({ msg: 'done' });
+        }
 
         // Properly close the logfile at the end
         job.logfile.end();

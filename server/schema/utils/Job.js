@@ -42,7 +42,7 @@ module.exports = function (document) {
     if (this.savePath != '') {
       const date = Date.now().toString();
       this.logfile = fs.createWriteStream(path.join(
-        this.savePath,
+        uploadPath,//this.savePath,
         date + '-' + this.document.projecttype + '-log.txt')
       );
       return true;

@@ -86,10 +86,11 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
-router.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/users/login', failureFlash: true }),
+router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }),
   function (req, res, next) {
 
-    res.redirect('/');
+    let {_id, username, email, settings } = req.session.passport.user
+    res.json({_id, username, email, settings})
 
   });
 
