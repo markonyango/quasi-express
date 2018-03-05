@@ -1,210 +1,170 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const to = require('../catchError');
-const { alignReferenceFolder } = require('../settings');
+const { alignReferenceFolder, uploadPath } = require('../settings');
 const fs = require('fs-extra');
 const path = require('path');
+const printOut = require('../printOut')
 
-const Project = require('../server/schema/project');
-const User = require('../server/schema/user');
+const Project = require('../server/schema/ProjectSchema');
+const User = require('../server/schema/UserSchema');
 
 
 // Where do the file uploads go to
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './uploads/')
-    },
-    filename: function (req, file, cb) {
-        // 
-        // TODO: DO NOT FORGET TO DELETE TEST QUERY PARAMETER OPTION - UNSAFE !!!!!!!!
-        //
-        var uid
-        if (!req.session.passport) {
-            uid = 'test';
-        } else {
-            uid = req.session.passport.user._id;
-        }
+  destination: function (req, file, cb) {
+    let savePath = req.user.settings.savePath
+    cb(null, savePath)
+  },
+  filename: function (req, file, cb) {
+    let uid = req.user._id;
 
-        cb(null, '[' + uid + '_' + Date.now() + ']-' + file.originalname)
-    }
+    cb(null, '[' + uid + '_' + Date.now() + ']-' + file.originalname)
+  }
 });
 const upload = multer({ storage: storage });
 
 
-router.get('/', async function (req, res) {
-    // 
-    // TODO: DO NOT FORGET TO DELETE TEST QUERY PARAMETER OPTION - UNSAFE !!!!!!!!
-    //
-    let uid;
-    try {
-        uid = req.query.uid ? req.query.uid : req.session.passport.user;
-    } catch (error) {
-        console.error('Invalid user session!');
-        res.status(500).json(error);
-        return;
-    }
+router.get('/', function (req, res) {
+  let uid = req.user._id;
 
-    if (req.query.json === 'true') {
-        try {
-            let projects = await Project.find({ uid: uid });
-            res.status(200).json(projects);
-        } catch (error) {
-            console.log(error)
-            res.send(500).json(error)
-        }
-    } else {
-        try {
-            let projects = await Project.find({ uid: uid });
-            res.render('projects', { title: 'Projects', projects: projects, script: 'js/projects.js' });
-        } catch (error) {
-            req.flash('error_msg', 'Something went wrong while getting the list of projects: ' + error);
-            res.redirect('/projects');
-        }
-    }
+  if (req.query.json === 'true') {
+    Project.find({ uid: uid }).exec()
+      .then(projects => {
+        res.status(200).json(projects);
+      })
+      .catch(error => {
+        console.error(`Could not fetch the list of projects for ${uid}: ${error}`)
+        res.send(500).json(error)
+      })
+  } else {
+    Project.find({ uid: uid }).exec()
+      .then(projects => {
+        res.render('projects', { title: 'Projects', projects: projects, script: 'js/projects.js' });
+      })
+      .catch(error => {
+        req.flash('error_msg', 'Something went wrong while getting the list of projects: ' + error);
+        res.redirect('/projects');
+      })
+  }
 });
 
 
-router.post('/upload', upload.array('files'), async function (req, res) {
+router.post('/upload', upload.array('files'), function (req, res, next) {
 
-    const files = req.files;
-    const projectname = req.body.projectname;
-    const projecttype = req.body.projecttype;
-    const settings = req.body.settings || {};
-    const status = 'queued';
-    const uid = req.query.uid ? req.query.uid : req.session.passport.user._id;
+  const files = req.files;
+  const projectname = req.body.projectname;
+  const projecttype = req.body.projecttype;
+  const settings = req.body.settings || {};
+  const status = 'queued';
+  const uid = req.user._id;
 
-    if (!files || !projectname || !projecttype || !uid) {
-        res.status(400).json('Invalid POST request!');
-        return
-    }
+  if (!files || !projectname || !projecttype || !uid) {
+    console.error('Invalid POST request to project upload route!')
+    res.status(400).json('Invalid POST request!');
+    next()
+  }
 
-    var project = new Project({
-        projectname: projectname,
-        projecttype: projecttype,
-        settings: settings,
-        status: status,
-        files: [],
-        uid: uid,
-        created: Date.now()
-    });
+  const project = new Project({
+    projectname: projectname,
+    projecttype: projecttype,
+    settings: settings,
+    status: status,
+    files: [],
+    uid: uid,
+    created: Date.now()
+  });
 
 
-    for (let file of files) {
-        project.files.push(file.filename);
-    }
+  for (let file of files) {
+    project.files.push(file.filename);
+  }
 
-    try {
-        const result = await project.save();
-        res.status(200).json(result);
-    } catch (error) {
-        res.status(500).json(error);
-    }
+  project.save()
+    .then(result => res.status(200).json(result))
+    .catch(error => {
+      console.error(`Something went wrong while saving project ${project._id}: ${error}`)
+      res.status(500).json(error);
+    })
 });
 
 router.get('/references', function (req, res) {
-    if (!req.session.passport) {
-        res.status(403).json(req.session);
+  fs.readdir(alignReferenceFolder, (err, files) => {
+    if (err) {
+      res.status(500).json(err);
     } else {
-        fs.readdir(alignReferenceFolder, (err, files) => {
-            if (err) {
-                res.status(500).json(err);
-            } else {
-                files = files.filter(file => {
-                    return file.indexOf('.fasta') >= 0 ? true : false
-                });
-                res.status(200).json(files);
-            }
-        });
+      files = files.filter(file => {
+        return file.indexOf('.fasta') >= 0 ? true : false
+      });
+      res.status(200).json(files);
     }
+  });
 });
 
 
-router.get('/:id', async function (req, res) {
+router.get('/:id', function (req, res) {
 
-    // 
-    // TODO: DO NOT FORGET TO DELETE TEST QUERY PARAMETER OPTION - UNSAFE !!!!!!!!
-    // 
-    const uid = req.query.uid ? req.query.uid : req.session.passport.user;
+  // View project details
+  const id = req.params.id;
+  const uid = req.user._id;
 
-    // View project details
-    const id = req.params.id;
-    if (req.query.json === 'true') {
-        var [error, project] = await to(Project.findOne({ _id: id, uid: uid }));
-        if (error) {
-            res.json(error)
+  if (req.query.json === 'true') {
+    Project.findOne({ _id: id, uid: uid }).exec()
+      .then(project => project.getData())
+      .then(project => res.status(200).json(project))
+      .catch(error => res.status(500).json(error))
+  } else {
+
+    Project.findOne({ _id: id, uid: uid }).exec()
+      .then(project => {
+        if (project.status === 'done') {
+          let files = fs.readdirSync(project.savePath);
+          files = files.filter(file => (file.indexOf('log') >= 0 || file.indexOf('error') >= 0) ? true : false);
+          res.render('project', { title: 'Project', project: project, log: files });
         } else {
-            res.status(200).json(project);
+          res.render('project', { title: 'Project', project: project });
         }
-    } else {
-        try {
-            let project = await Project.findOne({ _id: id, uid: uid });
-            if (project.status === 'done') {
-                await project.populate('uid', 'settings').execPopulate();
-                const savePath = project.uid.settings.savePath;
-                const id = project._id.toString();
-                // TODO: Make sure the output folder exists
-                let files = fs.readdirSync(path.join(savePath, id));
-                files = files.filter(file => file.indexOf('log') >= 0 ? true : false);
-                if (files.length != 1) {
-                    req.flash('error', 'This project has more than 1 logfile');
-                    res.redirect('/projects');
-                    return
-                } else {
-                    let logfile = fs.readFileSync(path.join(savePath, id, files[0]), {encoding: 'utf8'}).toString();
-                    res.render('project', { title: 'Project', project: project, log: logfile });
-                }
-            } else {
-                res.render('project', { title: 'Project', project: project });
-            }
-        } catch (error) {
-            req.flash('error', error.toString());
-            res.redirect('/projects');
-        }
-    }
+      })
+      .catch(error => {
+        console.error(`${printOut(__filename)} Could not fetch the stats for project ${id}: ${error}`)
+        req.flash('error', error.message);
+        res.redirect(500, '/projects');
+      })
+  }
 
 });
 
-router.put('/:id/:action', async function (req, res) {
+router.put('/:id/:action', function (req, res) {
 
-    // 
-    // TODO: DO NOT FORGET TO DELETE TEST QUERY PARAMETER OPTION - UNSAFE !!!!!!!!
-    // 
-    const uid = req.query.uid ? req.query.uid : req.session.passport.user;
+  const uid = req.user._id;
+  const { id, action } = req.params
 
-    const pid = req.params.id;
-    const action = req.params.action;
-
-    let [error, project] = await to(Project.findOne({ _id: pid, uid: uid }));
-
-    if (error) {
-        req.flash('error_msg', 'There was a mistake with your PUT request: ' + error)
-        res.redirect('/projects');
-    } else {
-        let error, result;
-        switch (action) {
-            case 'start':
-                try {
-                    result = await project.startjob();
-                    res.json(result);
-                } catch (error) {
-                    res.json(error)
-                }
-                break;
-            case 'stop':
-                [error, result] = await to(project.stopjob());
-                error ? res.json(error) : res.json(result);
-                break;
-            case 'remove':
-                [error, result] = await to(project.removejob());
-
-                error ? res.json(error) : res.json(result);
-                break;
-            default:
-                error = 'Could not identify the requested change action: ';
-                res.json(error + action);
-        }
-    }
+  Project.findOne({ _id: id, uid: uid }).exec()
+    .then(project => {
+      switch (action) {
+        case 'start':
+          project.startjob()
+            .then(project => res.status(200).json(project))
+            .catch(error => res.status(500).json(error))
+          break;
+        case 'stop':
+          project.stopjob()
+            .then(project => res.status(200).json(project))
+            .catch(error => res.status(500).json(error))
+          break;
+        case 'remove':
+          project.removejob()
+            .then(project => res.status(200).json(project))
+            .catch(error => res.status(500).json(error))
+          break;
+        default:
+          res.json(400, 'Could not identify the requested change action: ' + action);
+      }
+    })
+    .catch(error => {
+      console.error(`${printOut(__filename)} There was a mistake with your PUT request to start project ${id}: ${error}`.red)
+      res.status(500).json(error);
+    })
 });
 
 

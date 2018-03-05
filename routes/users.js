@@ -3,17 +3,20 @@ const router = express.Router();
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const mongoose = require('mongoose');
-const to = require('../catchError');
+const { MongooseDocument } = require('mongoose');
+const fs = require('fs-extra');
+const path = require('path');
+const { uploadPath } = require('../settings');
 
-const User = require('../server/schema/user');
-const Project = require('../server/schema/project');
+const User = require('../server/schema/UserSchema');
+const Project = require('../server/schema/ProjectSchema');
 
 /* GET users listing. */
 router.get('/register', function (req, res) {
   res.render('register', { title: 'Registration' });
 });
 
-router.post('/register', async function (req, res, next) {
+router.post('/register', function (req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
 
@@ -22,9 +25,9 @@ router.post('/register', async function (req, res, next) {
   req.check('email', 'Invalid email address').isEmail();
   req.check('password', 'Password must be at least 6 characters long').isLength({ min: 6 });
 
-  var errors = req.validationErrors();
+  let errors = req.validationErrors();
   if (errors) {
-    var error_msg = '';
+    let error_msg = '';
     errors.forEach(err => error_msg += err.msg + '; ');
     if (req.query.json === 'true') {
       res.json(error_msg);
@@ -35,24 +38,24 @@ router.post('/register', async function (req, res, next) {
   } else {
 
     // newUser is the document that will enter the 'users' collection
-    const newUser = new User({ email: email, password: password });
+    const newUser = new User({ email: email, password: password })
 
-    try {
-      let result = await newUser.save();
-
-      if (req.query.json === 'true') {
-        res.json(result)
-      } else {
-        res.render('register', { title: 'Registration', data: newUser.email });
-      }
-    } catch (error) {
-      if (req.query.json === 'true') {
-        console.error(error)
-        res.json(error)
-      } else {
-        req.flash('error_msg', 'Something went wrong while registering you: ' + error);
-        res.redirect('/register');
-      }
+    if (req.query.json === 'true') {
+      // Save the new user to the MongoDB
+      newUser.save()
+        .then(user => res.json(user))
+        .catch(error => {
+          console.error(`Could not register new user ${newUser.email}: ${error}`)
+          res.status(500).json(error)
+        })
+    } else {
+      newUser.save()
+        .then(user => res.render('register', { title: 'Registration', data: user.email }))
+        .catch(error => {
+          console.error(`Could not regist new user ${newUser.email}: ${error}`)
+          req.flash('error_msg', 'Something went wrong while registering you: ' + error)
+          res.redirect('/register')
+        })
     }
   }
 });
@@ -93,7 +96,7 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
   function (req, res, next) {
 
     if (req.body.json) {
-      let { _id, email, role } = req.session.passport.user
+      let { _id, email, role } = req.user
       res.json({ _id, email, role })
     } else {
       res.redirect('/')
@@ -102,53 +105,54 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
 
   });
 
-router.get('/logout', function (req, res) {
+router.get('/logout', function (req, res, next) {
   req.logout();
+  res.clearCookie('connect.sid')
   req.flash('success_msg', 'You are now logged out');
   res.redirect('/users/login');
 });
 
-router.post('/remove', async function (req, res) {
+router.post('/remove', function (req, res, next) {
+  const uid = req.user._id;
+  // User remove pre-hooks only fire when remove is called on the document
+  // Thus we can not call Model.remove(...)
 
   // If JSON was requested
   if (req.query.json === 'true') {
-    const uid = req.body.uid;
-
-    try {
-      let deleteProjects = await Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) })
-      let deleteUser = await User.findOneAndRemove({ _id: mongoose.Types.ObjectId(uid) })
-      req.clearCookie = true
-      let {email, _id, role} = deleteUser
-      res.json({email, _id, role})
-      req.session.destroy()
-    } catch (error) {
-      res.json(error)
-    }
-  } else {
-
-    const uid = req.session.passport.user._id;
-    let [error, deleteProjects] = await to(Project.deleteMany({ uid: mongoose.Types.ObjectId(uid) }));
-
-    if (error) {
-      req.flash('error_msg', 'Something went wrong while deleting your projects: ' + error);
-      res.redirect('/');
-    } else {
-      let ret;
-      [error, ret] = await to(User.findByIdAndRemove(uid));
-
-      if (error) {
-        req.flash('error_msg', 'Something went wrong while deleting your profile: ' + error);
-        res.redirect('/');
+    User.findById(uid, (err, user) => {
+      if (err) {
+        console.error(`Could not find the user you want to remove: ${err}`.red)
+        res.status(500).json(err)
       } else {
-        req.clearCookie = true;
-        req.flash('success_msg', 'Your account has been successfully deleted.');
-        res.redirect('/');
-        req.session.destroy();
+        user.remove()
+          .then(user => {
+            req.logout();
+            res.clearCookie('connect.sid');
+            res.json(user)
+          })
+          .catch(error => {
+            console.error(`Could not delete the user: ${error}`.red)
+            res.status(500).json(error.message)
+          })
       }
-    }
+    })
+  } else {
+    User.findById(uid, (err, user) => {
+      if (err) {
+        console.error(`Could not find the user you want to remove: ${err}`.red)
+        req.flash('error_msg', `Could not find the user you want to remove: ${err}`)
+        res.redirect(500, '/')
+      } else {
+        user.remove()
+          .then(user => {
+            req.logout()
+            res.clearCookie('connect.sid')
+            req.flash('success_msg', 'Successfully remove your account')
+            res.redirect('/')
+          })
+      }
+    })
   }
 });
-
-
 
 module.exports = router;
