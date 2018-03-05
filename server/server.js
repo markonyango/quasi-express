@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
+const { mongoDB } = require('../settings');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://192.168.0.248:27017/quasi-express',
+mongoose.connect(`mongodb://${mongoDB}:27017/quasi-express`,
     {
         useMongoClient: true
-    }, 
-    function(err) {
-        err ? console.log(`Catastrophic MongoDB error detected:\n ${err}`) : console.log('Connected to MongoDB');
+    },
+    function (err) {
+        err ? console.log(`Catastrophic MongoDB error detected:\n ${err}`) :
+            console.log(`Connected to MongoDB (${mongoDB})`);
     }
 );
 

@@ -6,13 +6,13 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const fs = require('fs-extra');
 const compression = require('compression');
-// const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const expressValidator = require('express-validator');
 const favicon = require('serve-favicon');
 const cors = require('cors');
+const { mongoDB } = require('./settings');
 
 // Register Custom HandlebarsHelpers
 require('./handlebar_helpers');
@@ -20,7 +20,6 @@ require('./handlebar_helpers');
 // Passport requirements
 const passport = require('passport');
 // const LocalStrategy = require('passport-local').Strategy;
-
 
 // Import Routes
 const index = require('./routes/index');
@@ -32,19 +31,10 @@ const settings = require('./routes/settings');
 var app = express();
 
 // Make sure CORS is enabled on this server
-let whitelist = ['http://localhost:3000', 'http://localhost:4200','http://127.0.0.1:5500', 'localhost:3000'];
+let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:5500', 'localhost:3000'];
 app.use(cors({
   credentials: true,
   origin: /localhost|127\.0\.0\.1/
-  // origin: function (origin, callback) {
-  //   if (whitelist.indexOf(origin) !== -1) {
-  //     console.log(origin)
-  //     callback(null, true)
-  //   } else {
-  //     console.log(origin)
-  //     callback(new Error('Not allowed by CORS'))
-  //   }
-  // }
 }
 ));
 
@@ -78,14 +68,15 @@ app.use(expressValidator());
 app.use(session({
   secret: 'supermegasecretkeythatnobodyshalleverfindout',
   saveUninitialized: false,
-  resave: true,
+  resave: false,
   store: new MongoStore({
-    url: 'mongodb://192.168.0.248:27017/quasi-express',
+    url: `mongodb://${mongoDB}:27017/quasi-express`,
     touchAfter: 24 * 3600,
     ttl: 2 * 24 * 3600
   }),
   cookie: {
-    httpOnly: false
+    httpOnly: false,
+    maxAge: 24 * 3600 * 1000
   }
 }));
 
@@ -128,19 +119,26 @@ app.use(favicon(path.join(__dirname, 'public', 'ico', 'favicon.ico')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/settings', settings);
-app.use('/projects', projects);
-app.use('/test', function(req, res, next) {
+app.use('/settings', ensureAuthenticated, settings);
+app.use('/projects', ensureAuthenticated, projects);
+app.use('/test', function (req, res, next) {
   res.render('test', { title: 'QUASI-Express App Testsuite', css: 'https://cdnjs.cloudflare.com/ajax/libs/mocha/5.0.1/mocha.min.css' })
 });
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {
+  let json = req.query.json || req.body.json || false;
   if (req.isAuthenticated()) {
-    return next();
+    next();
   } else {
-    req.flash('error_msg', 'You are not logged in');
-    res.redirect('/users/login');
+    console.error(`Detected unauthorized access attempt from ${req.ip} - ${req.hostname} @ URL: ${req.originalUrl}`.red)
+    if (!json) {
+      req.flash('error_msg', 'You are not logged in');
+      res.redirect('/users/login');
+    } else {
+      res.status(403).json('You are not logged in')
+      res.end()
+    }
   }
 }
 
