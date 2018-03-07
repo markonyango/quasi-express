@@ -2,6 +2,7 @@ const { fork } = require('child_process');
 const path = require('path');
 const color = require('colors');
 const fs = require('fs-extra');
+const rimraf = require('rimraf')
 const { uploadPath } = require('../../../settings');
 const printOut = require('../../../printOut');
 
@@ -12,14 +13,12 @@ const types = new Map([
 ]);
 
 
-function stopjob () {
+function stopjob() {
     var project = this;
-
-    project.status = 'stopped';
-    project.pid = null;
-    process.emit('stop', project._id);
-
     return new Promise((resolve, reject) => {
+        project.status = 'stopped';
+        project.pid = null;
+        process.emit('stop', project._id);
         project.save()
             .then(project => {
                 console.log(`${project._id} stopped`.red)
@@ -32,7 +31,7 @@ function stopjob () {
     })
 }
 
-function startjob () {
+function startjob() {
     var project = this;
     var job_handler;
 
@@ -142,21 +141,23 @@ function startjob () {
     return error ? error : res;
 }
 
-function removejob() {
+function remove(next) {
     let project = this;
 
     if (project.status === 'running') {
         console.log(`${printOut(__filename)} Stopping project before deletion...`.cyan)
         process.emit('stop', project._id);
     }
-
-    return new Promise((resolve, reject) => {
-        project.remove()
-            .then(project => resolve(project))
-            .catch(error => {
-                console.error(`${printOut(__filename)} Something went wrong while removing project document ${project._id}: ${error}`.red)
-                reject(error)
-            })
+    
+    // Remove the projects folder
+    rimraf(project.savePath, (error) => {
+        if (error) {
+            console.error(`${printOut(__filename)} Could not delete project folder: ${project.savePath}: ${error}`.red)
+            next(Error(`${printOut(__filename)} Could not delete project folder: ${project.savePath}: ${error}`))
+        } else {
+            console.error(`${printOut(__filename)} Deleted project folder: ${project.savePath}`.cyan)
+            next()
+        }
     })
 }
 
@@ -212,7 +213,7 @@ function getData() {
 module.exports = {
     startjob,
     stopjob,
-    removejob,
+    remove,
     savejob,
     getData
 }
