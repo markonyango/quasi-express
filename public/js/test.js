@@ -1,9 +1,9 @@
-const assert = chai.assert;
+const assert = chai.assert
 
-const testuser = 'test@user.com';
-const password = 'testuser';
-let uid = '';
-let project_id = '';
+const testuser = 'test@user.com'
+const password = 'testuser'
+let uid = ''
+let project_id = ''
 
 describe('App', function () {
   this.slow(500)
@@ -14,13 +14,13 @@ describe('App', function () {
         try {
           let res = await fetch('http://localhost:3000', { observe: 'response' })
 
-          assert.exists(res.headers, 'Response does not seem to have a header object!');
-          assert.strictEqual(res.status, 200, 'Response status is not 200!');
+          assert.exists(res.headers, 'Response does not seem to have a header object!')
+          assert.strictEqual(res.status, 200, 'Response status is not 200!')
         } catch (error) {
           assert.isNull(error, 'Fetch somehow failed: ' + error)
         }
-      });
-    });
+      })
+    })
 
 
     describe('Users', function () {
@@ -29,8 +29,8 @@ describe('App', function () {
           return fetch('http://localhost:3000/users/register?json=true', {
             method: 'POST',
             body: JSON.stringify({
-              "email": testuser,
-              "password": password
+              'email': testuser,
+              'password': password
             }),
             headers: {
               'content-type': 'application/json'
@@ -55,7 +55,7 @@ describe('App', function () {
             .catch(error => {
               assert.isNull(error, 'Could not register testuser: ' + error)
             })
-        });
+        })
 
         it('We should be able to login with our new testuser', function () {
           return fetch('http://localhost:3000/users/login', {
@@ -65,9 +65,9 @@ describe('App', function () {
             },
             credentials: 'include',
             body: JSON.stringify({
-              "email": testuser,
-              "password": password,
-              "json": true
+              'email': testuser,
+              'password': password,
+              'json': true
             })
           })
             .then(result => {
@@ -78,12 +78,12 @@ describe('App', function () {
               assert.hasAllKeys(result, ['_id', 'email', 'role'])
               assert.isNotNull(result._id)
               assert.equal(result.email, testuser)
-              uid = result._id;
+              uid = result._id
             })
             .catch(error => {
               assert.isNull(error, 'Could not log in: ' + error)
             })
-        });
+        })
 
         it('We should be able to remove the testuser again', function () {
           return fetch('http://localhost:3000/users/remove?json=true', {
@@ -109,7 +109,7 @@ describe('App', function () {
               assert.isNull(error, 'Could not remove user: ' + error)
             })
         })
-      });
+      })
     })
 
 
@@ -119,8 +119,8 @@ describe('App', function () {
         return fetch('http://localhost:3000/users/register?json=true', {
           method: 'POST',
           body: JSON.stringify({
-            "email": testuser,
-            "password": password
+            'email': testuser,
+            'password': password
           }),
           headers: {
             'content-type': 'application/json'
@@ -155,9 +155,9 @@ describe('App', function () {
               },
               credentials: 'include',
               body: JSON.stringify({
-                "email": testuser,
-                "password": password,
-                "json": true
+                'email': testuser,
+                'password': password,
+                'json': true
               })
             })
           })
@@ -169,7 +169,7 @@ describe('App', function () {
             assert.hasAllKeys(result, ['_id', 'email', 'role'])
             assert.isNotNull(result._id)
             assert.equal(result.email, testuser)
-            uid = result._id;
+            uid = result._id
           })
           .catch(error => {
             assert.isNull(error, 'Could not log in: ' + error)
@@ -180,7 +180,7 @@ describe('App', function () {
 
         beforeEach(function (done) {
           if (this.currentTest._currentRetry > 0) {
-            setTimeout(done, this.currentTest.currentRetry() * 1000);
+            setTimeout(done, this.currentTest.currentRetry() * 1000)
           } else {
             done()
           }
@@ -188,8 +188,8 @@ describe('App', function () {
 
         it('We should be able to create a new project for the testuser', function () {
 
-          const form = new FormData;
-          let file1, file2;
+          const form = new FormData
+          let file1, file2
           let test1 = fetch('http://localhost:3000/test/test.fastq').then(data => data.arrayBuffer())
           let test2 = fetch('http://localhost:3000/test/test2.fastq').then(data => data.arrayBuffer())
 
@@ -205,11 +205,11 @@ describe('App', function () {
             })
             .then(() => {
 
-              form.append('projectname', 'Test Project');
-              form.append('projecttype', 'qa');
-              form.append('settings', 'null');
-              form.append('status', 'queued');
-              form.append('uid', uid);
+              form.append('projectname', 'Test Project')
+              form.append('projecttype', 'qa')
+              form.append('settings', 'null')
+              form.append('status', 'queued')
+              form.append('uid', uid)
               form.append('files', file1)
               form.append('files', file2)
 
@@ -317,7 +317,7 @@ describe('App', function () {
               assert.isNull(error, 'Could not fetch the test projects stats: ' + error)
             })
         })
-      });
+      })
 
       describe('Output files', function () {
         it('Logfile should exist in users folder', function () {
@@ -343,7 +343,7 @@ describe('App', function () {
             })
         })
       })
-    });
+    })
   })
 
   after(function (done) {
@@ -371,9 +371,9 @@ describe('App', function () {
           assert.isNull(error, 'Could not remove user: ' + error)
         })
         .then(done, done)
-    }, 14000);
+    }, 14000)
   })
-});
+})
 
 
 

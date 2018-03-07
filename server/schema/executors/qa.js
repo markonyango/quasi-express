@@ -1,21 +1,21 @@
-const { parent2child, onExit, startSubject, projectSubject } = require('./parent2child');
+const { parent2child, onExit, startSubject, projectSubject } = require('./parent2child')
 const { exec } = require('child_process')
-const Rx = require('rxjs/Rx');
-const colors = require('colors');
-const path = require('path');
-const Job = require('../utils/Job');
+const Rx = require('rxjs/Rx')
+const colors = require('colors')
+const path = require('path')
+const Job = require('../utils/Job')
 
 
 // This event listener will handle all commands that are sent to this child via IPC
-process.on('message', parent2child);
+process.on('message', parent2child)
 
 // This even listener will handle exit behavior
 process.on('exit', onExit)
 
 // Since we don't know when the settings will be transmitted (usually shortly after the fork),
 // we will 'observe' the Subjects for changes. $ marks Observables
-var projectObservable$ = new Rx.Observable.from(projectSubject);
-var startObservable$ = new Rx.Observable.from(startSubject);
+var projectObservable$ = new Rx.Observable.from(projectSubject)
+var startObservable$ = new Rx.Observable.from(startSubject)
 
 
 // Observables have to be subscribed to, to make them hot observables
@@ -27,11 +27,11 @@ Rx.Observable.zip(
 )
   .subscribe(
     projectDocument => {
-      const job = new Job(projectDocument);
-      let check = job.preFlight();
+      const job = new Job(projectDocument)
+      let check = job.preFlight()
 
       if (check) {
-        exec(`${path.join(__dirname, "/R/qa.R")} ${job.savePath} ${[...projectDocument.files]}`, (error, stdout, stderr) => {
+        exec(`${path.join(__dirname, '/R/qa.R')} ${job.savePath} ${[...projectDocument.files]}`, (error, stdout, stderr) => {
           // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
           if ((error && stderr) ||  stdout === undefined) {
             console.error(error.yellow)
@@ -39,13 +39,13 @@ Rx.Observable.zip(
           } else {
             console.log(stdout.yellow)
             // Tell the parent that we are done with the job
-            process.send({ msg: 'done' });
+            process.send({ msg: 'done' })
             // Properly close the logfile at the end
-            job.logfile.end();
+            job.logfile.end()
           }
         })
       } else {
-        process.send({ msg: 'error', error: `Encountered an error during project execution pre-flight!` });
+        process.send({ msg: 'error', error: `Encountered an error during project execution pre-flight!` })
       }
     },
     error => console.error(new Error(error))
