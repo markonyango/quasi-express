@@ -6,15 +6,24 @@
 <p>Files: {{project.files}}</p>
 <p>Status: {{project.status}}</p>
 
-{{#if log}}
-<div class="card">
-    <div class="card-header">Logfile</div>
-    <div class="card-body">
-        <div class="card-text">
-            {{{html log}}}
+{{#if logfile}}
+<div class="card-deck">
+    <div class="card border-dark">
+        <h5 class="card-header bg-success">Logfile</h5>
+        <div class="card-body">
+            <div class="card-text">
+                {{{html logfile}}}
+            </div>
+        </div>
+    </div> {{/if}} {{#if errorfile}}
+    <div class="card border-dark">
+        <h5 class="card-header bg-danger">Errors</h5>
+        <div class="card-body">
+            <div class="card-text">
+                {{{html errorfile}}}
+            </div>
         </div>
     </div>
-</div> {{/if}}
-{{else}}
+</div> {{/if}} {{else}}
 <p>No project with this ID found!</p>
 {{/if}}
