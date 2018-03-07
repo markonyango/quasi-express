@@ -35,13 +35,18 @@ Rx.Observable.zip(
           // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
           if ((error && stderr) ||  stdout === undefined) {
             console.error(error.yellow)
+            job.errorfile.write(stderr)
+            job.errorfile.write(error)
+            stdout ? job.logfile.write(stdout) : ''
+            job.errorfile.end()
+            job.logfile.end()
             process.send({ msg: 'error', error: error })
           } else {
             console.log(stdout.yellow)
-            // Tell the parent that we are done with the job
-            process.send({ msg: 'done' })
-            // Properly close the logfile at the end
+            job.logfile.write(stdout)
+            job.errorfile.end()
             job.logfile.end()
+            process.send({ msg: 'done' })            
           }
         })
       } else {
