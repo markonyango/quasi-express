@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const multer = require('multer')
-const { alignReferenceFolder, uploadPath } = require('../settings')
+const { alignReferenceFolder } = require('../settings')
 const fs = require('fs-extra')
 const path = require('path')
 const printOut = require('../printOut')
 
 const Project = require('../server/schema/ProjectSchema')
-const User = require('../server/schema/UserSchema')
+
 
 
 // Where do the file uploads go to
@@ -17,8 +17,6 @@ var storage = multer.diskStorage({
     cb(null, savePath)
   },
   filename: function (req, file, cb) {
-    let uid = req.user._id
-
     cb(null, file.originalname)
   }
 })
@@ -159,7 +157,7 @@ router.put('/:id/:action', function (req, res) {
             .catch(error => res.status(500).json(error))
           break
         case 'remove':
-          project.removejob()
+          project.remove()
             .then(project => res.status(200).json(project))
             .catch(error => res.status(500).json(error))
           break

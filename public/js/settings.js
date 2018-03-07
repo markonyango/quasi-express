@@ -2,12 +2,12 @@ $(document).ready(function() {
 
     $('#form_remove_user').on('submit', function(e) {
 
-        e.preventDefault();
-        const form = $(this);
-        var formData = false;
+        e.preventDefault()
+        const form = $(this)
+        var formData = false
 
         if (window.FormData) {
-            formData = new FormData(form[0]);
+            formData = new FormData(form[0])
         }
 
         $.ajax({
@@ -18,16 +18,16 @@ $(document).ready(function() {
             contentType: false,
 
             complete: function() {
-                console.log('complete');
+                console.log('complete')
             },
             success: function() {
-                console.log('success');
+                console.log('success')
             },
             fail: function() {
-                console.log('failure');
+                console.log('failure')
             },
             error: function(error) {
-                console.log('error', error.responseText);
+                console.log('error', error.responseText)
             }
         })
     })

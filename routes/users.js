@@ -1,39 +1,39 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
-const mongoose = require('mongoose');
-const { MongooseDocument } = require('mongoose');
-const fs = require('fs-extra');
-const path = require('path');
-const { uploadPath } = require('../settings');
+const express = require('express')
+const router = express.Router()
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+const mongoose = require('mongoose')
+const { MongooseDocument } = require('mongoose')
+const fs = require('fs-extra')
+const path = require('path')
+const { uploadPath } = require('../settings')
 
-const User = require('../server/schema/UserSchema');
-const Project = require('../server/schema/ProjectSchema');
+const User = require('../server/schema/UserSchema')
+const Project = require('../server/schema/ProjectSchema')
 
 /* GET users listing. */
 router.get('/register', function (req, res) {
-  res.render('register', { title: 'Registration' });
-});
+  res.render('register', { title: 'Registration' })
+})
 
 router.post('/register', function (req, res, next) {
-  const email = req.body.email;
-  const password = req.body.password;
+  const email = req.body.email
+  const password = req.body.password
 
   // Validation
-  req.check('email', 'Email address is empty').isLength({ min: 1 });
-  req.check('email', 'Invalid email address').isEmail();
-  req.check('password', 'Password must be at least 6 characters long').isLength({ min: 6 });
+  req.check('email', 'Email address is empty').isLength({ min: 1 })
+  req.check('email', 'Invalid email address').isEmail()
+  req.check('password', 'Password must be at least 6 characters long').isLength({ min: 6 })
 
-  let errors = req.validationErrors();
+  let errors = req.validationErrors()
   if (errors) {
-    let error_msg = '';
-    errors.forEach(err => error_msg += err.msg + '; ');
+    let error_msg = ''
+    errors.forEach(err => error_msg += err.msg + '; ')
     if (req.query.json === 'true') {
-      res.json(error_msg);
+      res.json(error_msg)
     } else {
-      req.flash('error_msg', error_msg);
-      res.redirect('/users/register');
+      req.flash('error_msg', error_msg)
+      res.redirect('/users/register')
     }
   } else {
 
@@ -58,39 +58,39 @@ router.post('/register', function (req, res, next) {
         })
     }
   }
-});
+})
 
 router.get('/login', function (req, res) {
   res.render('login', { title: 'Login' })
-});
+})
 
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, function (email, password, done) {
   User.findOne({ email: email }, function (err, user) {
-    if (err) return done(err);
+    if (err) return done(err)
     if (!user) {
-      return done(null, false, { message: 'Wrong credentials' });
+      return done(null, false, { message: 'Wrong credentials' })
     }
     user.comparePassword(password, function (err, isMatch) {
-      if (err) return done(err);
+      if (err) return done(err)
       if (isMatch) {
-        return done(null, user);
+        return done(null, user)
       } else {
-        return done(null, false, { message: 'Wrong credentials' });
+        return done(null, false, { message: 'Wrong credentials' })
       }
-    });
-  });
+    })
+  })
 })
-);
+)
 
 passport.serializeUser(function (user, done) {
-  done(null, user);
-});
+  done(null, user)
+})
 
 passport.deserializeUser(function (id, done) {
   User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
+    done(err, user)
+  })
+})
 
 router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }),
   function (req, res, next) {
@@ -103,17 +103,17 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
     }
 
 
-  });
+  })
 
 router.get('/logout', function (req, res, next) {
-  req.logout();
+  req.logout()
   res.clearCookie('connect.sid')
-  req.flash('success_msg', 'You are now logged out');
-  res.redirect('/users/login');
-});
+  req.flash('success_msg', 'You are now logged out')
+  res.redirect('/users/login')
+})
 
 router.post('/remove', function (req, res, next) {
-  const uid = req.user._id;
+  const uid = req.user._id
   // User remove pre-hooks only fire when remove is called on the document
   // Thus we can not call Model.remove(...)
 
@@ -126,8 +126,8 @@ router.post('/remove', function (req, res, next) {
       } else {
         user.remove()
           .then(user => {
-            req.logout();
-            res.clearCookie('connect.sid');
+            req.logout()
+            res.clearCookie('connect.sid')
             res.json(user)
           })
           .catch(error => {
@@ -153,6 +153,6 @@ router.post('/remove', function (req, res, next) {
       }
     })
   }
-});
+})
 
-module.exports = router;
+module.exports = router

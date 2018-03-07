@@ -1,7 +1,7 @@
-const mongoose = require('../server');
+const mongoose = require('../server')
 const { save, remove, comparePassword } = require('./utils/UserMethods')
 
-var Schema = mongoose.Schema;
+var Schema = mongoose.Schema
 var userSchema = new Schema({
     username: {
         type: String,
@@ -26,10 +26,10 @@ var userSchema = new Schema({
         rPath: { type: String },
         savePath: { type: String }
     }
-});
+})
 
-userSchema.pre('save', save);
-userSchema.pre('remove', remove);
-userSchema.methods.comparePassword = comparePassword;
+userSchema.pre('save', save)
+userSchema.pre('remove', remove)
+userSchema.methods.comparePassword = comparePassword
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema)
