@@ -178,22 +178,47 @@ describe('App', function () {
 
       context('Projects', function () {
 
+        beforeEach(function (done) {
+          if (this.currentTest._currentRetry > 0) {
+            setTimeout(done, this.currentTest.currentRetry() * 1000);
+          } else {
+            done()
+          }
+        })
+
         it('We should be able to create a new project for the testuser', function () {
 
           const form = new FormData;
-          form.append('projectname', 'Test Project');
-          form.append('projecttype', 'qa');
-          form.append('settings', 'null');
-          form.append('status', 'queued');
-          form.append('uid', uid);
-          let file = new File(['files'], '/home/mark/Dokumente/quasi-express/test.fastq')
-          form.append('files', file, 'test.fastq')
+          let file1, file2;
+          let test1 = fetch('http://localhost:3000/test/test.fastq').then(data => data.arrayBuffer())
+          let test2 = fetch('http://localhost:3000/test/test2.fastq').then(data => data.arrayBuffer())
 
-          return fetch('http://localhost:3000/projects/upload',
-            {
-              method: 'POST',
-              body: form,
-              credentials: 'include'
+          return Promise.all([test1, test2])
+            .then(([res1, res2]) => {
+              assert.instanceOf(res1, ArrayBuffer, 'Loaded test.fastq does not resolve to instanceof ArrayBuffer')
+              assert.instanceOf(res2, ArrayBuffer, 'Loaded test2.fastq does not resolve to instanceof ArrayBuffer')
+              assert.isAbove(res1.byteLength, 0, 'byteLength of test.fastq is 0 but shouldn\'t be')
+              assert.isAbove(res2.byteLength, 0, 'byteLength of test2.fastq is 0 but shouldn\'t be')
+              file1 = new File([res1], 'test.fastq')
+              file2 = new File([res2], 'test2.fastq')
+              return Promise.resolve()
+            })
+            .then(() => {
+
+              form.append('projectname', 'Test Project');
+              form.append('projecttype', 'qa');
+              form.append('settings', 'null');
+              form.append('status', 'queued');
+              form.append('uid', uid);
+              form.append('files', file1)
+              form.append('files', file2)
+
+              return fetch('http://localhost:3000/projects/upload',
+                {
+                  method: 'POST',
+                  body: form,
+                  credentials: 'include'
+                })
             })
             .then(result => {
               assert.equal(result.status, 200, 'Response status is not 200!')
@@ -271,8 +296,9 @@ describe('App', function () {
             })
         })
 
-        it('The started project should either still be running or finished', function(done) {
-          fetch('http://localhost:3000/projects/' + project_id + '?json=true', {
+        it('The started project should be finished', function () {
+          this.retries(3)
+          return fetch('http://localhost:3000/projects/' + project_id + '?json=true', {
             credentials: 'include'
           })
             .then(result => {
@@ -285,21 +311,16 @@ describe('App', function () {
               assert.equal(result._id, project_id, 'Response contains the wrong project')
               assert.notEqual(result.status, 'failed', 'The projects execution seems to have failed somehow')
               assert.notEqual(result.status, 'queued', 'The project was never started')
+              assert.notEqual(result.status, 'running', 'The project is still running')
             })
             .catch(error => {
               assert.isNull(error, 'Could not fetch the test projects stats: ' + error)
             })
-            .then(function() {
-              // Aparently Mocha does not wait for every it() to complete before running the after() hook
-              setTimeout(() => {
-                done()
-              }, 1000);
-            }, done)
         })
       });
 
-      describe('Output files', function(){
-        it('Logfile should exist in users folder', function(){
+      describe('Output files', function () {
+        it('Logfile should exist in users folder', function () {
           this.retries(3)
           return fetch('http://localhost:3000/projects/' + project_id + '?json=true', {
             credentials: 'include'
@@ -328,30 +349,30 @@ describe('App', function () {
   after(function (done) {
     setTimeout(() => {
       fetch('http://localhost:3000/users/remove?json=true', {
-          method: 'POST',
-          credentials: 'include'
-        })
-          .then(result => {
-            assert.equal(result.status, 200, 'Response status is not 200!')
-            return result.json()
-          })
-          .then(result => {
-            assert.isObject(result)
-            assert.hasAllKeys(result, [
-              '_id',
-              'email',
-              'password',
-              'settings',
-              '__v',
-              'role'
-            ])
-          })
-          .catch(error => {
-            assert.isNull(error, 'Could not remove user: ' + error)
-          })
-          .then(done, done)
-    }, 9000);
+        method: 'POST',
+        credentials: 'include'
       })
+        .then(result => {
+          assert.equal(result.status, 200, 'Response status is not 200!')
+          return result.json()
+        })
+        .then(result => {
+          assert.isObject(result)
+          assert.hasAllKeys(result, [
+            '_id',
+            'email',
+            'password',
+            'settings',
+            '__v',
+            'role'
+          ])
+        })
+        .catch(error => {
+          assert.isNull(error, 'Could not remove user: ' + error)
+        })
+        .then(done, done)
+    }, 14000);
+  })
 });
 
 

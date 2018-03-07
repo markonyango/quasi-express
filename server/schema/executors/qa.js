@@ -1,11 +1,9 @@
 const { parent2child, onExit, startSubject, projectSubject } = require('./parent2child');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const { exec } = require('child_process')
 const Rx = require('rxjs/Rx');
 const colors = require('colors');
 const path = require('path');
 const Job = require('../utils/Job');
-const { uploadPath } = require('../../../settings');
 
 
 // This event listener will handle all commands that are sent to this child via IPC
@@ -28,45 +26,24 @@ Rx.Observable.zip(
   (project) => (project)
 )
   .subscribe(
-    async document => {
-      const job = new Job(document);
-      let check = await job.preFlight();
+    projectDocument => {
+      const job = new Job(projectDocument);
+      let check = job.preFlight();
 
       if (check) {
-        /* for (var file of document.files) {
-          try {
-            // Get the absolute path to the file
-            const filePath = path.join(uploadPath, file);
-
-            // Execute the Quality Assessment for this file
-            // Output gets written to stdout AFTER the program finishes
-            const { stdout } = await exec('qa ' + filePath);
-            job.logfile.write(stdout);
-
-            // Move output files to the savePath folder
-            await job.saveOutput();
-
-          } catch (error) {
-            job.logfile.write(error.toString());
-            process.send({ msg: 'error', error: `saveOutput: ${error}` });
+        exec(`${path.join(__dirname, "/R/qa.R")} ${job.savePath} ${[...projectDocument.files]}`, (error, stdout, stderr) => {
+          // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
+          if ((error && stderr) ||  stdout === undefined) {
+            console.error(error.yellow)
+            process.send({ msg: 'error', error: error })
+          } else {
+            console.log(stdout.yellow)
+            // Tell the parent that we are done with the job
+            process.send({ msg: 'done' });
+            // Properly close the logfile at the end
+            job.logfile.end();
           }
-        } */
-        try {
-          var { stdout, stderr } = await exec(`${path.join(__dirname, "/R/qa.R")} ${uploadPath} ${[...document.files]}`)
-        } catch (error) {
-          console.log(`Execution error: ${error}`)
-        }
-        if (stderr || stdout === undefined) {
-          console.log(stderr)
-          process.send({ msg: 'error', error: stderr })
-        } else {
-          console.log(stdout)
-          // Tell the parent that we are done with the job
-          process.send({ msg: 'done' });
-        }
-
-        // Properly close the logfile at the end
-        job.logfile.end();
+        })
       } else {
         process.send({ msg: 'error', error: `Encountered an error during project execution pre-flight!` });
       }

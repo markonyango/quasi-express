@@ -1,7 +1,6 @@
 const fs = require('fs-extra')
 const path = require('path');
 const printOut = require('../../../printOut')
-const { uploadPath } = require('../../../settings');
 
 module.exports = function (projectDocument) {
 
@@ -22,7 +21,7 @@ module.exports = function (projectDocument) {
       return false;
     }
 
-    const checkLogFile = this.setLogFile();
+    this.setLogFile();
     if (!this.logfile instanceof fs.WriteStream) {
       console.error(`${printOut(__filename)} Logfile is not an instance of WriteStream!`.red)
       process.send({ msg: 'error', error: `Logfile is not an instance of WriteStream!` });

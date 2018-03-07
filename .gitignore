@@ -6,3 +6,6 @@ outfile.txt
 *.txt
 test2.js
 server/schema/executors/test.js
+tasks.json
+.settings
+quality-report.pdf
