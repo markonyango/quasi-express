@@ -190,8 +190,8 @@ describe('App', function () {
 
           const form = new FormData
           let file1, file2
-          let test1 = fetch('http://localhost:3000/test/test.fastq').then(data => data.arrayBuffer())
-          let test2 = fetch('http://localhost:3000/test/test2.fastq').then(data => data.arrayBuffer())
+          let test1 = fetch('http://localhost:3000/test/test.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
+          let test2 = fetch('http://localhost:3000/test/test2.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
 
           return Promise.all([test1, test2])
             .then(([res1, res2]) => {

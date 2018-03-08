@@ -3,7 +3,6 @@ const router = express.Router()
 const multer = require('multer')
 const { alignReferenceFolder } = require('../settings')
 const fs = require('fs-extra')
-const path = require('path')
 const printOut = require('../printOut')
 
 const Project = require('../server/schema/ProjectSchema')
@@ -114,23 +113,9 @@ router.get('/:id', function (req, res) {
   } else {
 
     Project.findOne({ _id: id, uid: uid }).exec()
-      .then(project => {
-        if (project.status === 'done') {
-          let errorFile = fs.readFile(path.join(project.savePath, 'error.txt'), 'utf8')
-          let logFile = fs.readFile(path.join(project.savePath, 'logfile.txt'), 'utf8')
-
-          Promise.all([errorFile, logFile])
-            .then(([error, log]) => {
-              res.render('project', { title: 'Project', project: project, logfile: log, errorfile: error })
-            })
-            .catch(error => console.error(`${printOut(__filename)} Could not read the logfiles for project ${project._id}: ${error}`.red))
-          
-        } else {
-          res.render('project', { title: 'Project', project: project })
-        }
-      })
+      .then(project => project.getData())
+      .then(project => res.render('project', { title: 'Project', project: project }))
       .catch(error => {
-        console.error(`${printOut(__filename)} Could not fetch the stats for project ${id}: ${error}`.red)
         req.flash('error', error.message)
         res.redirect(500, '/projects')
       })

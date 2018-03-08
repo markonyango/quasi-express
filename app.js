@@ -1,68 +1,68 @@
-const express = require('express');
-const path = require('path');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const hbs = require('hbs');
-const fs = require('fs-extra');
-const compression = require('compression');
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const flash = require('connect-flash');
-const expressValidator = require('express-validator');
-const favicon = require('serve-favicon');
-const cors = require('cors');
-const { mongoDB } = require('./settings');
+const express = require('express')
+const path = require('path')
+const logger = require('morgan')
+const bodyParser = require('body-parser')
+const hbs = require('hbs')
+const fs = require('fs-extra')
+const compression = require('compression')
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session)
+const flash = require('connect-flash')
+const expressValidator = require('express-validator')
+const favicon = require('serve-favicon')
+const cors = require('cors')
+const { mongoDB } = require('./settings')
+const printOut = require('./printOut')
+
 
 // Register Custom HandlebarsHelpers
-require('./handlebar_helpers');
+require('./handlebar_helpers')
 
 // Passport requirements
-const passport = require('passport');
+const passport = require('passport')
 // const LocalStrategy = require('passport-local').Strategy;
 
 // Import Routes
-const index = require('./routes/index');
-const users = require('./routes/users');
-const projects = require('./routes/projects');
-const settings = require('./routes/settings');
+const index = require('./routes/index')
+const users = require('./routes/users')
+const projects = require('./routes/projects')
+const settings = require('./routes/settings')
 
 // Initialize Express App
-var app = express();
+var app = express()
 
 // Make sure CORS is enabled on this server
-let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:5500', 'localhost:3000'];
+let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:5500', 'localhost:3000']
 app.use(cors({
   credentials: true,
   origin: /localhost|127\.0\.0\.1/
 }
-));
+))
 
 // view engine setup
-hbs.registerPartials(__dirname + '/views/partials');
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+hbs.registerPartials(__dirname + '/views/partials')
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'hbs')
 
 // Use GZip compression on responses
-app.use(compression());
+app.use(compression())
 
 // Morgan middleware setup
-const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' });
+const morganlog = fs.createWriteStream(path.join(__dirname, 'morganlog.txt'), { flags: 'a' })
 app.use(logger('dev', {
   stream: morganlog,
   skip: function (req) {
     return /^\/js|^\/css|^\/ico/.test(req.url)
   }
-}));
+}))
 // app.use(logger('dev', {
 //   skip: function (req) { return /^\/js|^\/css|^\/ico/.test(req.url) }
 // }));
 
 // Bodyparser and Cookieparser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(expressValidator());
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+app.use(expressValidator())
 
 // Express session - this must come after the cookieParser()
 app.use(session({
@@ -78,21 +78,21 @@ app.use(session({
     httpOnly: false,
     maxAge: 24 * 3600 * 1000
   }
-}));
+}))
 
 // Passport initialization
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Connect Flash middleware
-app.use(flash());
+app.use(flash())
 
 // Global Vars
 app.use(function (req, res, next) {
-  res.locals.success_msg = req.flash('success_msg');
-  res.locals.error_msg = req.flash('error_msg');
-  res.locals.error = req.flash('error');
-  res.locals.user = req.user || null;
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.error_msg = req.flash('error_msg')
+  res.locals.error = req.flash('error')
+  res.locals.user = req.user || null
   // Make server stats available
   res.locals.stats = {
     memoryUsage: {
@@ -107,34 +107,34 @@ app.use(function (req, res, next) {
     uptime: Math.floor(process.uptime()),
     nodeVersion: process.version,
     platform: process.platform
-  };
-  next();
-});
+  }
+  next()
+})
 
 // Set static public folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Favicon middleware
-app.use(favicon(path.join(__dirname, 'public', 'ico', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'ico', 'favicon.ico')))
 
-app.use('/', index);
-app.use('/users', users);
-app.use('/settings', ensureAuthenticated, settings);
-app.use('/projects', ensureAuthenticated, projects);
+app.use('/', index)
+app.use('/users', users)
+app.use('/settings', ensureAuthenticated, settings)
+app.use('/projects', ensureAuthenticated, projects)
 app.use('/test', function (req, res, next) {
   res.render('test', { title: 'QUASI-Express App Testsuite', css: 'https://cdnjs.cloudflare.com/ajax/libs/mocha/5.0.1/mocha.min.css' })
-});
+})
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {
-  let json = req.query.json || req.body.json || false;
+  let json = req.query.json || req.body.json || false
   if (req.isAuthenticated()) {
-    next();
+    next()
   } else {
     console.error(`Detected unauthorized access attempt from ${req.ip} - ${req.hostname} @ URL: ${req.originalUrl}`.red)
     if (!json) {
-      req.flash('error_msg', 'You are not logged in');
-      res.redirect('/users/login');
+      req.flash('error_msg', 'You are not logged in')
+      res.redirect('/users/login')
     } else {
       res.status(403).json('You are not logged in')
       res.end()
@@ -144,33 +144,38 @@ function ensureAuthenticated(req, res, next) {
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  var err = new Error(`Requested route (${req.originalUrl}) could not be found!`);
-  err.status = 404;
-  next(err);
-});
+  var err = new Error(`Requested route (${req.originalUrl}) could not be found!`)
+  err.status = 404
+  next(err)
+})
 
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
 
   // render the error page
-  res.status(err.status || 500);
+  res.status(err.status || 500)
 
-  res.render('error');
-});
+  res.render('error')
+})
 
-var gracefulExit = function (signal) {
-  require('./server/server').connection.close(function () {
-    console.log(`Mongoose connection shut down by killing the Node app. Signal: ${signal}`);
-    signal === 'SIGUSR2' ? process.kill(process.pid, 'SIGUSR2') : process.kill(process.pid, signal);
-  });
-};
+function gracefulExit(signal) {
+  require('./server/server').connection.close()
+    .then(() => {
+      console.log(`Recieved signal: ${signal}. Killing myself...`)
+      signal === 'SIGUSR2' ? process.kill(process.pid, 'SIGUSR2') : process.kill(process.pid, signal)
+    })
+    .catch(error =>  {
+      console.error(`${printOut(__filename)} Could not close the connection to the MongoDB server: ${error}`.red)
+      process.kill(process.pid, 'SIGKILL')
+    })
+}
 
 process
   .once('SIGINT', gracefulExit)
   .once('SIGTERM', gracefulExit)
   .once('SIGUSR2', gracefulExit)
 
-module.exports = app;
+module.exports = app

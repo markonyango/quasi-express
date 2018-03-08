@@ -2,21 +2,17 @@ const express = require('express')
 const router = express.Router()
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
-const mongoose = require('mongoose')
-const { MongooseDocument } = require('mongoose')
-const fs = require('fs-extra')
-const path = require('path')
-const { uploadPath } = require('../settings')
+const printOut = require('../printOut')
 
 const User = require('../server/schema/UserSchema')
-const Project = require('../server/schema/ProjectSchema')
 
 /* GET users listing. */
 router.get('/register', function (req, res) {
   res.render('register', { title: 'Registration' })
+  req.session.destroy()
 })
 
-router.post('/register', function (req, res, next) {
+router.post('/register', function (req, res) {
   const email = req.body.email
   const password = req.body.password
 
@@ -30,7 +26,7 @@ router.post('/register', function (req, res, next) {
     let error_msg = ''
     errors.forEach(err => error_msg += err.msg + '; ')
     if (req.query.json === 'true') {
-      res.json(error_msg)
+      res.status(400).json(error_msg)
     } else {
       req.flash('error_msg', error_msg)
       res.redirect('/users/register')
@@ -43,16 +39,24 @@ router.post('/register', function (req, res, next) {
     if (req.query.json === 'true') {
       // Save the new user to the MongoDB
       newUser.save()
-        .then(user => res.json(user))
+        .then(user => {
+          req.session.destroy()
+          res.status(200).json(user)
+        })
         .catch(error => {
           console.error(`Could not register new user ${newUser.email}: ${error}`)
+          req.session.destroy()
           res.status(500).json(error)
         })
     } else {
       newUser.save()
-        .then(user => res.render('register', { title: 'Registration', data: user.email }))
+        .then(user => {
+          req.session.destroy()
+          res.render('login', { title: 'Login' })
+        })
         .catch(error => {
-          console.error(`Could not regist new user ${newUser.email}: ${error}`)
+          console.error(`Could not register new user ${newUser.email}: ${error}`)
+          req.session.destroy()
           req.flash('error_msg', 'Something went wrong while registering you: ' + error)
           res.redirect('/register')
         })
@@ -93,7 +97,7 @@ passport.deserializeUser(function (id, done) {
 })
 
 router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }),
-  function (req, res, next) {
+  function (req, res) {
 
     if (req.body.json) {
       let { _id, email, role } = req.user
@@ -105,53 +109,47 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/users/
 
   })
 
-router.get('/logout', function (req, res, next) {
+router.get('/logout', function (req, res) {
   req.logout()
   res.clearCookie('connect.sid')
   req.flash('success_msg', 'You are now logged out')
-  res.redirect('/users/login')
+  req.session.destroy()
+  res.redirect('/')
 })
 
-router.post('/remove', function (req, res, next) {
+router.post('/remove', function (req, res) {
   const uid = req.user._id
   // User remove pre-hooks only fire when remove is called on the document
   // Thus we can not call Model.remove(...)
 
   // If JSON was requested
   if (req.query.json === 'true') {
-    User.findById(uid, (err, user) => {
-      if (err) {
-        console.error(`Could not find the user you want to remove: ${err}`.red)
-        res.status(500).json(err)
-      } else {
-        user.remove()
-          .then(user => {
-            req.logout()
-            res.clearCookie('connect.sid')
-            res.json(user)
-          })
-          .catch(error => {
-            console.error(`Could not delete the user: ${error}`.red)
-            res.status(500).json(error.message)
-          })
-      }
-    })
+    User.findById(uid).exec()
+      .then(user => user.remove())
+      .then(user => {
+        req.session.destroy()
+        req.logout()
+        res.clearCookie('connect.sid')
+        res.status(200).json(user)
+
+
+      })
+      .catch(error => res.status(500).json(error))
   } else {
-    User.findById(uid, (err, user) => {
-      if (err) {
-        console.error(`Could not find the user you want to remove: ${err}`.red)
-        req.flash('error_msg', `Could not find the user you want to remove: ${err}`)
+    User.findById(uid).exec()
+      .then(user => user.remove())
+      .then(() => {
+        req.logout()
+        req.session.destroy()
+        res.clearCookie('connect.sid')
+        req.flash('success_msg', 'Successfully remove your account')
+        res.redirect('/')
+      })
+      .catch(error => {
+        req.flash('error_msg', `Could not find the user you want to remove: ${error}`)
         res.redirect(500, '/')
-      } else {
-        user.remove()
-          .then(user => {
-            req.logout()
-            res.clearCookie('connect.sid')
-            req.flash('success_msg', 'Successfully remove your account')
-            res.redirect('/')
-          })
-      }
-    })
+      })
+
   }
 })
 

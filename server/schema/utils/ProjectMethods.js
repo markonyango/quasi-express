@@ -1,24 +1,18 @@
-const { fork } = require('child_process');
-const path = require('path');
-const color = require('colors');
-const fs = require('fs-extra');
+const { fork } = require('child_process')
+const path = require('path')
+const color = require('colors')
+const fs = require('fs-extra')
 const rimraf = require('rimraf')
-const { uploadPath } = require('../../../settings');
-const printOut = require('../../../printOut');
-
-const types = new Map([
-    ['qa', 'Quality Assessment'],
-    ['dea', 'Differential Expression Analysis'],
-    ['align', 'Alignment']
-]);
+const { uploadPath } = require('../../../settings')
+const printOut = require('../../../printOut')
 
 
 function stopjob() {
-    var project = this;
+    var project = this
     return new Promise((resolve, reject) => {
-        project.status = 'stopped';
-        project.pid = null;
-        process.emit('stop', project._id);
+        project.status = 'stopped'
+        project.pid = null
+        process.emit('stop', project._id)
         project.save()
             .then(project => {
                 console.log(`${project._id} stopped`.red)
@@ -32,35 +26,34 @@ function stopjob() {
 }
 
 function startjob() {
-    var project = this;
-    var job_handler;
+    var project = this
+    var job_handler
 
     // Which Executor should be forked, according to the project type
     switch (project.projecttype) {
         case 'qa':
-            job_handler = path.join(__dirname, '../executors/qa.js');
-            break;
+            job_handler = path.join(__dirname, '../executors/qa.js')
+            break
         case 'dea':
-            job_handler = path.join(__dirname, '../executors/qa.js');
-            break;
+            job_handler = path.join(__dirname, '../executors/qa.js')
+            break
         case 'align':
-            job_handler = path.join(__dirname, '../executors/align.js');
-            break;
+            job_handler = path.join(__dirname, '../executors/align.js')
+            break
         default:
-            const error = new Error('Could not identify the project type of the project to be started.')
-            return error;
+            return Error('Could not identify the project type of the project to be started.')
     }
 
 
     // Fork Executor into new Node instance. IPC channel will be opened
-    const forked = fork(job_handler);
+    const forked = fork(job_handler)
 
     // Send this document via IPC to the forked child
     // but populate the 'uid' path with the user settings first
     forked.send({
         msg: 'project',
         document: project
-    });
+    })
 
 
     // Create the listener that will respond to user-triggered stop events
@@ -72,11 +65,11 @@ function startjob() {
         } else {
             console.error(`${printOut(__filename)} There is no process with that ID hence it can not be stopped!`.red)
         }
-    });
+    })
 
     // Creating the listener that will catch any errors from the child_process
     forked.on('error', (msg) => {
-        project.status = 'failed';
+        project.status = 'failed'
         project.save()
             .then(project => {
                 console.error(`${printOut(__filename)} Something went wrong while trying to start the child_process: ${msg}`.red)
@@ -84,16 +77,16 @@ function startjob() {
             .catch(error => {
                 console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red)
             })
-    });
+    })
 
     // Create the listener that reacts to messages from the child
     forked.on('message', async function (msg) {
         switch (msg.msg) {
             case 'done':
-                console.log(`${printOut(__filename)} Recieved 'done'`.cyan);
-                forked.send({ msg: 'stop' });
-                project.status = 'done';
-                project.pid = null;
+                console.log(`${printOut(__filename)} Recieved 'done'`.cyan)
+                forked.send({ msg: 'stop' })
+                project.status = 'done'
+                project.pid = null
                 project.save()
                     .then(project => {
                         console.log(`${printOut(__filename)} Saving project status: ${project.status}`.cyan)
@@ -101,7 +94,7 @@ function startjob() {
                     .catch(error => {
                         console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red)
                     })
-                break;
+                break
             case 'error':
                 console.error(`${printOut(__filename)} Recieved 'error': ${msg.error}. Killing job`.red)
                 forked.send({ msg: 'kill' })
@@ -114,20 +107,19 @@ function startjob() {
                     .catch(error => {
                         console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red)
                     })
-                break;
+                break
             default:
-                break;
+                break
         }
     })
 
-    project.pid = forked.pid;
-    project.status = 'running';
-
     return new Promise((resolve, reject) => {
+        project.pid = forked.pid
+        project.status = 'running'
         project.save()
             .then(project => {
 
-                forked.send({ msg: 'start' });
+                forked.send({ msg: 'start' })
                 resolve(project)
             })
             .catch(error => {
@@ -135,20 +127,16 @@ function startjob() {
                 reject(error)
             })
     })
-
-
-
-    return error ? error : res;
 }
 
 function remove(next) {
-    let project = this;
+    let project = this
 
     if (project.status === 'running') {
         console.log(`${printOut(__filename)} Stopping project before deletion...`.cyan)
-        process.emit('stop', project._id);
+        process.emit('stop', project._id)
     }
-    
+
     // Remove the projects folder
     rimraf(project.savePath, (error) => {
         if (error) {
@@ -162,7 +150,7 @@ function remove(next) {
 }
 
 function savejob(next) {
-    var project = this;
+    var project = this
     if (project.isNew) {
         // Build users directory path
         let savePath = path.join(uploadPath, project.uid.toString(), project._id.toString())
@@ -184,23 +172,22 @@ function savejob(next) {
 }
 
 function getData() {
-    let project = this;
+    let project = this
     return new Promise((resolve, reject) => {
         if (project.status === 'done') {
             // Let's append the path to the logfile to the response json
             // View will make it available as download
-            let projectDirectory = project.savePath
-            let logfile = fs.readdir(projectDirectory, (error, files) => {
-                if (error) {
-                    console.error(`Something went wrong while appending logfiles of project ${project._id} path to response JSON : ${error}`)
+            //let projectDirectory = project.savePath
+            let errorFile = fs.readFile(path.join(project.savePath, 'error.txt'), 'utf8')
+            let logFile = fs.readFile(path.join(project.savePath, 'logfile.txt'), 'utf8')
+            Promise.all([errorFile, logFile])
+                .then(([error, log]) => {
+                    resolve(Object.assign({ ...project }._doc, { logfiles: [error, log] }))
+                })
+                .catch(error => {
+                    console.error(`${printOut(__filename)} Could not read the logfiles for project ${project._id}: ${error}`.red)
                     reject(error)
-                } else {
-                    let logfiles = files.filter(file => (file.indexOf('log') >= 0 || file.indexOf('error') >= 0) ? true : false)
-                    // Since project is a MongoDB document we need to extract the _doc object and then merge it 
-                    // with the logfiles array
-                    resolve(Object.assign({ ...project }._doc, { logfiles: logfiles }))
-                }
-            })
+                })
         } else {
             resolve(project)
         }
