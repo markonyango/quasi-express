@@ -8,10 +8,18 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+What things you need to install the software and how to install them.
 
+#### Ubuntu Linux
+First, make sure you have the _build tools_ installed (needed for compilation/building/etc). If not install them like this
 ```bash
-npm install
+sudo apt-get install -y build-essential
+```
+
+Next we are going to install _NodeJS_ itself
+```
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
 ### Installing
