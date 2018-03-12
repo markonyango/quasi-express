@@ -11,6 +11,7 @@ const flash = require('connect-flash')
 const expressValidator = require('express-validator')
 const favicon = require('serve-favicon')
 const cors = require('cors')
+const helmet = require('helmet')
 const { mongoDB } = require('./settings')
 const printOut = require('./printOut')
 
@@ -32,12 +33,17 @@ const settings = require('./routes/settings')
 var app = express()
 
 // Make sure CORS is enabled on this server
-let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:5500', 'localhost:3000']
+//let whitelist = ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:5500', 'localhost:3000']
 app.use(cors({
   credentials: true,
   origin: /localhost|127\.0\.0\.1/
 }
 ))
+
+// Use HelmetJS to secure Express server by setting various HTTP headers
+app.use(helmet({
+  noCache: true
+}))
 
 // view engine setup
 hbs.registerPartials(__dirname + '/views/partials')
@@ -75,8 +81,7 @@ app.use(session({
     ttl: 2 * 24 * 3600
   }),
   cookie: {
-    httpOnly: false,
-    maxAge: 24 * 3600 * 1000
+    httpOnly: false
   }
 }))
 
@@ -121,16 +126,16 @@ app.use('/', index)
 app.use('/users', users)
 app.use('/settings', ensureAuthenticated, settings)
 app.use('/projects', ensureAuthenticated, projects)
-app.use('/test', function (req, res, next) {
+app.use('/test', function (req, res) {
   res.render('test', { title: 'QUASI-Express App Testsuite', css: 'https://cdnjs.cloudflare.com/ajax/libs/mocha/5.0.1/mocha.min.css' })
 })
 
 // Middleware that ensure the visitor is authenticated to view secured areas
 function ensureAuthenticated(req, res, next) {
-  let json = req.query.json || req.body.json || false
   if (req.isAuthenticated()) {
     next()
   } else {
+    let json = req.query.json || req.body.json || false
     console.error(`Detected unauthorized access attempt from ${req.ip} - ${req.hostname} @ URL: ${req.originalUrl}`.red)
     if (!json) {
       req.flash('error_msg', 'You are not logged in')
@@ -150,7 +155,7 @@ app.use(function (req, res, next) {
 })
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
