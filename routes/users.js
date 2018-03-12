@@ -52,7 +52,8 @@ router.post('/register', function (req, res) {
       newUser.save()
         .then(user => {
           req.session.destroy()
-          res.render('login', { title: 'Login' })
+          req.flash('success_msg', `${user.email} successfully registered`)
+          res.redirect('login', { title: 'Login' })
         })
         .catch(error => {
           console.error(`Could not register new user ${newUser.email}: ${error}`)
