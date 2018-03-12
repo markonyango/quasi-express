@@ -56,7 +56,7 @@ router.post('/register', function (req, res) {
           res.redirect('login', { title: 'Login' })
         })
         .catch(error => {
-          console.error(`Could not register new user ${newUser.email}: ${error}`)
+          console.error(`${printOut(__filename)} Could not register new user ${newUser.email}: ${error}`)
           req.session.destroy()
           req.flash('error_msg', 'Something went wrong while registering you: ' + error)
           res.redirect('/register')

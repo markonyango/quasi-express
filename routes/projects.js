@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const multer = require('multer')
-const { alignReferenceFolder } = require('../settings')
+const { alignReferenceFolder, uploadPath } = require('../settings')
 const fs = require('fs-extra')
 const printOut = require('../printOut')
 
@@ -121,6 +121,21 @@ router.get('/:id', function (req, res) {
       })
   }
 
+})
+
+router.get('/:id/:file', function (req, res) {
+  const uid = req.user._id
+  const { id, file } = req.params
+
+  Project.findOne({ _id: id, uid: uid }).exec()
+    .then(project => {
+      let filePath = `${project.savePath}/${file}`
+      res.sendFile(filePath)
+    })
+    .catch(error => {
+      console.error(`${printOut(__filename)} There was a mistake with a request for ${uploadPath}/${uid}/${id}/${file}: ${error}`.red)
+      res.status(500).json(error)
+    })
 })
 
 router.put('/:id/:action', function (req, res) {

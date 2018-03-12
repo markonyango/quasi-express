@@ -62,7 +62,7 @@ body * {
   background: #212529;
   padding: 2px 5px 2px 5px !important;
 }
-.sidebar .card-body,.list-group-item {
+.sidebar .card-body, .sidebar .list-group-item {
   padding: 2px 2px 2px 5px!important;
   background: rgb(90, 90, 90)!important;
   font-size: 90%!important;
@@ -84,6 +84,35 @@ button[name="remove_project"] {
 }
 
 
+/* Project details page - Card styling */
+.project-header {
+  /* margin-top: 0px; */
+  padding: 0rem 0rem 0rem 0rem;
+  margin: 0rem 0rem 0.5rem 0rem;
+  /* line-height: 1; */
+}
+.project-details {
+  border-radius: 5px!important;
+  color: #fff;
+}
+.project-details .card-header {
+  background: #212529;
+  padding: 2px 5px 2px 5px !important;
+}
+.project-details .card-body, .project-details .list-group-item {
+  padding: 2px 2px 2px 5px!important;
+  background: rgb(90, 90, 90)!important;
+  font-size: 90%!important;
+}
+.project-details .card-text {
+  word-wrap: break-word!important;
+}
+
+.project-details.jumbotron {
+  display: none;
+  padding: 0.3125rem;
+  background: rgb(90, 90, 90)!important;
+}
 
 
 
@@ -97,6 +126,10 @@ button[name="remove_project"] {
 
   #breadcrumb {
       display: none;
+  }
+
+  .sidebar {
+    display: none;
   }
 
 }
@@ -113,6 +146,10 @@ button[name="remove_project"] {
 
   nav {
       margin-bottom: 15px !important;
+  }
+
+  .sidebar {
+    display: none;
   }
 }
 
