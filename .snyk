@@ -1,0 +1,93 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.10.2
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'npm:hoek:20180212':
+    - npm > request > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > npm-registry-client > request > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > npm-registry-client > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > npm-registry-client > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > npm-registry-client > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.889Z'
+    - npm > npm-lifecycle > node-gyp > request > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > npm-lifecycle > node-gyp > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > npm-lifecycle > node-gyp > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > npm-lifecycle > node-gyp > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > libcipm > npm-lifecycle > node-gyp > request > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > libcipm > npm-lifecycle > node-gyp > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > libcipm > npm-lifecycle > node-gyp > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - npm > libcipm > npm-lifecycle > node-gyp > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.890Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > request > hawk > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+    - nodemon > chokidar > fsevents > node-pre-gyp > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+  'npm:lodash:20180130':
+    - npm > cli-table2 > lodash:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+  'npm:ssri:20180214':
+    - npm > npm-registry-client > ssri:
+        reason: None given
+        expires: '2018-04-11T08:58:43.891Z'
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - nodemon > chokidar > fsevents > node-pre-gyp > tar-pack > debug:
+        patched: '2018-03-12T08:56:44.296Z'
+  'npm:tough-cookie:20170905':
+    - nodemon > chokidar > fsevents > node-pre-gyp > request > tough-cookie:
+        patched: '2018-03-12T08:56:44.296Z'
