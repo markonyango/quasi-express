@@ -1,80 +1,73 @@
 # QUASI-Express
 
-One Paragraph of project description goes here
-
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for your own purposes.
 
 ### Prerequisites
 
 What things you need to install the software and how to install them.
 
 #### Ubuntu Linux
-First, make sure you have the _build tools_ installed (needed for compilation/building/etc). If not install them like this
+
+First, make sure you have the neccessary tools for building software from GitHub installed (needed for compilation/building/etc). If not install them like this
+
 ```bash
-sudo apt-get install -y build-essential
+sudo apt-get install -y build-essential git curl
 ```
 
-Next we are going to install _NodeJS_ itself
-```
+Next, install _NodeJS_ itself and confirm the version you downloaded (e.g. v9.6.1)
+
+```bash
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
+node --version
 ```
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+Download the repository to your local machine and change to the new folder. Once inside the new folder, trigger the installation of all required npm dependencies
 
 ```bash
-Give the example
+git clone https://github.com/markonyango/quasi-express.git
+cd quasi-express
+npm install
 ```
 
-And repeat
+The server can be started by simply running either of the following commands
 
 ```bash
-until finished
+npm start
+./bin/www
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+the difference being that the first starts the server with *nodemon* which will catch app crashes and restart the server, while the latter starts the server instance directly.
+
+With the default setup, the server will be reachable [localhost:3000](http://localhost:3000). Every other PC in your network will also be able to access the server as long as your PCs network/firewall settings allow it. This is usefull if you are thinking of setting up the server to be used by multiple people (e.g. co-workers in your group or even faculty/company-wide).
 
 ## Running the tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+To run the testsuite, spin up the server with
 
 ```bash
-Give an example
+npm start
 ```
 
-### And coding style tests
+and visit [localhost:3000/test](http://localhost:3000/test) in your browser. Each test will run automatically and report its return status. The server will also provide useful information in the terminal window from which it was started. Detailed information pertaining potential errors during execution will show up there.
 
-Explain what these tests test and why
+Make sure that you remove the following files once you are ready to publicly deploy the server (for obvious security reasons)
 
-```bash
-Give an example
-```
++ public/test (entire folder)
++ public/js/test.js
++ public/js/mocha.min.js
++ public/js/chai.min.js
++ views/test.hbs
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+These files are only used for testing purposes and can be remove safely after successful testing your installation.
 
 ## Authors
 
-* **Mark Onyango** - *Initial work* - [markonyango](https://github.com/markonyango)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
++ **Mark Onyango** - *Initial work* - [markonyango](https://github.com/markonyango)
 
 ## License
 
@@ -82,6 +75,4 @@ This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
++ Hat tip to anyone whose code was used
