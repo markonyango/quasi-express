@@ -1,5 +1,7 @@
 # QUASI-Express
 
+[![Known Vulnerabilities](https://snyk.io/test/github/markonyango/quasi-express/badge.svg?style=flat-square)](https://snyk.io/test/github/markonyango/quasi-express)
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for your own purposes.
