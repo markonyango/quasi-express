@@ -176,7 +176,7 @@ describe('App', function () {
           })
       })
 
-      context('Projects', function () {
+      describe('Projects', function () {
 
         beforeEach(function (done) {
           if (this.currentTest._currentRetry > 0) {
@@ -317,9 +317,7 @@ describe('App', function () {
               assert.isNull(error, 'Could not fetch the test projects stats: ' + error)
             })
         })
-      })
 
-      describe('Output files', function () {
         it('Logfile should exist in users folder', function () {
           this.retries(3)
           return fetch('http://localhost:3000/projects/' + project_id + '?json=true', {
@@ -341,6 +339,64 @@ describe('App', function () {
             .catch(error => {
               assert.isNull(error, 'Could not fetch the test projects stats: ' + error)
             })
+        })
+
+        context('Alignment', function(){
+          it('Alignment module should finish successfully', function () {
+
+            const form = new FormData
+            let file1, file2
+            let test1 = fetch('http://localhost:3000/test/test.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
+            let test2 = fetch('http://localhost:3000/test/test2.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
+  
+            return Promise.all([test1, test2])
+              .then(([res1, res2]) => {
+                assert.instanceOf(res1, ArrayBuffer, 'Loaded test.fastq does not resolve to instanceof ArrayBuffer')
+                assert.instanceOf(res2, ArrayBuffer, 'Loaded test2.fastq does not resolve to instanceof ArrayBuffer')
+                assert.isAbove(res1.byteLength, 0, 'byteLength of test.fastq is 0 but shouldn\'t be')
+                assert.isAbove(res2.byteLength, 0, 'byteLength of test2.fastq is 0 but shouldn\'t be')
+                file1 = new File([res1], 'test.fastq')
+                file2 = new File([res2], 'test2.fastq')
+                return Promise.resolve()
+              })
+              .then(() => {
+  
+                form.append('projectname', 'Test Project2')
+                form.append('projecttype', 'align')
+                form.append('settings', 'null')
+                form.append('status', 'queued')
+                form.append('uid', uid)
+                form.append('files', file1)
+                form.append('files', file2)
+  
+                return fetch('http://localhost:3000/projects/upload',
+                  {
+                    method: 'POST',
+                    body: form,
+                    credentials: 'include'
+                  })
+              })
+              .then(result => {
+                assert.equal(result.status, 200, 'Response status is not 200!')
+                return result.json()
+              })
+              .then(result => {
+                assert.exists(result._id, 'Project does not seem to have an Object ID')
+                project_id = result._id
+                assert.equal(result.projectname, 'Test Project2', 'Projectname does not match')
+                assert.equal(result.projecttype, 'align', 'Projecttype does not match')
+                assert.equal(result.status, 'queued', 'Projects initial status should be "queued"')
+                assert.equal(result.pid, 0, 'Projects initial process id should be 0')
+                assert.isAbove(result.files.length, 0, 'Project does not seem to have any files associated with it')
+              })
+              .catch(error => {
+                assert.isNull(error, 'Could not upload new project data: ' + error)
+              })
+              .then(() => {
+                return fetch(`http://localhost:3000/projects/${project_id}/start`)
+                // Start project and then check wether alignment module returns successfully
+              })
+          })
         })
       })
     })
@@ -371,7 +427,7 @@ describe('App', function () {
           assert.isNull(error, 'Could not remove user: ' + error)
         })
         .then(done, done)
-    }, 14000)
+    }, 5000)
   })
 })
 
