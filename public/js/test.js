@@ -439,7 +439,7 @@ describe('App', function () {
     })
   })
 
- /* after(function (done) {
+ after(function (done) {
     setTimeout(() => {
       fetch('http://localhost:3000/users/remove?json=true', {
         method: 'POST',
@@ -465,7 +465,7 @@ describe('App', function () {
         })
         .then(done, done)
     }, 5000)
-  })*/
+  })
 })
 
 
