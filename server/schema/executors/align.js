@@ -1,11 +1,10 @@
 const { parent2child, onExit, startSubject, projectSubject } = require('./parent2child')
-const fs = require('fs-extra')
-const exec = require('child_process').exec
+const exec = require('util').promisify(require('child_process').exec)
 const Rx = require('rxjs/Rx')
-const colors = require('colors')
 const path = require('path')
 const os = require('os')
 const Job = require('../utils/Job')
+const sequentialPromises = require('../../../helpers/sequentialPromises')
 const { alignReferenceFolder } = require('../../../settings')
 
 
@@ -28,8 +27,8 @@ Rx.Observable.zip(
   startObservable$,
   (project) => (project)
 )
-  .subscribe(document => {
-    const job = new Job(document)
+  .subscribe(projectDocument => {
+    const job = new Job(projectDocument)
     let check = job.preFlight()
     let {
       preTrim,
@@ -45,7 +44,7 @@ Rx.Observable.zip(
     reference = path.join(alignReferenceFolder, path.basename(reference, '.fasta'))
 
     if (check) {
-      for (let file of job.files) {
+      let promiseArray = job.files.map(file => {
         // Get the absolute path to the file
         const filePath = path.join(job.savePath, '..', file)
 
@@ -53,48 +52,51 @@ Rx.Observable.zip(
         const ext = path.extname(filePath)
         const basename = path.basename(filePath, ext)
 
-        let cmd = `bowtie -3 ${preTrim} -5 ${postTrim} -v ${mismatches} -y -p ${cores} -m 1 --norc --best -S `
+        let cmd = `bowtie --verbose -3 ${preTrim} -5 ${postTrim} -v ${mismatches} -y -p ${cores} -m 1 --norc --best -S `
 
         if (writeUnaligned) {
           cmd += `--un ${job.savePath}/unaligned_${basename}.fq `
         }
         cmd += `${reference} ${filePath} ${job.savePath}/${basename}.sam`
 
-        exec(cmd, function (error, stdout, stderr) {
-          job.logfile.write(`Executing bowtie for for file ${file} with cmd ${cmd}\n`)
-          // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
-          if (error || stdout === undefined) {
-            job.errorfile.write(stderr)
-            job.errorfile.write(error.message)
-            stdout ? job.logfile.write(stdout) : ''
-            job.errorfile.end('Error occured')
-            job.logfile.end('Error occured')
-            process.send({ msg: 'error', error: error.message })
-          } else {
-            job.logfile.write(stderr)
-            job.logfile.write(stdout)
+        // Push exec-Promisefunction into array for later sequential execution
+        return (() => exec(cmd))
+      })
 
-            // Run samstat on the resulting SAM file
-            let ext = path.extname(file)
-            let SAMfile = file.replace(ext, '.sam')
-            SAMfile = path.join(job.savePath, SAMfile)
+      // Run samstat on the resulting SAM files
+      let samstatArray = job.files.map(file => {
+        let ext = path.extname(file)
+        let SAMfile = file.replace(ext, '.sam')
+        SAMfile = path.join(job.savePath, SAMfile)
+        return (() => exec(`samstat ${SAMfile}`))
+      })
 
-            exec(`samstat ${SAMfile}`, (error, stdout, stderr) => {
-              if (error) {
-                job.errorfile.write(stderr)
-                job.errorfile.write(error.message)
-                stdout ? job.logfile.write(stdout) : ''
-                job.errorfile.end('Error occured')
-                job.logfile.end('Error occured')
-                process.send({ msg: 'error', error: error.message })
-              } else {
-                job.logfile.write(stderr)
-                job.logfile.write(stdout)
-              }
-            })
-          }
+      // Execute all Promises that are stored in the Promisearray
+      sequentialPromises([...promiseArray,...samstatArray])
+        // Make one single string out of all the returned stdouts and stderrs  
+        .then(res => res.reduce((acc, curr) => {
+          acc.stdout += curr.stdout
+          acc.stderr += curr.stderr
+          return acc
+        }))
+        .then(({ stdout, stderr }) => {
+          /* Bowtie and samstat write to stderr for whatever reason...
+          * Just in case something should ever be written to stdout
+          * we are going to log it as well
+          */
+          job.logfile.write(stdout)
+          job.logfile.write(stderr)
+          job.logfile.end('End of logfile')
+          job.errorfile.end('End of errorfile')
+          process.send({ msg: 'done' })
         })
-      }
+        .catch(error => {
+          job.errorfile.write(error.message)
+          job.errorfile.end('End of errorfile')
+          job.logfile.write('Error occured!')
+          job.logfile.end('End of logfile')
+          process.send({ msg: 'error', error: error.message })
+        })
     } else {
       process.send({ msg: 'error', error: `Encountered an error during project execution pre-flight!` })
     }
