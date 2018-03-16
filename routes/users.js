@@ -12,7 +12,7 @@ router.get('/register', function (req, res) {
   req.session.destroy()
 })
 
-router.post('/register', function (req, res) {
+router.post('/register', function (req, res, next) {
   const email = req.body.email
   const password = req.body.password
 
@@ -35,7 +35,7 @@ router.post('/register', function (req, res) {
 
     // newUser is the document that will enter the 'users' collection
     const newUser = new User({ email: email, password: password })
-
+    
     if (req.query.json === 'true') {
       // Save the new user to the MongoDB
       newUser.save()
@@ -52,12 +52,12 @@ router.post('/register', function (req, res) {
       newUser.save()
         .then(user => {
           req.flash('success_msg', `${user.email} successfully registered`)
-          res.redirect('login', { title: 'Login' })
+          res.redirect(200, 'login')
         })
         .catch(error => {
-          console.error(`${printOut(__filename)} Could not register new user ${newUser.email}: ${error}`)
+          console.error(`${printOut(__filename)} Could not register new user ${newUser.email}: ${error}`.red)
           req.flash('error_msg', 'Something went wrong while registering you: ' + error)
-          res.redirect('/register')
+          res.redirect('register')
         })
     }
   }

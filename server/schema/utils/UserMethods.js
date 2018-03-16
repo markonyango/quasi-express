@@ -6,9 +6,11 @@ const color = require('colors')
 const bcrypt = require('bcryptjs')
 const rimraf = require('rimraf')
 const Project = require('../ProjectSchema')
+const User = require('../UserSchema')
 
 function save(next) {
   let user = this
+  
   if (user.isNew) {
     // Let's create the user folder in the servers upload directory
     let userDir = path.join(uploadPath, user._id.toString())
@@ -69,8 +71,18 @@ function comparePassword(password, cb) {
   })
 }
 
+// ####### VALIDATION METHODS #######
+function emailUnique(email) {
+  return new Promise((resolve, reject) => {
+    this.model('User').count({email}).exec()
+    .then(count => resolve(!count))
+    .catch(reject)
+  })
+}
+
 module.exports = {
   save,
   remove,
   comparePassword,
+  emailUnique
 }
