@@ -1,5 +1,5 @@
 const mongoose = require('../server')
-const { save, remove, comparePassword } = require('./utils/UserMethods')
+const { save, remove, comparePassword, emailUnique } = require('./utils/UserMethods')
 
 var Schema = mongoose.Schema
 var userSchema = new Schema({
@@ -11,7 +11,11 @@ var userSchema = new Schema({
         type: String,
         lowercase: true,
         unique: true,
-        required: true
+        required: true,
+        validate: {
+            validator: emailUnique,
+            msg: 'This eMail is already registered'
+        }
     },
     password: {
         type: String,
