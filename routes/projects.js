@@ -3,7 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const { alignReferenceFolder, uploadPath } = require('../settings')
 const fs = require('fs-extra')
-const printOut = require('../printOut')
+const printOut = require('../helpers/printOut')
 
 const Project = require('../server/schema/ProjectSchema')
 

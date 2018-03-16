@@ -1,6 +1,6 @@
 const Rx = require('rxjs/Rx')
 const colors = require('colors')
-const printOut = require('../../../printOut')
+const printOut = require('../../../helpers/printOut')
 
 var projectSubject = new Rx.ReplaySubject()
 var startSubject = new Rx.Subject()

@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
-const printOut = require('../printOut')
+const printOut = require('../helpers/printOut')
 
 const User = require('../server/schema/UserSchema')
 

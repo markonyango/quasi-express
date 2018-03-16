@@ -1,7 +1,7 @@
 const { uploadPath } = require('../../../settings')
 const fs = require('fs-extra')
 const path = require('path')
-const printOut = require('../../../printOut')
+const printOut = require('../../../helpers/printOut')
 const color = require('colors')
 const bcrypt = require('bcryptjs')
 const rimraf = require('rimraf')

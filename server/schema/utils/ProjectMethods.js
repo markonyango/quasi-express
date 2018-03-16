@@ -4,7 +4,7 @@ const color = require('colors')
 const fs = require('fs-extra')
 const rimraf = require('rimraf')
 const { uploadPath } = require('../../../settings')
-const printOut = require('../../../printOut')
+const printOut = require('../../../helpers/printOut')
 
 
 function stopjob() {

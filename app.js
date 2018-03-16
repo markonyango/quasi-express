@@ -13,11 +13,11 @@ const favicon = require('serve-favicon')
 const cors = require('cors')
 const helmet = require('helmet')
 const { mongoDB } = require('./settings')
-const printOut = require('./printOut')
+const printOut = require('./helpers/printOut')
 
 
 // Register Custom HandlebarsHelpers
-require('./handlebar_helpers')
+require('./helpers/handlebar_helpers')
 
 // Passport requirements
 const passport = require('passport')

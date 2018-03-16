@@ -1,6 +1,6 @@
 const fs = require('fs-extra')
 const path = require('path')
-const printOut = require('../../../printOut')
+const printOut = require('../../../helpers/printOut')
 
 function Job(projectDocument) {
 
