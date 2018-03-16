@@ -30,20 +30,7 @@ function startjob() {
     var job_handler
 
     // Which Executor should be forked, according to the project type
-    switch (project.projecttype) {
-        case 'qa':
-            job_handler = path.join(__dirname, '../executors/qa.js')
-            break
-        case 'dea':
-            job_handler = path.join(__dirname, '../executors/qa.js')
-            break
-        case 'align':
-            job_handler = path.join(__dirname, '../executors/align.js')
-            break
-        default:
-            return Error('Could not identify the project type of the project to be started.')
-    }
-
+    job_handler = path.join(__dirname, '../executors', `${project.projecttype}.js`)
 
     // Fork Executor into new Node instance. IPC channel will be opened
     const forked = fork(job_handler)
@@ -71,7 +58,7 @@ function startjob() {
     forked.on('error', (msg) => {
         project.status = 'failed'
         project.save()
-            .then(project => {
+            .then(() => {
                 console.error(`${printOut(__filename)} Something went wrong while trying to start the child_process: ${msg}`.red)
             })
             .catch(error => {
@@ -80,7 +67,7 @@ function startjob() {
     })
 
     // Create the listener that reacts to messages from the child
-    forked.on('message', async function (msg) {
+    forked.on('message', function (msg) {
         switch (msg.msg) {
             case 'done':
                 console.log(`${printOut(__filename)} Recieved 'done'`.cyan)
@@ -88,12 +75,8 @@ function startjob() {
                 project.status = 'done'
                 project.pid = null
                 project.save()
-                    .then(project => {
-                        console.log(`${printOut(__filename)} Saving project status: ${project.status}`.cyan)
-                    })
-                    .catch(error => {
-                        console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red)
-                    })
+                    .then(project => console.log(`${printOut(__filename)} Saving project status: ${project.status}`.cyan))
+                    .catch(error => console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red))
                 break
             case 'error':
                 console.error(`${printOut(__filename)} Recieved 'error': ${msg.error}. Killing job`.red)
@@ -101,12 +84,8 @@ function startjob() {
                 project.status = 'failed'
                 project.pid = null
                 project.save()
-                    .then(project => {
-                        console.error(`${printOut(__filename)} Saving project status: ${project.status}`.cyan)
-                    })
-                    .catch(error => {
-                        console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red)
-                    })
+                    .then(project => console.error(`${printOut(__filename)} Saving project status: ${project.status}`.cyan))
+                    .catch(error => console.error(`${printOut(__filename)} Something went wrong while updating projects status to failed: ${error}`.red))
                 break
             default:
                 break
@@ -155,9 +134,9 @@ function savejob(next) {
         // Build users directory path
         let savePath = path.join(uploadPath, project.uid.toString(), project._id.toString())
         fs.mkdir(savePath)
-            .then(res => fs.createFile(path.join(savePath, 'logfile.txt')))
-            .then(res => fs.createFile(path.join(savePath, 'error.txt')))
-            .then(res => {
+            .then(() => fs.createFile(path.join(savePath, 'logfile.txt')))
+            .then(() => fs.createFile(path.join(savePath, 'error.txt')))
+            .then(() => {
                 console.log(`${printOut(__filename)} New project directory has been created: ${savePath}.`.cyan)
                 project.savePath = savePath
                 next()

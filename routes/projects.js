@@ -114,7 +114,7 @@ router.get('/:id', function (req, res) {
 
     Project.findOne({ _id: id, uid: uid }).exec()
       .then(project => project.getData())
-      .then(project => res.render('project', { title: 'Project', project: project }))
+      .then(project => res.render(project.projecttype, { title: 'Project', project: project }))
       .catch(error => {
         req.flash('error', error.message)
         res.redirect(500, '/projects')
