@@ -341,14 +341,14 @@ describe('App', function () {
             })
         })
 
-        context('Alignment', function(){
-          it('Alignment module should finish successfully', function () {
+        context('Alignment', function () {
+          it('Alignment can be created and started', function () {
 
             const form = new FormData
             let file1, file2
             let test1 = fetch('http://localhost:3000/test/test.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
             let test2 = fetch('http://localhost:3000/test/test2.fastq', { credentials: 'include' }).then(data => data.arrayBuffer())
-  
+
             return Promise.all([test1, test2])
               .then(([res1, res2]) => {
                 assert.instanceOf(res1, ArrayBuffer, 'Loaded test.fastq does not resolve to instanceof ArrayBuffer')
@@ -360,15 +360,20 @@ describe('App', function () {
                 return Promise.resolve()
               })
               .then(() => {
-  
+
                 form.append('projectname', 'Test Project2')
                 form.append('projecttype', 'align')
-                form.append('settings', 'null')
+                form.append('settings[numCores]', '1')
+                form.append('settings[mismatches]', '0')
+                form.append('settings[preTrim]', '0')
+                form.append('settings[postTrim]', '0')
+                form.append('settings[writeUnaligned]', true)
+                form.append('settings[reference]', 'all_new.fasta')
                 form.append('status', 'queued')
                 form.append('uid', uid)
                 form.append('files', file1)
                 form.append('files', file2)
-  
+
                 return fetch('http://localhost:3000/projects/upload',
                   {
                     method: 'POST',
@@ -393,8 +398,40 @@ describe('App', function () {
                 assert.isNull(error, 'Could not upload new project data: ' + error)
               })
               .then(() => {
-                return fetch(`http://localhost:3000/projects/${project_id}/start`)
-                // Start project and then check wether alignment module returns successfully
+                return fetch(`http://localhost:3000/projects/${project_id}/start`,
+                  {
+                    credentials: 'include',
+                    method: 'PUT'
+                  })
+              })
+              .then(result => {
+                assert.equal(result.status, 200, 'Response status is not 200!')
+                return result.json()
+              })
+              .then(result => {
+                assert.equal(result.status, 'running')
+              })
+              .catch(error => assert.isNull(error, 'Project does not seem to be running: ' + error))
+          })
+
+          it('Alignment does finish successfully', function () {
+            this.retries(3)
+            return fetch('http://localhost:3000/projects/' + project_id + '?json=true', {
+              credentials: 'include'
+            })
+              .then(result => {
+                assert.equal(result.status, 200, 'Response status is not 200!')
+                return result.json()
+              })
+              .then(result => {
+                assert.isObject(result, 'Response is not an Object but should be')
+                assert.equal(result._id, project_id, 'Response contains the wrong project')
+                assert.notEqual(result.status, 'failed', 'The projects execution seems to have failed somehow')
+                assert.notEqual(result.status, 'queued', 'The project was never started')
+                assert.notEqual(result.status, 'running', 'The project is still running')
+              })
+              .catch(error => {
+                assert.isNull(error, 'Could not fetch the test projects stats: ' + error)
               })
           })
         })
@@ -402,7 +439,7 @@ describe('App', function () {
     })
   })
 
-  after(function (done) {
+ /* after(function (done) {
     setTimeout(() => {
       fetch('http://localhost:3000/users/remove?json=true', {
         method: 'POST',
@@ -428,7 +465,7 @@ describe('App', function () {
         })
         .then(done, done)
     }, 5000)
-  })
+  })*/
 })
 
 

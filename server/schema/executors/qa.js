@@ -31,10 +31,10 @@ Rx.Observable.zip(
       let check = job.preFlight()
 
       if (check) {
-        exec(`${path.join(__dirname, '/R/qa.R')} ${job.savePath} ${[...projectDocument.files]}`, (error, stdout, stderr) => {
+        exec(`${path.join(__dirname, '/R/qa.R')} ${job.savePath} ${[...job.files]}`, (error, stdout, stderr) => {
           // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
           if ((error && stderr) ||  stdout === undefined) {
-            console.error(error.yellow)
+            console.error(error.message.yellow)
             job.errorfile.write(stderr)
             job.errorfile.write(error)
             stdout ? job.logfile.write(stdout) : ''
@@ -42,7 +42,7 @@ Rx.Observable.zip(
             job.logfile.end()
             process.send({ msg: 'error', error: error })
           } else {
-            console.log(stdout.yellow)
+            //console.log(stdout.yellow)
             job.logfile.write(stdout)
             job.errorfile.end()
             job.logfile.end()

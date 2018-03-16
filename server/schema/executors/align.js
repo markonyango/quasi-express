@@ -1,11 +1,12 @@
 const { parent2child, onExit, startSubject, projectSubject } = require('./parent2child')
-const { exec } = require('child_process')
+const fs = require('fs-extra')
+const exec = require('child_process').exec
 const Rx = require('rxjs/Rx')
 const colors = require('colors')
 const path = require('path')
 const os = require('os')
 const Job = require('../utils/Job')
-const { uploadPath, alignReferenceFolder } = require('../../../settings')
+const { alignReferenceFolder } = require('../../../settings')
 
 
 // This event listener will handle all commands that are sent to this child via IPC
@@ -36,7 +37,7 @@ Rx.Observable.zip(
       mismatches,
       writeUnaligned,
       reference
-    } = job.document.settings
+    } = job.settings
     let cores = os.cpus().length
 
 
@@ -44,9 +45,9 @@ Rx.Observable.zip(
     reference = path.join(alignReferenceFolder, path.basename(reference, '.fasta'))
 
     if (check) {
-      for (var file of document.files) {
+      for (let file of job.files) {
         // Get the absolute path to the file
-        const filePath = path.join(job.savePath, file)
+        const filePath = path.join(job.savePath, '..', file)
 
         // Get the basename and extension of the file
         const ext = path.extname(filePath)
@@ -58,26 +59,39 @@ Rx.Observable.zip(
           cmd += `--un ${job.savePath}/unaligned_${basename}.fq `
         }
         cmd += `${reference} ${filePath} ${job.savePath}/${basename}.sam`
-        job.logfile.write(`Executing bowtie for for file ${file} with cmd ${cmd}`)
-        exec(cmd, function (error, stdout, stderr) {
-          // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
-          if ((error && stderr) || stdout === undefined) {
-            console.error(error.yellow)
-            job.errorfile.write(stderr)
-            job.errorfile.write(error)
-            stdout ? job.logfile.write(stdout) : ''
-            job.errorfile.end()
-            job.logfile.end()
-            process.send({ msg: 'error', error: error })
-          } else {
-            console.log(stdout.yellow)
-            job.logfile.write(stdout)
-            job.errorfile.end()
-            job.logfile.end()
-            process.send({ msg: 'done' })
 
-            // Tell the parent that we are done with the job
-            process.send({ msg: 'done' })
+        exec(cmd, function (error, stdout, stderr) {
+          job.logfile.write(`Executing bowtie for for file ${file} with cmd ${cmd}\n`)
+          // Don't ask wether stderr has data as some programs output non-errors to stderr for whatever reason....
+          if (error || stdout === undefined) {
+            job.errorfile.write(stderr)
+            job.errorfile.write(error.message)
+            stdout ? job.logfile.write(stdout) : ''
+            job.errorfile.end('Error occured')
+            job.logfile.end('Error occured')
+            process.send({ msg: 'error', error: error.message })
+          } else {
+            job.logfile.write(stderr)
+            job.logfile.write(stdout)
+
+            // Run samstat on the resulting SAM file
+            let ext = path.extname(file)
+            let SAMfile = file.replace(ext, '.sam')
+            SAMfile = path.join(job.savePath, SAMfile)
+
+            exec(`samstat ${SAMfile}`, (error, stdout, stderr) => {
+              if (error) {
+                job.errorfile.write(stderr)
+                job.errorfile.write(error.message)
+                stdout ? job.logfile.write(stdout) : ''
+                job.errorfile.end('Error occured')
+                job.logfile.end('Error occured')
+                process.send({ msg: 'error', error: error.message })
+              } else {
+                job.logfile.write(stderr)
+                job.logfile.write(stdout)
+              }
+            })
           }
         })
       }

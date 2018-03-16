@@ -4,11 +4,13 @@ const printOut = require('../../../printOut')
 
 function Job(projectDocument) {
 
-  this.projectDocument = projectDocument
+  this.id = projectDocument._id
+  this.uid = projectDocument.uid
   this.files = projectDocument.files
   this.savePath = projectDocument.savePath
-  this.logfile = ''
-  this.errorfile = ''
+  this.settings = projectDocument.settings
+  this.logfile = null
+  this.errorfile = null
 }
 
 Job.prototype.setLogFile = function () {
@@ -19,7 +21,6 @@ Job.prototype.setLogFile = function () {
 Job.prototype.preFlight = function () {
   const checkSaveFolder = fs.existsSync(this.savePath)
   if (!checkSaveFolder || checkSaveFolder == undefined) {
-    console.log(this.savePath)
     console.error(`${printOut(__filename)} Couldn't access your chosen save path (${this.savePath}). Make sure the permissions are set accordingly!`.red)
     return false
   }
