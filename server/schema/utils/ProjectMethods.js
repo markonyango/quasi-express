@@ -5,6 +5,7 @@ const fs = require('fs-extra')
 const rimraf = require('rimraf')
 const { uploadPath } = require('../../../settings')
 const printOut = require('../../../helpers/printOut')
+const QAReport = require('./QAReport')
 
 
 function stopjob() {
@@ -150,6 +151,12 @@ function savejob(next) {
     }
 }
 
+/**
+ * This function grabs the result files from the project folder and returns them to the calling route function.
+ * 
+ * @returns {Promise<{projectinfo, logfiles:['error', 'log']}>} The project result files as Promise object
+ * with already present projectinfo and the logfiles array [error, log].
+ */
 function getData() {
     let project = this
     return new Promise((resolve, reject) => {
@@ -157,15 +164,24 @@ function getData() {
             // Let's append the the logfiles to the response json in cleartext
             let errorFile = fs.readFile(path.join(project.savePath, 'error.txt'), 'utf8')
             let logFile = fs.readFile(path.join(project.savePath, 'logfile.txt'), 'utf8')
+
+            // Resolve the logfiles promises and resolve the return promise with the new project object
             Promise.all([errorFile, logFile])
-                .then(([error, log]) => {
-                    let responseObject = { ...project.toObject() , logfiles: [error, log] }
-                    resolve(responseObject)
+                .then(([error, log]) => appendLogfiles([error, log], project))
+                .then(project => {
+                    switch (project.projecttype) {
+                        case 'qa':
+                            resolve({ ...project, QAReport: new QAReport(project).generateReport() })
+                            break
+                        default:
+                            resolve(project)
+                    }
                 })
                 .catch(error => {
                     console.error(`${printOut(__filename)} Could not read the logfiles for project ${project._id}: ${error}`.red)
                     reject(error)
                 })
+
         } else {
             resolve(project)
         }
@@ -173,7 +189,16 @@ function getData() {
 
 }
 
+function appendLogfiles([error, log], project) {
+    return new Promise((resolve, reject) => {
+        if (!error && !log) {
+            reject(Error('Logfiles inaccessible or empty'))
+        } else {
+            resolve({ ...project.toObject(), logfiles: [error, log] })
+        }
 
+    })
+}
 
 module.exports = {
     startjob,

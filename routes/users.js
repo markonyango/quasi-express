@@ -95,7 +95,7 @@ passport.deserializeUser(function (id, done) {
   })
 })
 
-router.post('/login', passport.authenticate('local', { failureRedirect: '/users/login', failureFlash: true }),
+router.post('/login', passport.authenticate('local', { failWithError: true, failureFlash: true }),
   function (req, res) {
 
     if (req.body.json) {
