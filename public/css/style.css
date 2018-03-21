@@ -109,9 +109,13 @@ button[name="remove_project"] {
 }
 
 .project-details.jumbotron {
-  display: none;
-  padding: 0.3125rem;
+  padding: 0.625rem;
   background: rgb(90, 90, 90)!important;
+}
+
+.project-details canvas {
+  background-color: white;
+  margin: 0 auto;
 }
 
 

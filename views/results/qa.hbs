@@ -1,0 +1,68 @@
+{{#if project}}
+<h2 class="project-header">{{project.projectname}}</h2>
+<h4>{{project.projecttype}}</h4>
+<div class="card-columns">
+    <div class="card project-details border-dark">
+        <h5 class="card-header">Settings</h5>
+        <div class="card-body">
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    {{#each project.settings}}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{@key}}
+                        <span>{{this}}</span>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card project-details border-dark">
+        <h5 class="card-header">Uploaded Files</h5>
+        <div class="card-body">
+            <div class="card-text">
+                <ul class="list-group list-group-flush">
+                    {{#each project.files}}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{this}}
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>
+    Status: {{project.status}} - <button class="btn btn-sm btn-dark" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
+    <button class="btn btn-sm btn-dark" id="tempfilesBtn">Download temporary files</button>
+</p>
+
+{{#if project.logfiles}} {{!-- Put PDF viewer code here as it does only exist if --}}
+<div class="jumbotron project-details" id="results">
+    <canvas id="base_distribution"></canvas>
+</div>
+
+<div class="card-deck">
+    {{#if project.logfiles.[1]}}
+    <div class="card project-details border-dark" style="border-radius: 2px !important">
+        <h5 class="card-header">Logfile</h5>
+        <div class="card-body">
+            <div class="card-text">
+                {{{html project.logfiles.[1]}}}
+            </div>
+        </div>
+    </div>{{!-- {{/if}} {{#if project.logfiles.[0]}} --}}
+    <div class="card project-details border-dark">
+        <h5 class="card-header">Errors</h5>
+        <div class="card-body">
+            <div class="card-text">
+                {{{html project.logfiles.[0]}}}
+            </div>
+        </div>
+    </div> {{/if}}
+</div> {{/if}} {{else}}
+<p>No project with this ID found!</p>
+{{/if}}
+<script defer src="/js/Chart.bundle.min.js"></script>
+<script defer src="/js/results/qa.js"></script>
