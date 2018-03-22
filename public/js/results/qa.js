@@ -1,16 +1,25 @@
 let divResults = document.getElementById('results')
 
-function makeChart(ctx, type) {
+function makeCanvas(parentDiv) {
+  let canvas = document.createElement('canvas')
+  parentDiv.appendChild(canvas)
+  return canvas
+}
+
+function makeChart(canvas, type) {
+  let ctx = canvas.getContext('2d')
   return new Chart(ctx, {
     type: type,
     options: {
       responsive: true,
       scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true
+            }
           }
-        }]
+        ]
       }
     }
   })
@@ -22,28 +31,41 @@ fetch(window.location.pathname + '?json=true', {
 })
   .then(res => res.json())
   .then(({ QAReport }) => {
-    let ctx = document.querySelector('canvas[id=base_distribution]').getContext('2d')
-    let chart = makeChart(ctx, 'line')
-    QAReport = QAReport.baseDistribution
-    
-    let maxReadLength = Math.max(
-      QAReport[0].data.A.length,
-      QAReport[0].data.T.length,
-      QAReport[0].data.G.length,
-      QAReport[0].data.C.length,
-      QAReport[0].data.N.length
+    let { baseDistribution, lengthDistribution, phredDistribution } = QAReport
+
+    let maxReadLength = lengthDistribution.reduce(
+      (max, file) => (file.data.length > max ? file.data.length : max),
+      0
     )
 
-    //chart.options.scales.yAxes.stacked = false
+    let resultDiv = document.getElementById('results')
 
-    chart.data.labels = Array(maxReadLength).fill(0).map((value, index) => index + 1)
-    
-    for(let file of QAReport){
-      chart.options.title.text = `Base Distributions per Cycle for ${file.label}`
+    // Creating base distribution charts
+    let baseDiv = document.createElement('div')
+    baseDiv.id = 'baseDiv'
+    resultDiv.appendChild(baseDiv)
+    for (let file of baseDistribution) {
+      let canvas = makeCanvas(baseDiv)
+      let chart = makeChart(canvas, 'line')
+      chart.data.labels = Array(maxReadLength)
+        .fill(0)
+        .map((value, index) => index + 1)
+      chart.options.layout.padding = { left: 10, right: 30 }
+      chart.options.scales.xAxes[0] = {
+        ticks: {
+          callback: function(value, index, values) {
+            let retVal = (x, gap) => (value % gap === 0 ? value : null)
+            if (values.length > 100) return retVal(value, 10)
+            else if (values.length > 50) return retVal(value, 5)
+            else if (values.length > 20) return retVal(value, 2)
+            else return value
+          }
+        }
+      }
+      chart.options.title.text =
+        'Base Distributions per Cycle for ' + file.label
       chart.options.title.display = true
-      /*chart.options.scales.xAxes.push({ticks: {callback : function(value, index, values){
-        return value % 2 === 0 ? value : ''
-      }}})*/
+
       chart.data.datasets.push({
         label: 'A',
         data: file.data.A,
@@ -70,19 +92,6 @@ fetch(window.location.pathname + '?json=true', {
         backgroundColor: 'rgba(0, 0, 0, 0.50)'
       })
 
+      chart.update()
     }
-    
-    /*chart.data.datasets.push({
-      label: 'mark',
-      backgroundColor: 'red',
-      data: [50, 50]
-    })
-    chart.data.datasets.push({
-      label: 'eva',
-      backgroundColor: 'green',
-      data: [25, 75]
-    })*/
-    chart.update()
-    let datasets = QAReport.baseDistribution
-    console.log(datasets)
   })
