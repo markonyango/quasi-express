@@ -1,11 +1,33 @@
 let resultDiv = document.getElementById('results')
+let getResultsButton = document.getElementById('getResultsButton')
+
+getResultsButton.addEventListener('click', function() {
+  fetch(window.location.pathname + '?json=true', {
+    credentials: 'include'
+  })
+    .then(res => res.json())
+    .then(({ QAReport }) => {
+      let { baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution } = QAReport
+      let maxReadLength = lengthDistribution.reduce(
+        (max, file) => (file.data.length > max ? file.data.length : max),
+        0
+      )
+
+      createBaseDistributionGraphs(baseDistribution, maxReadLength)
+      createLengthDistributionGraphs(lengthDistribution, maxReadLength)
+      createPhredDistributionGraphs(phredDistribution, maxReadLength)
+      createBoxplotGraphs(boxplotDistribution, maxReadLength)
+    })
+
+  getResultsButton.setAttribute('disabled', true)
+})
 
 function makeCanvas(parentDiv) {
   let canvasDiv = document.createElement('div')
   let canvas = document.createElement('canvas')
 
   canvasDiv.classList.add('carousel-item')
-  canvas.classList.add('d-block', 'w-100')
+  //canvas.classList.add('d-block', 'w-80')
 
   canvasDiv.appendChild(canvas)
   parentDiv.appendChild(canvasDiv)
@@ -32,19 +54,45 @@ function makeChart(canvas, type) {
   })
 }
 
-function makeDiv(id, classes = []) {
-  let div = document.createElement('div')
-  div.id = id
-  div.classList.add(...classes)
-  div.classList.add('carousel', 'slide')
+function makeDiv(id) {
+  let card = document.createElement('div')
+  let cardBody = document.createElement('div')
+  let cardHeader = document.createElement('div')
+  let rowDiv = document.createElement('div')
+  let colLeft = document.createElement('div')
+  let colMid = document.createElement('div')
+  let colRight = document.createElement('div')
   let carouselInner = document.createElement('div')
+
+  // Set up the rowDiv where the arrow buttons and the canvas will be shown
+  rowDiv.classList.add('row', 'align-items-center', 'justify-content-between')
+  colLeft.classList.add('col-1')
+  colRight.classList.add('col-1')
+  colMid.classList.add('col-10')
+
+  // Set up the card itself
+  // Card Header can be any of the following
+  switch (id) {
+    case 'baseDiv':
+      cardHeader.innerText = 'Base Distributions'
+      break
+    case 'lengthDiv':
+      cardHeader.innerText = 'Length Distributions'
+      break
+    case 'phredDiv':
+      cardHeader.innerText = 'Phredscore Distributions'
+      break
+  }
+  cardHeader.classList.add('card-header')
+  cardBody.id = id
+  card.classList.add('card', 'project-details')
+  cardBody.classList.add('card-body', 'carousel', 'slide')
   carouselInner.classList.add('carousel-inner')
-  div.appendChild(carouselInner)
 
   // Create carousel controls
   // Left arrow button
   let leftArrow = document.createElement('a')
-  leftArrow.classList.add('carousel-control-prev')
+  leftArrow.classList.add('arrowLeft') //carousel-control-prev')
   leftArrow.setAttribute('role', 'button')
   leftArrow.setAttribute('data-slide', 'prev')
   leftArrow.setAttribute('href', '#' + id)
@@ -52,39 +100,31 @@ function makeDiv(id, classes = []) {
 
   // Right arrow button
   let rightArrow = document.createElement('a')
-  rightArrow.classList.add('carousel-control-next')
+  rightArrow.classList.add('arrowRight') //carousel-control-next')
   rightArrow.setAttribute('role', 'button')
   rightArrow.setAttribute('data-slide', 'next')
   rightArrow.setAttribute('href', '#' + id)
   rightArrow.innerHTML = `<span class="carousel-control-next-icon" aria-hidden="true"></span><span class="sr-only">Next</span>`
 
-  // Append both arrow buttons to the div element
-  div.appendChild(leftArrow)
-  div.appendChild(rightArrow)
+  // Append divs to their respective parents
+  colLeft.appendChild(leftArrow)
+  colRight.appendChild(rightArrow)
+  colMid.appendChild(carouselInner)
 
-  resultDiv.appendChild(div)
+  rowDiv.appendChild(colLeft)
+  rowDiv.appendChild(colMid)
+  rowDiv.appendChild(colRight)
+
+  cardBody.appendChild(rowDiv)
+  card.appendChild(cardHeader)
+  card.appendChild(cardBody)
+
+  resultDiv.appendChild(card)
   return carouselInner
 }
 
-// Create the distribution charts
-fetch(window.location.pathname + '?json=true', {
-  credentials: 'include'
-})
-  .then(res => res.json())
-  .then(({ QAReport }) => {
-    let { baseDistribution, lengthDistribution, phredDistribution } = QAReport
-    let maxReadLength = lengthDistribution.reduce(
-      (max, file) => (file.data.length > max ? file.data.length : max),
-      0
-    )
-
-    createBaseDistributionGraphs(baseDistribution, maxReadLength)
-    createLengthDistributionGraphs(lengthDistribution, maxReadLength)
-    createPhredDistributionGraphs(phredDistribution, maxReadLength)
-  })
-
 function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
-  let baseDiv = makeDiv('baseDiv', ['jumbotron', 'project-details'])
+  let baseDiv = makeDiv('baseDiv')
   baseDistribution.map((file, index) => {
     let canvas = makeCanvas(baseDiv)
     let chart = makeChart(canvas, 'line')
@@ -131,7 +171,7 @@ function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
 }
 
 function createLengthDistributionGraphs(lengthDistribution, maxReadLength) {
-  let lengthDiv = makeDiv('lengthDiv', ['jumbotron', 'project-details'])
+  let lengthDiv = makeDiv('lengthDiv')
   let canvas = makeCanvas(lengthDiv)
   let chart = makeChart(canvas, 'bar')
 
@@ -168,7 +208,7 @@ function createLengthDistributionGraphs(lengthDistribution, maxReadLength) {
 }
 
 function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
-  let phredDiv = makeDiv('phredDiv', ['jumbotron', 'project-details'])
+  let phredDiv = makeDiv('phredDiv')
 
   phredDistribution.map((file, index) => {
     let canvas = makeCanvas(phredDiv)
@@ -182,7 +222,7 @@ function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
     // If it is the first canvas we need to set its class to active
     if (index === 0) canvas.parentElement.classList.add('active')
 
-    chart.options.title.text = 'Phred Score Distributions per base for '
+    chart.options.title.text = 'Phred Score Distributions per base for ' + file.label
     chart.options.title.display = true
 
     chart.data.labels = Array(maxPhredScore + 2)
@@ -204,6 +244,34 @@ function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
       backgroundColor: colors[index]
     }))
 
+    chart.update()
+  })
+}
+
+function createBoxplotGraphs(boxplotDistribution, maxReadLength) {
+  let boxplotDiv = makeDiv('boxplotDiv')
+
+  boxplotDistribution.map((file, index) => {
+    let canvas = makeCanvas(boxplotDiv)
+    let chart = makeChart(canvas, 'boxplot')
+
+    // If it is the first canvas we need to set its class to active
+    if (index === 0) canvas.parentElement.classList.add('active')
+
+    chart.options.title.text = 'Qualityscore distribution per cycle for ' + file.label
+    chart.options.title.display = true
+
+    chart.data.labels = Array(maxReadLength + 1)
+      .fill(0)
+      .map((val, index) => index)
+    chart.data.datasets = file.data
+    chart.data.datasets = [
+      {
+        data: file.data,
+        label: file.label,
+        backgroundColor: 'rgba(0, 0, 0, .75)'
+      }
+    ]
     chart.update()
   })
 }

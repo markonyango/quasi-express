@@ -34,7 +34,7 @@
 </div>
 
 <p>
-    Status: {{project.status}} - <button class="btn btn-sm btn-dark" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
+    Status: {{project.status}} - <button class="btn btn-sm btn-dark" id="getResultsButton" {{#if project.logfiles}}{{else}}disabled{{/if}}>Get Results</button>
     <button class="btn btn-sm btn-dark" id="tempfilesBtn">Download temporary files</button>
 </p>
 
@@ -45,15 +45,15 @@
 
 <div class="card-deck">
     {{#if project.logfiles.[1]}}
-    <div class="card project-details border-dark" style="border-radius: 2px !important">
+    <div class="card project-details border-dark logfile" style="border-radius: 2px !important">
         <h5 class="card-header">Logfile</h5>
         <div class="card-body">
             <div class="card-text">
                 {{{html project.logfiles.[1]}}}
             </div>
         </div>
-    </div>{{!-- {{/if}} {{#if project.logfiles.[0]}} --}}
-    <div class="card project-details border-dark">
+    </div>{{/if}} {{#if project.logfiles.[0]}}
+    <div class="card project-details border-dark errorfile">
         <h5 class="card-header">Errors</h5>
         <div class="card-body">
             <div class="card-text">
@@ -65,4 +65,5 @@
 <p>No project with this ID found!</p>
 {{/if}}
 <script defer src="/js/Chart.bundle.min.js"></script>
+<script defer src="/js/Chart.BoxPlot.min.js"></script>
 <script defer src="/js/results/qa.js"></script>

@@ -9,6 +9,7 @@ function QAReport(projectDocument) {
   this.lengthDistribution = null
   this.phredDistribution = null
   this.baseDistribution = null
+  this.boxplotDistribution = null
 }
 
 QAReport.prototype.generateReport = function() {
@@ -17,11 +18,13 @@ QAReport.prototype.generateReport = function() {
   this.lengthDistribution = this.readLengthDistribution()
   this.baseDistribution = this.readBaseDistribution()
   this.phredDistribution = this.readPhredDistribution()
+  this.boxplotDistribution = this.readBoxplotDistribution()
 
   return {
     lengthDistribution: this.lengthDistribution,
     baseDistribution: this.baseDistribution,
-    phredDistribution: this.phredDistribution
+    phredDistribution: this.phredDistribution,
+    boxplotDistribution: this.boxplotDistribution
   }
 }
 
@@ -51,10 +54,10 @@ QAReport.prototype.readPhredDistribution = function() {
       .trim()
       .split(' ')
       .map(Number)
-    let A = data.splice(0,61)
-    let T = data.splice(0,61)
-    let G = data.splice(0,61)
-    let C = data.splice(0,61)
+    let A = data.splice(0, 61)
+    let T = data.splice(0, 61)
+    let G = data.splice(0, 61)
+    let C = data.splice(0, 61)
 
     data = { A, T, G, C }
 
@@ -94,6 +97,37 @@ QAReport.prototype.readBaseDistribution = function() {
       data,
       borderWidth: 1,
       backgroundColor: backgroundColor()
+    }
+  })
+}
+
+QAReport.prototype.readBoxplotDistribution = function() {
+  return this.files.map(file => {
+    let buff = this.readResultFile(file, '-boxplotdata.txt')
+    let data = buff
+      .trim()
+      .split('\n')
+      .map(row =>
+        row
+          .trim()
+          .split(' ')
+          .map(Number)
+      )
+    // Quality scores are represented by columns
+    // Cycle is represented by rows
+    
+    data = transpose(data)
+    data = data.map((scoreArr) => {
+      return scoreArr.reduce((acc, quantity, index) => {
+        return [...acc,  ...Array.from({length: quantity}, i => index)]
+      },[])
+    })
+
+    let label = path.basename(file)
+
+    return {
+      label,
+      data
     }
   })
 }
