@@ -1,23 +1,26 @@
 let resultDiv = document.getElementById('results')
 let getResultsButton = document.getElementById('getResultsButton')
 
+let baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution
+let maxReadLength
+
 getResultsButton.addEventListener('click', function() {
   fetch(window.location.pathname + '?json=true', {
     credentials: 'include'
   })
     .then(res => res.json())
     .then(({ QAReport }) => {
-      let { baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution } = QAReport
-      let maxReadLength = lengthDistribution.reduce(
+      ({ baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution } = QAReport)
+      maxReadLength = lengthDistribution.reduce(
         (max, file) => (file.data.length > max ? file.data.length : max),
         0
       )
-
-      createBaseDistributionGraphs(baseDistribution, maxReadLength)
-      createLengthDistributionGraphs(lengthDistribution, maxReadLength)
-      createPhredDistributionGraphs(phredDistribution, maxReadLength)
-      createBoxplotGraphs(boxplotDistribution, maxReadLength)
     })
+    .then(() => createBaseDistributionGraphs(baseDistribution, maxReadLength))
+    .then(() => createLengthDistributionGraphs(lengthDistribution, maxReadLength))
+    .then(() => createPhredDistributionGraphs(phredDistribution, maxReadLength))
+    .then(() => createBoxplotGraphs(boxplotDistribution, maxReadLength))
+    .catch(error => console.log('Error while creating QAReport charts: ' + error))
 
   getResultsButton.setAttribute('disabled', true)
 })
