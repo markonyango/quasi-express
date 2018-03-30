@@ -1,10 +1,12 @@
 const fs = require('fs-extra')
 const path = require('path')
+const { quantileSeq } = require('mathjs')
 
 function QAReport(projectDocument) {
   this.files = projectDocument.files
   this.savePath = projectDocument.savePath
   this.maxLength = 0
+  this.maxReads = {}
 
   this.lengthDistribution = null
   this.phredDistribution = null
@@ -13,18 +15,45 @@ function QAReport(projectDocument) {
 }
 
 QAReport.prototype.generateReport = function() {
-  // maxLength is being calculated in readLengthDistribution only
-  // so run this first
-  this.lengthDistribution = this.readLengthDistribution()
-  this.baseDistribution = this.readBaseDistribution()
-  this.phredDistribution = this.readPhredDistribution()
-  this.boxplotDistribution = this.readBoxplotDistribution()
+  let reportFile = path.join(this.savePath, 'report.txt')
+  try {
+    let buff = fs.readFileSync(reportFile, { encoding: 'utf-8', flag: 'r' })
+    let json = JSON.parse(buff)
+    this.lengthDistribution = json.lengthDistribution
+    this.baseDistribution = json.baseDistribution
+    this.phredDistribution = json.phredDistribution
+    this.boxplotDistribution = json.boxplotDistribution
+    this.maxLength = json.maxLength
+    this.maxReads = json.maxReads
+  } catch (error) {
+    // maxLength is being calculated in readLengthDistribution only
+    // so run this first
+    this.lengthDistribution = this.readLengthDistribution()
+    this.baseDistribution = this.readBaseDistribution()
+    this.phredDistribution = this.readPhredDistribution()
+    this.boxplotDistribution = this.readBoxplotDistribution()
+
+    fs.writeFile(
+      reportFile,
+      JSON.stringify({
+        lengthDistribution: this.lengthDistribution,
+        baseDistribution: this.baseDistribution,
+        phredDistribution: this.phredDistribution,
+        boxplotDistribution: this.boxplotDistribution,
+        maxLength: this.maxLength,
+        maxReads: this.maxReads
+      }),
+      error => error ? console.log(error) : ''
+    )
+  }
 
   return {
     lengthDistribution: this.lengthDistribution,
     baseDistribution: this.baseDistribution,
     phredDistribution: this.phredDistribution,
-    boxplotDistribution: this.boxplotDistribution
+    boxplotDistribution: this.boxplotDistribution,
+    maxLength: this.maxLength,
+    maxReads: this.maxReads
   }
 }
 
@@ -115,12 +144,27 @@ QAReport.prototype.readBoxplotDistribution = function() {
       )
     // Quality scores are represented by columns
     // Cycle is represented by rows
-    
     data = transpose(data)
-    data = data.map((scoreArr) => {
-      return scoreArr.reduce((acc, quantity, index) => {
-        return [...acc,  ...Array.from({length: quantity}, i => index)]
-      },[])
+    data = data.map(scoreArr => {
+      // scoreArr is being unpacked by .reduce() into a sorted array of numReads length
+      let sortedArray = scoreArr.reduce((acc, quantity, index) => {
+        return [...acc, ...Array.from({ length: quantity }, i => index)]
+      }, [])
+
+      // Update global maxNumReads variable
+      this.maxReads[file] = sortedArray.length
+      console.log(this.maxReads)
+
+      // Calculate quantiles here
+      let quantiles = quantileSeq(sortedArray, [0.25, 0.5, 0.75], true)
+      return {
+        min: sortedArray[0],
+        q1: quantiles[0],
+        median: quantiles[1],
+        q3: quantiles[2],
+        max: sortedArray[sortedArray.length - 1],
+        outliers: []
+      }
     })
 
     let label = path.basename(file)
@@ -165,21 +209,6 @@ function backgroundColor() {
  */
 function transpose(a) {
   return a[0].map((_, c) => a.map(r => r[c]))
-}
-
-/**
- * Turns a 1d array into a 2d array with width columns.
- * Code taken from: https://stackoverflow.com/a/39838921
- * @param {array} arr 1d array to be turned into 2d array
- * @param {number} width Number of columns of the 2d array
- * @returns {Array.<Array.<any>>} 2d array with width columns
- */
-function toMatrix(arr, width) {
-  return arr.reduce(
-    (rows, key, index) =>
-      (index % width == 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows,
-    []
-  )
 }
 
 module.exports = QAReport

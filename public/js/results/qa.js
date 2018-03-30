@@ -2,27 +2,23 @@ let resultDiv = document.getElementById('results')
 let getResultsButton = document.getElementById('getResultsButton')
 
 let baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution
-let maxReadLength
+let maxLength, maxReads
+
+writeMaxReadsToList(window.Report.QAReport.maxReads)
+getResultsButton.style.display = 'block'
 
 getResultsButton.addEventListener('click', function() {
-  fetch(window.location.pathname + '?json=true', {
-    credentials: 'include'
-  })
-    .then(res => res.json())
+  Promise.resolve(window.Report)
     .then(({ QAReport }) => {
-      ({ baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution } = QAReport)
-      maxReadLength = lengthDistribution.reduce(
-        (max, file) => (file.data.length > max ? file.data.length : max),
-        0
-      )
+      ({ baseDistribution, lengthDistribution, phredDistribution, boxplotDistribution, maxLength, maxReads } = QAReport)
     })
-    .then(() => createBaseDistributionGraphs(baseDistribution, maxReadLength))
-    .then(() => createLengthDistributionGraphs(lengthDistribution, maxReadLength))
-    .then(() => createPhredDistributionGraphs(phredDistribution, maxReadLength))
-    .then(() => createBoxplotGraphs(boxplotDistribution, maxReadLength))
+    .then(() => createBaseDistributionGraphs(baseDistribution, maxLength))
+    .then(() => createLengthDistributionGraphs(lengthDistribution, maxLength))
+    .then(() => createPhredDistributionGraphs(phredDistribution, maxLength))
+    .then(() => createBoxplotGraphs(boxplotDistribution, maxLength))
     .catch(error => console.log('Error while creating QAReport charts: ' + error))
 
-  getResultsButton.setAttribute('disabled', true)
+  getResultsButton.style.display = 'none'
 })
 
 function makeCanvas(parentDiv) {
@@ -85,6 +81,8 @@ function makeDiv(id) {
     case 'phredDiv':
       cardHeader.innerText = 'Phredscore Distributions'
       break
+    case 'boxplotDiv':
+      cardHeader.innerText = 'Boxplot of quality scores per cycle'
   }
   cardHeader.classList.add('card-header')
   cardBody.id = id
@@ -126,7 +124,7 @@ function makeDiv(id) {
   return carouselInner
 }
 
-function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
+function createBaseDistributionGraphs(baseDistribution, maxLength) {
   let baseDiv = makeDiv('baseDiv')
   baseDistribution.map((file, index) => {
     let canvas = makeCanvas(baseDiv)
@@ -135,7 +133,7 @@ function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
     // If it is the first canvas we need to set its class to active
     if (index === 0) canvas.parentElement.classList.add('active')
 
-    chart.data.labels = Array(maxReadLength)
+    chart.data.labels = Array(maxLength)
       .fill(0)
       .map((value, index) => index + 1)
     chart.options.layout.padding = { left: 10, right: 30 }
@@ -161,7 +159,7 @@ function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
       'rgba(255,0,0,0.75)',
       'rgba(0,255,0,0.75)',
       'rgba(0,0,255,0.75)',
-      'rgba(255,255,0,0.75)',
+      'rgba(255,175,0,0.75)',
       'rgba(0,0,0,0.75)'
     ]
     chart.data.datasets = chart.data.datasets.map((dataset, index) => ({
@@ -173,7 +171,7 @@ function createBaseDistributionGraphs(baseDistribution, maxReadLength) {
   })
 }
 
-function createLengthDistributionGraphs(lengthDistribution, maxReadLength) {
+function createLengthDistributionGraphs(lengthDistribution, maxLength) {
   let lengthDiv = makeDiv('lengthDiv')
   let canvas = makeCanvas(lengthDiv)
   let chart = makeChart(canvas, 'bar')
@@ -181,7 +179,7 @@ function createLengthDistributionGraphs(lengthDistribution, maxReadLength) {
   // There will be only one canvas but we still need to set its parents class to active
   canvas.parentElement.classList.add('active')
 
-  chart.data.labels = Array(maxReadLength)
+  chart.data.labels = Array(maxLength)
     .fill(0)
     .map((value, index) => index + 1)
   chart.options.layout.padding = { left: 10, right: 30 }
@@ -210,7 +208,7 @@ function createLengthDistributionGraphs(lengthDistribution, maxReadLength) {
   chart.update()
 }
 
-function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
+function createPhredDistributionGraphs(phredDistribution, maxLength) {
   let phredDiv = makeDiv('phredDiv')
 
   phredDistribution.map((file, index) => {
@@ -234,13 +232,14 @@ function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
 
     chart.data.datasets = Object.entries(file.data).map(base => ({
       label: base[0],
-      data: base[1]
+      data: base[1],
+      categoryPercentage: 0.9
     }))
     let colors = [
-      'rgba(255,0,0,0.75)',
-      'rgba(0,255,0,0.75)',
-      'rgba(0,0,255,0.75)',
-      'rgba(255,255,0,0.75)'
+      'rgba(255,0,0,1.0)',
+      'rgba(0,255,0,1.0)',
+      'rgba(0,0,255,1.0)',
+      'rgba(255,175,0,1.0)'
     ]
     chart.data.datasets = chart.data.datasets.map((dataset, index) => ({
       ...dataset,
@@ -251,12 +250,13 @@ function createPhredDistributionGraphs(phredDistribution, maxReadLength) {
   })
 }
 
-function createBoxplotGraphs(boxplotDistribution, maxReadLength) {
+function createBoxplotGraphs(boxplotDistribution, maxLength) {
   let boxplotDiv = makeDiv('boxplotDiv')
 
   boxplotDistribution.map((file, index) => {
     let canvas = makeCanvas(boxplotDiv)
     let chart = makeChart(canvas, 'boxplot')
+    window.chart = chart
 
     // If it is the first canvas we need to set its class to active
     if (index === 0) canvas.parentElement.classList.add('active')
@@ -264,17 +264,25 @@ function createBoxplotGraphs(boxplotDistribution, maxReadLength) {
     chart.options.title.text = 'Qualityscore distribution per cycle for ' + file.label
     chart.options.title.display = true
 
-    chart.data.labels = Array(maxReadLength + 1)
-      .fill(0)
-      .map((val, index) => index)
-    chart.data.datasets = file.data
+    chart.data.labels = Array.from({ length: maxLength }, (v, i) => i + 1)
     chart.data.datasets = [
       {
         data: file.data,
         label: file.label,
-        backgroundColor: 'rgba(0, 0, 0, .75)'
+        backgroundColor: 'rgba(133,44,55,0.75)',
+        padding: 0.1
       }
     ]
     chart.update()
   })
+}
+
+function writeMaxReadsToList(maxReads){
+  let fileList = document.getElementById('fileList')
+  
+  for(let child of fileList.children) {
+    let text = child.innerText
+    let numReads = maxReads[text]
+    child.innerText += ` ${numReads} reads`
+  }
 }

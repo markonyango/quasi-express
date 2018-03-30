@@ -93,7 +93,7 @@ button[name="remove_project"] {
 }
 .project-details {
   background-color: #000 !important;
-  margin-bottom: 1.625em;
+  margin-bottom: 1.625rem;
   /* border-radius: 5px!important; */
   color: #fff;
 }
@@ -129,6 +129,10 @@ float: right;
   overflow: auto;
 }
 
+#getResultsButton {
+  display: none;
+  margin-top: 0.625rem
+}
 
 
 
