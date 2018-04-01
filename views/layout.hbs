@@ -16,19 +16,19 @@
   {{#if css}}<link rel="stylesheet" href="{{css}}">{{/if}}
   <meta name="theme-color" content="#ffffff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
 
 <body>
   {{> header}}
+  <div ><input type="checkbox" id="sidebarToggle" role="button"/><label for="sidebarToggle"><i class="fas fa-caret-right"></i></label></div>
 
   <div class="container-fluid" id="main">
     {{#if user}}
     <div class="row">
-      <div class="col-lg-2 d-none d-lg-block">
+      <div class="col-lg-2 d-none d-lg-block" id="sidebar">
         {{> sidebar}}
       </div>
-      <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12">
+      <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12" id="mainBox">
         {{> alerts}} {{{body}}}
       </div>
     </div>
@@ -41,7 +41,8 @@
     &copy; Mark Onyango 2017
   </footer>
   <script src="/js/jquery.min.js"></script>
-  <script src="/js/bootstrap.bundle.min.js"></script> {{#if script}}
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/style.js"></script> {{#if script}}
   <script src="{{script}}"></script> {{/if}}
 </body>
 
