@@ -1,34 +1,30 @@
-{{#if project}}
-<h2 class="project-header">{{project.projectname}}</h2>
+<h2 class="project-title">{{project.projectname}}</h2>
 <h4>{{project.projecttype}}</h4>
-<div class="card-columns">
-    <div class="card project-details border-dark">
-        <h5 class="card-header">Settings</h5>
+
+<div class="project-details-deck">
+    <div class="project-details border-dark">
+        <div class="card-header">Settings</div>
         <div class="card-body">
-            <div class="card-text">
-                <ul class="list-group list-group-flush">
-                    {{#each project.settings}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{@key}}
-                        <span>{{this}}</span>
-                    </li>
-                    {{/each}}
-                </ul>
-            </div>
+            <ul class="list-group">
+                {{#each project.settings}}
+                <li class="list-group-item">
+                    {{@key}}
+                    <span>{{this}}</span>
+                </li>
+                {{/each}}
+            </ul>
         </div>
     </div>
-    <div class="card project-details border-dark">
-        <h5 class="card-header">Uploaded Files</h5>
+    <div class="project-details border-dark">
+        <div class="card-header">Uploaded Files</div>
         <div class="card-body">
-            <div class="card-text">
-                <ul class="list-group list-group-flush" id="fileList">
-                    {{#each project.files}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{this}}
-                    </li>
-                    {{/each}}
-                </ul>
-            </div>
+            <ul class="list-group" id="fileList">
+                {{#each project.files}}
+                <li class="list-group-item">
+                    {{this}}
+                </li>
+                {{/each}}
+            </ul>
         </div>
     </div>
 </div>
@@ -43,31 +39,22 @@
 
 </div>
 
-<div class="card-deck">
-    {{#if project.logfiles.[1]}}
-    <div class="card project-details border-dark logfile" style="border-radius: 2px !important">
-        <h5 class="card-header">Logfile</h5>
-        <div class="card-body">
-            <div class="card-text">
-                {{{html project.logfiles.[1]}}}
-            </div>
-        </div>
-    </div>{{/if}} {{#if project.logfiles.[0]}}
-    <div class="card project-details border-dark errorfile">
-        <h5 class="card-header">Errors</h5>
-        <div class="card-body">
-            <div class="card-text">
-                {{{html project.logfiles.[0]}}}
-            </div>
-        </div>
-    </div> {{/if}}
-</div> 
+{{#if project.logfiles.[1]}}
+<div class="project-details logfile">
+    <div class="card-header">Logfile</div>
+    <div class="card-body">
+        {{{html project.logfiles.[1]}}}
+    </div>
+</div>{{/if}} {{#if project.logfiles.[0]}}
+<div class="project-details errorfile">
+    <div class="card-header">Errors</div>
+    <div class="card-body">
+        {{{html project.logfiles.[0]}}}
+    </div>
+</div> {{/if}}
+
 <!-- (HandleBars) Save projects JSON data in the browsers window object -->
-<script>window.Report = {{{json project}}}</script>
+<script>window.Report = {{{ json project }}}</script>
 <script defer src="/js/Chart.bundle.min.js"></script>
 <script defer src="/js/Chart.BoxPlot.min.js"></script>
-<script defer src="/js/results/qa.js"></script>
-
-{{/if}} {{else}}
-<p>No project with this ID found!</p>
- {{/if}}
+<script defer src="/js/results/qa.js"></script> {{/if}}

@@ -1,0 +1,31 @@
+/* Sidebar */
+.sidebar {
+  color: #fff !important;
+  padding: 0 !important;
+  margin: 0rem 0rem 1.5625rem 0rem !important;
+  border: 1px solid #000 !important;
+  border-radius: 5px !important;
+  box-shadow: 0.3125rem 0.3125rem 0.3125rem 0.1875rem rgba(0, 0, 0, 0.15) !important;
+  background: rgb(90, 90, 90) !important;
+  max-width: 100% !important;
+}
+.sidebar .card-header {
+  background: #212529;
+  padding: 0.125rem 0.3125rem 0.125rem 0.3125rem !important;
+}
+
+.sidebar ul {
+  padding-left: 0.2rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+.sidebar .card-body,
+.sidebar .list-group-item {
+  padding: 2px 2px 2px 0px !important;
+  background: rgb(90, 90, 90) !important;
+  font-size: 90% !important;
+  list-style-type: none;
+}
+.sidebar .card-text {
+  word-wrap: break-word !important;
+}

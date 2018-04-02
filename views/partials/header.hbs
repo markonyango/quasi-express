@@ -32,21 +32,35 @@
     {{/if}}
   </div>
 </nav> --}}
-<nav class="navbar-dark bg-dark">
+<nav class="navbar-dark bg-dark gridNavbar">
+  {{!-- <div class="nav-items">&#9776;</div> --}}
+  <div class="nav-items logo"><i class="fas fa-database"></i> QUASI-Express</a></div>
   <div class="nav-items">
     <a class="nav-link" href="/">
-      <i class="fas fa-home"></i> Home</a>
+      <i class="fas fa-home"></i> <span class="nav-text">Home</span></a>
   </div>
+  {{#if user}}
   <div class="nav-items">
     <a class="nav-link" href="/projects">
-      <i class="fas fa-clipboard"></i> Projects</a>
+      <i class="fas fa-clipboard"></i> <span class="nav-text">Projects</span></a>
   </div>
   <div class="nav-items">
+    <a class="nav-link" href="/settings">
+      <i class="fas fa-cog"></i> <span class="nav-text">Settings</span></a>
+  </div>
+  {{else}}
+  <div class="nav-items">
     <a class="nav-link" href="/users/login">
-      <i class="fas fa-sign-in-alt"></i> Login</a>
+      <i class="fas fa-sign-in-alt"></i> <span class="nav-text">Login</span></a>
   </div>
   <div class="nav-items">
     <a class="nav-link" href="/users/register">
-      <i class="fas fa-user-plus"></i> Register</a>
+      <i class="fas fa-user-plus"></i> <span class="nav-text">Register</span></a>
   </div>
+  {{/if}} {{#if user}}
+  <div class="logout">
+    <a class="nav-item nav-link" href="/users/logout">
+      <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span></a>
+  </div>
+  {{/if}}
 </nav>

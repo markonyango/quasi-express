@@ -34,82 +34,12 @@
 </div>
 
 <p>
-    Status: {{project.status}} - <button class="btn btn-sm btn-dark" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
+    Status: {{project.status}} -
+    <button class="btn btn-sm btn-dark" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
     <button class="btn btn-sm btn-dark" id="tempfilesBtn">Download temporary files</button>
 </p>
 
 
-{{#if project.logfiles}} {{!-- Put PDF viewer code here as it does only exist if --}}
-
-<div class="jumbotron project-details">
-    <div id="project-result">
-
-    </div>
-</div>
-
-<div class="card-deck">
-    {{#if project.logfiles.[1]}}
-    <div class="card project-details border-dark" style="border-radius: 2px !important">
-        <h5 class="card-header">Logfile</h5>
-        <div class="card-body">
-            <div class="card-text">
-                {{{html project.logfiles.[1]}}}
-            </div>
-        </div>
-    </div>{{!-- {{/if}} {{#if project.logfiles.[0]}} --}}
-    <div class="card project-details border-dark">
-        <h5 class="card-header">Errors</h5>
-        <div class="card-body">
-            <div class="card-text">
-                {{{html project.logfiles.[0]}}}
-            </div>
-        </div>
-    </div> {{/if}}
-</div> {{/if}} {{else}}
+{{else}}
 <p>No project with this ID found!</p>
 {{/if}}
-
-<script>
-    let getResultBtn = document.getElementById('resultBtn')
-    let tempfilesBtn = document.getElementById('tempfilesBtn')
-    getResultBtn.addEventListener('click', function (event) {
-        let resultBox = document.getElementById('project-result')
-        let projectID = "{{project._id}}"
-        let pdfUrl = projectID + '/quality-report.pdf'
-
-        fetch('/projects/' + pdfUrl, { credentials: 'include' })
-            .then(res => {
-                if (!res.ok) {
-                    throw Error(res.statusText)
-                } else {
-                    return res
-                }
-            })
-            .then(res => res.arrayBuffer())
-            .then(file => {
-                let objectElement = document.createElement('object')
-                objectElement.setAttribute('width', '100%')
-                objectElement.setAttribute('height', '500px')
-                objectElement.setAttribute('data', URL.createObjectURL(new Blob([file], { type: 'application/pdf' })))
-                resultBox.appendChild(objectElement)
-                resultBox.parentElement.style.display = 'inherit'
-            })
-            .catch(error => console.error(error))
-    })
-
-    tempfilesBtn.addEventListener('click', function(event) {
-        let projectID = "{{project._id}}"
-        let tempfilesUrl = projectID + '/tempfiles.tar.gz'
-
-        fetch('/projects/' + tempfilesUrl, { credentials: 'include' })
-        .then(res => {
-                if (!res.ok) {
-                    throw Error(res.statusText)
-                } else {
-                    return res
-                }
-            })
-            .then(res => res.arrayBuffer())
-            .then(file => {/* Something like URL.createObjectURL(file) append to DOM somehow etc. */})
-    })
-</script>

@@ -1,8 +1,71 @@
 nav {
-    display: grid!important;
-    grid-template-columns: repeat(6, 2fr);
+  display: grid;
+  grid-template-columns: 2rem repeat(11, 1fr);
+  background-color: #212529ad;
+  line-height: 2.125rem;
+  margin: 0;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
-.navitems {
-    grid-column: auto / span 4;
+.gridNavbar {
+  grid-area: navbar;
 }
+
+nav a {
+  text-decoration: none;
+  color: white;
+  font-size: 1em;
+}
+
+nav a:hover {
+  color: red;
+}
+
+.nav-items {
+  margin-left: 0.125rem;
+  grid-column: auto / span 1;
+}
+
+.logout {
+  grid-column: 12 / 12;
+  margin-left: auto;
+}
+
+.logo {
+    grid-column: auto / span 2;
+    color: #fff;
+}
+
+@media only screen and (max-width: 990px) {
+  nav {
+    display: grid;
+    grid-template-columns: 2rem repeat(5, 2fr);
+    background-color: #212529ad;
+    line-height: 2.125rem;
+    margin: 0;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .nav-items {
+    grid-column: auto / span 1;
+  }
+  .logo { display: none }
+}
+
+@media only screen and (max-width: 768px) {
+    nav {
+      background-color: #212529ad;
+      grid-template-columns: repeat(6, 2fr);
+      padding: 0;
+      margin: auto;
+      display: grid;
+    }
+  
+    .nav-text {display: none}
+    .logo { display: none }
+    .nav-items { margin: auto }
+  }
