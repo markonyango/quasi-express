@@ -1,0 +1,8 @@
+nav {
+    display: grid!important;
+    grid-template-columns: repeat(6, 2fr);
+}
+
+.navitems {
+    grid-column: auto / span 4;
+}

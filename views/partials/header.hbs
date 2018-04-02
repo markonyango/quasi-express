@@ -1,25 +1,52 @@
+{{!--
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-  <a class="navbar-brand" href="#"><i class="fas fa-database"></i> QUASI-Express</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+  <a class="navbar-brand" href="#">
+    <i class="fas fa-database"></i> QUASI-Express</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false"
+    aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbar">
     <div class="navbar-nav mr-auto">
-      <a class="nav-item nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+      <a class="nav-item nav-link" href="/">
+        <i class="fas fa-home"></i> Home</a>
       {{#if user}}
-      <a class="nav-item nav-link" href="/projects"><i class="fas fa-clipboard"></i> Projects</a>
-      <a class="nav-item nav-link" href="/settings"><i class="fas fa-cog"></i> Settings</a>
+      <a class="nav-item nav-link" href="/projects">
+        <i class="fas fa-clipboard"></i> Projects</a>
+      <a class="nav-item nav-link" href="/settings">
+        <i class="fas fa-cog"></i> Settings</a>
       {{else}}
-      <a class="nav-item nav-link" href="/users/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-      <a class="nav-item nav-link" href="/users/register"><i class="fas fa-user-plus"></i> Register</a>
+      <a class="nav-item nav-link" href="/users/login">
+        <i class="fas fa-sign-in-alt"></i> Login</a>
+      <a class="nav-item nav-link" href="/users/register">
+        <i class="fas fa-user-plus"></i> Register</a>
       {{/if}}
     </div>
     {{#if user}}
     <div class="navbar-nav ml-auto logout">
       <span class="navbar-text">{{user.email}}</span>
-      <a class="nav-item nav-link" href="/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <a class="nav-item nav-link" href="/users/logout">
+        <i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
     {{/if}}
+  </div>
+</nav> --}}
+<nav class="navbar-dark bg-dark">
+  <div class="nav-items">
+    <a class="nav-link" href="/">
+      <i class="fas fa-home"></i> Home</a>
+  </div>
+  <div class="nav-items">
+    <a class="nav-link" href="/projects">
+      <i class="fas fa-clipboard"></i> Projects</a>
+  </div>
+  <div class="nav-items">
+    <a class="nav-link" href="/users/login">
+      <i class="fas fa-sign-in-alt"></i> Login</a>
+  </div>
+  <div class="nav-items">
+    <a class="nav-link" href="/users/register">
+      <i class="fas fa-user-plus"></i> Register</a>
   </div>
 </nav>
