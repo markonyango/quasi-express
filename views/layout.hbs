@@ -3,11 +3,11 @@
 
 <head>
   <title>{{title}}</title>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="/css/OpenSans.css" rel="stylesheet">
   <link rel='stylesheet' href='/css/style.css' />
   <link rel="stylesheet" href="/css/navbar.css" />
   <link rel="stylesheet" href="/css/sidebar.css" />
-  <link rel="stylesheet" href="/css/projects.css" /> 
+  <link rel="stylesheet" href="/css/projects.css" />
   <link rel='stylesheet' href='/css/fa-svg-with-js.css' />
   <script src="/js/fontawesome-all.min.js"></script> {{!-- FAVICON CODE --}}
   <link rel="apple-touch-icon" sizes="180x180" href="/ico/apple-touch-icon.png">
@@ -16,7 +16,6 @@
   <link rel="manifest" href="/ico/manifest.json">
   <link rel="mask-icon" href="/ico/safari-pinned-tab.svg" color="#5bbad5"> {{#if css}}
   <link rel="stylesheet" href="{{css}}">{{/if}}
-  <meta name="theme-color" content="#ffffff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -30,14 +29,18 @@
     <div class="gridContent" id="mainBox">
       {{> alerts}} {{{body}}}
     </div>
-    {{else}} {{> alerts}} {{{body}}} {{/if}}
+    {{else}}
+    <div class="gridContent" id="mainBox">
+      {{> alerts}} {{{body}}}
+    </div>
+    {{/if}}
     <footer id="footer" class="gridFooter">
       &copy; Mark Onyango 2017
     </footer>
   </div>
 
-  <script src="/js/jquery.min.js"></script>
-  {{#if script}} <script src="{{script}}"></script> {{/if}}
+  {{#if script}}
+  <script src="{{script}}"></script> {{/if}}
 </body>
 
 </html>

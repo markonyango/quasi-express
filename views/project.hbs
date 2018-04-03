@@ -1,14 +1,14 @@
 {{#if project}}
 <h2 class="project-header">{{project.projectname}}</h2>
 <h4>{{project.projecttype}}</h4>
-<div class="card-columns">
-    <div class="card project-details border-dark">
+<div class="project-details-deck">
+    <div class="card">
         <h5 class="card-header">Settings</h5>
         <div class="card-body">
             <div class="card-text">
-                <ul class="list-group list-group-flush">
+                <ul class="list-group">
                     {{#each project.settings}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item">
                         {{@key}}
                         <span>{{this}}</span>
                     </li>
@@ -17,13 +17,13 @@
             </div>
         </div>
     </div>
-    <div class="card project-details border-dark">
+    <div class="card">
         <h5 class="card-header">Uploaded Files</h5>
         <div class="card-body">
             <div class="card-text">
-                <ul class="list-group list-group-flush">
+                <ul class="list-group">
                     {{#each project.files}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item">
                         {{this}}
                     </li>
                     {{/each}}
@@ -35,8 +35,8 @@
 
 <p>
     Status: {{project.status}} -
-    <button class="btn btn-sm btn-dark" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
-    <button class="btn btn-sm btn-dark" id="tempfilesBtn">Download temporary files</button>
+    <button class="btn" id="resultBtn" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show PDF</button>
+    <button class="btn" id="tempfilesBtn">Download temporary files</button>
 </p>
 
 

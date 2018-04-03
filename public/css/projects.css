@@ -10,18 +10,11 @@ button[name='remove_project'] {
   cursor: pointer;
 }
 
+
 /* Project details page - Card styling */
 .project-title {
   padding: 0rem 0rem 0rem 0rem;
   margin: 0rem 0rem 0.5rem 0rem;
-}
-
-.project-details {
-  padding: 0;
-  margin: 0;
-  box-shadow: 0.3125rem 0.3125rem 0.3125rem 0.1875rem rgba(0, 0, 0, 0.15);
-  border: 1px solid black;
-  border-radius: 5px;
 }
 
 .project-details-deck {
@@ -42,11 +35,10 @@ button[name='remove_project'] {
   float: right;
 }
 
-.project-details.logfile,
-.project-details.errorfile {
+.logfile, .errorfile {
+  max-width: 95%;
   max-height: 50vh;
   overflow: auto;
-  word-wrap: break-word;
   margin-bottom: 5rem;
 }
 
@@ -60,7 +52,10 @@ button[name='remove_project'] {
 @media only screen and (max-width: 600px) {
   .project-details-deck {
     display: grid;
-    grid-template-columns: 12fr;
+    grid-template-columns: 6fr 6fr;
     grid-gap: 0.85rem;
   }
+
+  .logfile { display: none }
+  .errorfile { display: none }
 }

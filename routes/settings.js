@@ -9,7 +9,7 @@ router.get('/', function (req, res) {
     const uid = req.user._id
     User.findOne({ _id: uid }).exec()
         .then(user => {
-            res.render('settings', { title: 'Settings', user: user, script: '../js/settings.js' })
+            res.render('settings', { title: 'Settings', user: user })
         })
         .catch(error => {
             req.flash('error_msg', 'Something went wrong while retrieving your settings: ' + error)

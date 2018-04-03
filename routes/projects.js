@@ -37,7 +37,7 @@ router.get('/', function (req, res) {
   } else {
     Project.find({ uid: uid }).exec()
       .then(projects => {
-        res.render('projects', { title: 'Projects', projects: projects, script: 'js/projects.js' })
+        res.render('projects', { title: 'Projects', projects: projects })
       })
       .catch(error => {
         req.flash('error_msg', 'Something went wrong while getting the list of projects: ' + error)

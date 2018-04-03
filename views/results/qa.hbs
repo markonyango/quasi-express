@@ -2,7 +2,7 @@
 <h4>{{project.projecttype}}</h4>
 
 <div class="project-details-deck">
-    <div class="project-details border-dark">
+    <div class="card">
         <div class="card-header">Settings</div>
         <div class="card-body">
             <ul class="list-group">
@@ -15,7 +15,7 @@
             </ul>
         </div>
     </div>
-    <div class="project-details border-dark">
+    <div class="card">
         <div class="card-header">Uploaded Files</div>
         <div class="card-body">
             <ul class="list-group" id="fileList">
@@ -31,7 +31,7 @@
 
 <p>
     Status: {{project.status}}
-    <button class="btn btn-sm btn-dark" id="getResultsButton" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show Results</button>
+    <button class="btn" id="getResultsButton" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show Results</button>
 </p>
 
 {{#if project.logfiles}} {{!-- Put PDF viewer code here as it does only exist if --}}
@@ -40,13 +40,13 @@
 </div>
 
 {{#if project.logfiles.[1]}}
-<div class="project-details logfile">
+<div class="card logfile">
     <div class="card-header">Logfile</div>
     <div class="card-body">
         {{{html project.logfiles.[1]}}}
     </div>
 </div>{{/if}} {{#if project.logfiles.[0]}}
-<div class="project-details errorfile">
+<div class="card errorfile">
     <div class="card-header">Errors</div>
     <div class="card-body">
         {{{html project.logfiles.[0]}}}

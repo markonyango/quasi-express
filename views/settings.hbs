@@ -1,26 +1,23 @@
-<div class="container">
-    <form style="width: 75%" id="form_settings" name="form_settings" method="POST" action="/settings">
-        <fieldset>
-            <legend class="col-form-label">Profile Settings</legend>
-            <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Username</label>
-                <input class="col-sm-8 form-control" type="text" name="username" {{#if user.username}} value="{{user.username}}"
-                    {{else}} placeholder="Username" {{/if}} focus>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-4 col-form-label">eMail</label>
-                <input class="col-sm-8 form-control" type="text" name="email" {{#if user.email}} value="{{user.email}}"
-                    {{else}} placeholder="eMail" {{/if}} disabled>
-            </div>
-        </fieldset>
-        <div class="form-group row pt-3">
-            <button class="offset-sm-4 btn btn-sm btn-success" type="submit">Save Settings</button>
+<form style="width: 75%" id="form_settings" name="form_settings" method="POST" action="/settings">
+    <fieldset>
+        <legend>Profile Settings</legend>
+        <div>
+            <label>Username</label>
+            <input type="text" name="username" {{#if user.username}} value="{{user.username}}" {{else}} placeholder="Username" {{/if}}
+                focus>
         </div>
+        <div>
+            <label>eMail</label>
+            <input type="text" name="email" {{#if user.email}} value="{{user.email}}" {{else}} placeholder="eMail" {{/if}} disabled>
+        </div>
+    </fieldset>
+    <div>
+        <button class="btn" type="submit">Save Settings</button>
+    </div>
+</form>
+<p>
+    <form id="form_remove_user" method="POST" action="/users/remove">
+        <button type="submit" class="btn">Remove Account</button>
+        <span>All your data will be removed permanently!</span>
     </form>
-    <p class="pt-5">
-        <form id="form_remove_user">
-            <button type="submit" class="btn btn-sm btn-danger">Remove Account</button>
-            <span class="font-weight-bold ml-3">All your data will be removed permanently!</span>
-        </form>
-    </p>
-</div>
+</p>

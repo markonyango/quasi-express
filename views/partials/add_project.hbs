@@ -1,99 +1,76 @@
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Project Setup</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="add_project_form">
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Name</label>
-            <input class="col-sm-9 form-control form-control-sm" type="text" name="projectname" placeholder="Projectname..." required>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Type</label>
-            <select class="col-sm-9 form-control form-control-sm" type="select" name="projecttype">
-              <option value="" disabled selected>Select project type...</option>
-              <option value="qa">Quality Assessment</option>
-              <option value="dea">Differential Expression Analysis</option>
-              <option value="align">Alignment</option>
-            </select>
-          </div>
-          <fieldset class="form-group" id="options_dea" style="display: none">
-            <div class="row">
-              <label class="col-form-label col-sm-2 pt-0">Options</label>
-              <div class="col-sm-9">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="gridRadios" value="option1">
-                  <label class="form-check-label" for="gridRadios1">
-                    Options 1
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="gridRadios" value="option2">
-                  <label class="form-check-label" for="gridRadios2">
-                    Options 2
-                  </label>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="form-group" id="options_align" style="display: none">
-            <div class="row">
-              <label class="col-form-label col-sm-2 pt-0">Options</label>
-              <div class="col-sm-9">
-                <div class="form-group row">
-                  <label class="col-8 col-form-label col-form-label-sm" for="numCores">Number of cores</label>
-                  <input class="col-3 form-control form-control-sm" type="text" name="settings[numCores]" readonly placeholder="Automatic">
-                </div>
-                <div class="form-group row">
-                  <label class="col-8 col-form-label col-form-label-sm" for="mismatches">How many mismatches will you allow?</label>
-                  <input class="col-3 form-control form-control-sm" type="number" name="settings[mismatches]" value="0">
-                </div>
-                <div class="form-group row">
-                  <label class="col-8 col-form-label col-form-label-sm" for="preTrim">How many bases shall be trimmed from the 3' end?</label>
-                  <input class="col-3 form-control form-control-sm" type="number" name="settings[preTrim]" value="0">
-                </div>
-                <div class="form-group row">
-                  <label class="col-8 col-form-label col-form-label-sm" for="postTrim">How many bases shall be trimmed from the 5' end?</label>
-                  <input class="col-3 form-control form-control-sm" type="number" name="settings[postTrim]" value="0">
-                </div>
-                <div class="form-check row">
-                  <label class="col-6 col-form-label col-form-label-sm" for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
-                  <input class="form-check-input" type="checkbox" name="settings[writeUnaligned]" checked>
-                </div>
-                <div class="form-group row">
-                  <label class="col-8 col-form-label col-form-label-sm" for="settings[reference]">Which reference should be used by Bowtie?</label>
-                  <select class="col-3 form-control form-control-sm" name="settings[reference]">
-                    
-                  </select>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-          <div class="form-group row" id="files">
-            <label class="col-sm-2 col-form-label">Files</label>
-            <input class="col-sm-9 form-control form-control-sm" type="file" name="files" placeholder="Files..." accept=".fastq,.fq"
-              multiple>
-          </div>
-          <div class="form-group row">
-            <input type="submit" class="offset-sm-2 btn btn-primary btn-sm">
-            <button type="button" class="ml-5 btn btn-danger btn-sm">Cancel</button>
-          </div>
-          {{!-- <div class="form-group row" style="display: none">
-            <div class="progress offset-sm-2 col-sm-9 pl-0 pr-0">
-              <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-          </div>
-          <div class="form-group row">
-            <span class="form-text offset-sm-2 col-sm-9 pl-0 pr-0" name="status"></span>
-          </div> --}}
-          {{!-- <input type="hidden" name="uid" value="{{user._id}}"> --}}
-        </form>
+<form id="add_project_form">
+  <div>
+    <label>Name</label>
+    <input type="text" name="projectname" placeholder="Projectname..." required>
+  </div>
+  <div>
+    <label>Type</label>
+    <select type="select" name="projecttype">
+      <option value="" disabled selected>Select project type...</option>
+      <option value="qa">Quality Assessment</option>
+      <option value="dea">Differential Expression Analysis</option>
+      <option value="align">Alignment</option>
+    </select>
+  </div>
+  <fieldset id="options_dea" style="display: none">
+    <div>
+      <label>Options</label>
+      <div>
+        <div>
+          <input type="checkbox" name="gridRadios" value="option1">
+          <label for="gridRadios1">
+            Options 1
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" name="gridRadios" value="option2">
+          <label for="gridRadios2">
+            Options 2
+          </label>
+        </div>
       </div>
     </div>
+  </fieldset>
+  <fieldset id="options_align" style="display: none">
+    <div>
+      <label>Options</label>
+      <div>
+        <div>
+          <label for="numCores">Number of cores</label>
+          <input type="text" name="settings[numCores]" placeholder="Automatic">
+        </div>
+        <div>
+          <label for="mismatches">How many mismatches will you allow?</label>
+          <input type="number" name="settings[mismatches]" placeholder="0">
+        </div>
+        <div>
+          <label for="preTrim">How many bases shall be trimmed from the 3' end?</label>
+          <input type="number" name="settings[preTrim]" placeholder="0">
+        </div>
+        <div>
+          <label for="postTrim">How many bases shall be trimmed from the 5' end?</label>
+          <input type="number" name="settings[postTrim]" placeholder="0">
+        </div>
+        <div>
+          <label for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
+          <input type="checkbox" name="settings[writeUnaligned]">
+        </div>
+        <div>
+          <label for="settings[reference]">Which reference should be used by Bowtie?</label>
+          <select name="settings[reference]">
+            <option value="" disabled selected>Select reference...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+  <div id="files">
+    <label >Files</label>
+    <input type="file" name="files" placeholder="Files..." accept=".fastq,.fq"
+      multiple>
   </div>
-</div>
+  <div>
+    <input type="submit" class="btn">
+    <button type="button" class="btn">Cancel</button>
+  </div>
+</form>

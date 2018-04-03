@@ -1,6 +1,6 @@
 nav {
   display: grid;
-  grid-template-columns: 2rem repeat(11, 1fr);
+  grid-template-columns: repeat(6, 2fr);
   /* background-color: #212529ad; */
   line-height: 2.125rem;
   margin: 0;
@@ -13,13 +13,13 @@ nav {
   grid-area: navbar;
 }
 
-nav a {
+.nav-link {
   text-decoration: none;
   /* color: white; */
   font-size: 1em;
 }
 
-nav a:hover {
+.nav-link:hover {
   color: red;
 }
 
@@ -29,7 +29,7 @@ nav a:hover {
 }
 
 .logout {
-  grid-column: 12 / 12;
+  grid-column: auto / span 1;
   margin-left: auto;
 }
 
@@ -41,8 +41,8 @@ nav a:hover {
 @media only screen and (max-width: 990px) {
   nav {
     display: grid;
-    grid-template-columns: 2rem repeat(5, 2fr);
-    background-color: #212529ad;
+    grid-template-columns: repeat(6, 2fr);
+    /* background-color: #212529ad; */
     line-height: 2.125rem;
     margin: 0;
     margin-bottom: 1rem;
@@ -58,14 +58,14 @@ nav a:hover {
 
 @media only screen and (max-width: 768px) {
     nav {
-      background-color: #212529ad;
-      grid-template-columns: repeat(6, 2fr);
+      /* background-color: #212529ad; */
+      grid-template-columns: repeat(4, 1fr);
       padding: 0;
-      margin: auto;
+      margin: 0;
       display: grid;
     }
   
     .nav-text {display: none}
     .logo { display: none }
-    .nav-items { margin: auto }
+    .nav-items, .logout { margin: auto }
   }

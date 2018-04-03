@@ -1,21 +1,21 @@
 {{#unless success_msg}}
 <form method="POST" action="/users/register">
-    <div class="form-group row">
-        <label class="col-2 col-form-label">Email</label>
-        <div class="col-10">
-            <input class="form-control" type="text" placeholder="Email..." name="email">
+    <div>
+        <label>Email</label>
+        <div>
+            <input type="text" placeholder="Email..." name="email">
         </div>
     </div>
-    <div class="form-group row">
-        <label class="col-2 col-form-label">Password</label>
-        <div class="col-10">
-            <input class="form-control" type="password" placeholder="Password..." name="password">
+    <div>
+        <label>Password</label>
+        <div>
+            <input type="password" placeholder="Password..." name="password">
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-2"></div>
-        <div class="col-10">
-            <button type="submit" class="btn btn-primary">Save changes</button>
+    <div>
+        <div></div>
+        <div>
+            <button type="submit" class="btn">Save changes</button>
         </div>
     </div>
 </form>
