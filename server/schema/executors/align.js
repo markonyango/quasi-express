@@ -87,7 +87,7 @@ Rx.Observable.zip(
           job.logfile.write(stdout)
           job.logfile.write(stderr)
           job.logfile.end('End of logfile')
-          job.errorfile.end('End of errorfile')
+          job.errorfile.end()
           process.send({ msg: 'done' })
         })
         .catch(error => {

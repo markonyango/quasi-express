@@ -6,6 +6,7 @@ const rimraf = require('rimraf')
 const { uploadPath } = require('../../../settings')
 const printOut = require('../../../helpers/printOut')
 const QAReport = require('./QAReport')
+const AlignReport = require('./AlignReport')
 
 
 function stopjob() {
@@ -172,6 +173,9 @@ function getData() {
                     switch (project.projecttype) {
                         case 'qa':
                             resolve({ ...project, QAReport: new QAReport(project).generateReport() })
+                            break
+                        case 'align':
+                            resolve({ ...project, AlignReport: new AlignReport(project).generateReport()})
                             break
                         default:
                             resolve(project)
