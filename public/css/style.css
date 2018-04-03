@@ -4,11 +4,12 @@ html {
 }
 
 body {
-  background: #a3a0a0 !important;
+  /* background: #2c3e50; */
   font-size: 100%;
   font-family: 'Open Sans', sans-serif !important;
   padding: 0;
   margin: 0;
+  /* color: #ecf0f1; */
 }
 
 body * {
@@ -16,8 +17,7 @@ body * {
 }
 
 #footer {
-  background: #333333;
-  color: #ffffff;
+  /* background: #333333; */
   text-align: center;
   font-size: 0.8rem;
   position: fixed;
@@ -25,10 +25,68 @@ body * {
   width: 100%;
 }
 
-/* Navbar logout hover styling */
-.logout a:hover {
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.275rem 0.625rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn:hover, .btn:focus {
+  text-decoration: none;
+}
+
+.btn:focus, .btn.focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn.disabled, .btn:disabled {
+  opacity: 0.65;
+}
+
+.btn:not(:disabled):not(.disabled) {
   cursor: pointer;
 }
+
+
+
+
+.card-header {
+  /* background: #212529; */
+  padding: 0.125rem 0.3125rem 0.125rem 0.3125rem !important;
+}
+
+.list-group {
+  padding: 0rem 0.125rem 0rem 1.35rem;
+  margin: 0;
+}
+
+.list-group-item {
+  list-style: decimal;
+  /* text-align-last: justify; */
+  font-size: 0.8rem;
+}
+
+.card-body{
+  padding: 0rem 0rem 0.125rem 0rem;
+  font-size: 0.9rem;
+  /* background-color: #3498DB; */
+}
+
+
+
 
 
 
