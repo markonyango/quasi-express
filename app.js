@@ -99,19 +99,21 @@ app.use(function (req, res, next) {
   res.locals.error = req.flash('error')
   res.locals.user = req.user || null
   // Make server stats available
-  res.locals.stats = {
-    memoryUsage: {
-      heapTotal: Math.trunc(process.memoryUsage().heapTotal / 1024 / 1024),
-      heapUsed: Math.trunc(process.memoryUsage().heapUsed / 1024 / 1024),
-      rss: Math.trunc(process.memoryUsage().rss / 1024 / 1024)
-    },
-    cpuUsage: {
-      user: process.cpuUsage().user / 1e6,
-      system: process.cpuUsage().system / 1e6
-    },
-    uptime: Math.floor(process.uptime()),
-    nodeVersion: process.version,
-    platform: process.platform
+  if(req.user){
+    res.locals.stats = {
+      memoryUsage: {
+        heapTotal: Math.trunc(process.memoryUsage().heapTotal / 1024 / 1024),
+        heapUsed: Math.trunc(process.memoryUsage().heapUsed / 1024 / 1024),
+        rss: Math.trunc(process.memoryUsage().rss / 1024 / 1024)
+      },
+      cpuUsage: {
+        user: process.cpuUsage().user / 1e6,
+        system: process.cpuUsage().system / 1e6
+      },
+      uptime: Math.floor(process.uptime()),
+      nodeVersion: process.version,
+      platform: process.platform
+    }
   }
   next()
 })
