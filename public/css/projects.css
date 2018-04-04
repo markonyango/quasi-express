@@ -19,6 +19,7 @@ button[name='remove_project'] {
 
 .project-details-deck {
   display: grid;
+  max-width: 95%;
   grid-template-columns: 4fr 4fr 4fr;
   grid-gap: 0.85rem;
 }
