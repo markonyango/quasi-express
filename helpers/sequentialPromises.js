@@ -16,6 +16,7 @@ module.exports = function (promiseArray) {
                     array.push(res)
                     return res
                 })
+                .catch(error => {throw new Error(error)})
         })
     }, Promise.resolve())
         .then(() => { return array })
