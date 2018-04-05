@@ -5,7 +5,7 @@ function AlignReport(projectDocument) {
   this.files = projectDocument.files
   this.savePath = projectDocument.savePath
 
-  this.samstatFiles = []
+  this.resultFiles = []
 }
 
 AlignReport.prototype.generateReport = function() {
@@ -14,19 +14,20 @@ AlignReport.prototype.generateReport = function() {
     let buff = fs.readFileSync(reportFile, { encoding: 'utf-8', flag: 'r' })
     let json = JSON.parse(buff)
 
-    this.samstatFiles = json.samstatFiles
+    this.resultFiles = json.resultFiles
   } catch (error) {
-    this.samstatFiles = fs.readdirSync(this.savePath).filter(file => file.indexOf('samstat.html') !== -1)
-    
+    let fileFilter = ['report.txt', 'logfile.txt', 'error.txt', ...this.files]
+    this.resultFiles = fs.readdirSync(this.savePath).filter(file => !fileFilter.includes(file))
+
     fs.writeFile(
       reportFile,
-      JSON.stringify({ samstatFiles: this.samstatFiles }),
+      JSON.stringify({ resultFiles: this.resultFiles }),
       error => (error ? console.log(error) : '')
     )
   }
 
   return {
-    samstatFiles: this.samstatFiles
+    resultFiles: this.resultFiles
   }
 }
 

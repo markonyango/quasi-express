@@ -40,7 +40,7 @@ button[name='remove_project'] {
   max-width: 95%;
   max-height: 50vh;
   overflow: auto;
-  margin-bottom: 5rem;
+  margin-bottom: 1.5625rem;
 }
 
 #getResultsButton {

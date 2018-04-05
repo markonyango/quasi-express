@@ -73,7 +73,6 @@ Rx.Observable.zip(
       })
 
       // If wanted, create countMatrix of output SAM files
-      let countMatrixPromise = null
       if(countMatrix) {
         let filesString = job.files.map(file => {
           let ext = path.extname(file)
@@ -81,11 +80,11 @@ Rx.Observable.zip(
           SAMfile = path.join(job.savePath, SAMfile)
           return SAMfile
         }).join(' ')
-        countMatrixPromise = exec(`count ${filesString}`)
+        promiseArray.push(() => exec(`cd ${job.savePath} && count ${filesString}`))
       }
 
       // Execute all Promises that are stored in the Promisearray
-      sequentialPromises([...promiseArray,...samstatArray, countMatrixPromise])
+      sequentialPromises([...promiseArray,...samstatArray])
         // Make one single string out of all the returned stdouts and stderrs  
         .then(res => res.reduce((acc, curr) => {
           acc.stdout += curr.stdout
