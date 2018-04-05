@@ -35,7 +35,14 @@ projectType.addEventListener('change', function() {
           })
           options_align.style.display = 'block'
         })
-        .catch(error => console.log)
+        .catch(error => {
+          let referenceSelect = document.querySelector('select[name="settings[reference]"]')
+          let child = document.createElement('option')
+          child.text = 'Error retrieving references'
+          child.disabled = true
+          referenceSelect.appendChild(child)
+          options_align.style.display = 'block'
+        })
     } else {
       options_align.style.display = 'block'
     }
