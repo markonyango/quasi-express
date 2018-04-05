@@ -35,7 +35,8 @@ Rx.Observable.zip(
       postTrim,
       mismatches,
       writeUnaligned,
-      reference
+      reference,
+      countMatrix
     } = job.settings
     let cores = os.cpus().length
 
@@ -71,8 +72,20 @@ Rx.Observable.zip(
         return (() => exec(`samstat ${SAMfile}`))
       })
 
+      // If wanted, create countMatrix of output SAM files
+      let countMatrixPromise = null
+      if(countMatrix) {
+        let filesString = job.files.map(file => {
+          let ext = path.extname(file)
+          let SAMfile = file.replace(ext, '.sam')
+          SAMfile = path.join(job.savePath, SAMfile)
+          return SAMfile
+        }).join(' ')
+        countMatrixPromise = exec(`count ${filesString}`)
+      }
+
       // Execute all Promises that are stored in the Promisearray
-      sequentialPromises([...promiseArray,...samstatArray])
+      sequentialPromises([...promiseArray,...samstatArray, countMatrixPromise])
         // Make one single string out of all the returned stdouts and stderrs  
         .then(res => res.reduce((acc, curr) => {
           acc.stdout += curr.stdout
