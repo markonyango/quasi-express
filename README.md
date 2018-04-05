@@ -8,7 +8,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
++ NodeJS
++ MongoDB
 
 #### Ubuntu Linux
 
@@ -26,6 +27,8 @@ sudo apt-get install -y nodejs
 node --version
 ```
 
+MongoDB is needed as the backend part. You can find a detailed installation instruction here: [Link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+
 ### Installing
 
 Download the repository to your local machine and change to the new folder. Once inside the new folder, trigger the installation of all required npm dependencies
@@ -34,6 +37,11 @@ Download the repository to your local machine and change to the new folder. Once
 git clone https://github.com/markonyango/quasi-express.git
 cd quasi-express
 npm install
+```
+Next install the quasi-tools library for full functionality. It's available here: [Link](http://www.github.com/markonyango/quasi-tools)
+```bash
+git clone https://github.com/markonyango/quasi-tools.git
+sh ./quasi-tools/install.sh
 ```
 
 The server can be started by simply running either of the following commands
@@ -46,6 +54,18 @@ npm start
 the difference being that the first starts the server with *nodemon* which will catch app crashes and restart the server, while the latter starts the server instance directly.
 
 With the default setup, the server will be reachable [localhost:3000](http://localhost:3000). Every other PC in your network will also be able to access the server as long as your PCs network/firewall settings allow it. This is usefull if you are thinking of setting up the server to be used by multiple people (e.g. co-workers in your group or even faculty/company-wide).
+
+## Configuring the server
+
+Once the server was successfully downloaded, make sure to set the neccessary server variables in settings.js:
+
+```javascript
+module.exports = {
+  uploadPath: 'path/where/userfiles/will/be/stored',
+  mongodDB: 'url to your mongodb installation (e.g. 127.0.0.1)',
+  alignReferenceFolder: 'path/to/your/bowtie/reference/files'
+}
+```
 
 ## Running the tests
 
