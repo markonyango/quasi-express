@@ -161,7 +161,7 @@ function savejob(next) {
 function getData() {
     let project = this
     return new Promise((resolve, reject) => {
-        if (project.status === 'done') {
+        if (project.status === 'done' || project.status === 'failed') {
             // Let's append the the logfiles to the response json in cleartext
             let errorFile = fs.readFile(path.join(project.savePath, 'error.txt'), 'utf8')
             let logFile = fs.readFile(path.join(project.savePath, 'logfile.txt'), 'utf8')
@@ -170,16 +170,21 @@ function getData() {
             Promise.all([errorFile, logFile])
                 .then(([error, log]) => appendLogfiles([error, log], project))
                 .then(project => {
-                    switch (project.projecttype) {
-                        case 'qa':
-                            resolve({ ...project, QAReport: new QAReport(project).generateReport() })
-                            break
-                        case 'align':
-                            resolve({ ...project, AlignReport: new AlignReport(project).generateReport()})
-                            break
-                        default:
-                            resolve(project)
+                    if(project.status === 'failed') {
+                        resolve(project)
+                    } else {
+                        switch (project.projecttype) {
+                            case 'qa':
+                                resolve({ ...project, QAReport: new QAReport(project).generateReport() })
+                                break
+                            case 'align':
+                                resolve({ ...project, AlignReport: new AlignReport(project).generateReport()})
+                                break
+                            default:
+                                resolve(project)
+                        }
                     }
+                    
                 })
                 .catch(error => {
                     console.error(`${printOut(__filename)} Could not read the logfiles for project ${project._id}: ${error}`.red)
