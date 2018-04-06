@@ -9,4 +9,4 @@ server/schema/executors/test.js
 tasks.json
 .settings
 quality-report.pdf
-public/css/*
+style.min.css
