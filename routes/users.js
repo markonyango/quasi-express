@@ -126,23 +126,21 @@ router.post('/remove', function (req, res) {
     User.findById(uid).exec()
       .then(user => user.remove())
       .then(user => {
-        req.session.destroy()
         req.logout()
         res.clearCookie('connect.sid')
         res.status(200).json(user)
-
-
+        req.session.destroy()
       })
       .catch(error => res.status(500).json(error))
   } else {
     User.findById(uid).exec()
       .then(user => user.remove())
       .then(() => {
-        req.logout()
-        req.session.destroy()
         res.clearCookie('connect.sid')
         req.flash('success_msg', 'Successfully remove your account')
         res.redirect('/')
+        req.logout()
+        req.session.destroy()
       })
       .catch(error => {
         req.flash('error_msg', `Could not find the user you want to remove: ${error}`)

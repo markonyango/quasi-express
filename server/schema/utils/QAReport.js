@@ -153,7 +153,6 @@ QAReport.prototype.readBoxplotDistribution = function() {
 
       // Update global maxNumReads variable
       this.maxReads[file] = sortedArray.length
-      console.log(this.maxReads)
 
       // Calculate quantiles here
       let quantiles = quantileSeq(sortedArray, [0.25, 0.5, 0.75], true)
