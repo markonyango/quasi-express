@@ -38,50 +38,6 @@ body * {
   width: 100%;
 }
 
-.btn {
-  display: inline-block;
-  font-weight: 400;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  border: 1px solid transparent;
-  padding: 0.275rem 0.625rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: 0.25rem;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.btn:hover,
-.btn:focus {
-  text-decoration: none;
-}
-
-.btn:focus,
-.btn.focus {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.btn.disabled,
-.btn:disabled {
-  opacity: 0.65;
-}
-
-.btn:not(:disabled):not(.disabled) {
-  cursor: pointer;
-}
-
-.card-header {
-  /* background: #212529; */
-  padding: 0.125rem 0.3125rem 0.125rem 0.3125rem;
-}
-
 .list-group {
   padding: 0rem 0.125rem 0rem 1.35rem;
   margin: 0;
@@ -91,21 +47,6 @@ body * {
   list-style: decimal;
   /* text-align-last: justify; */
   font-size: 0.8rem;
-}
-
-.card {
-  padding: 0;
-  margin: 0rem 0rem 1.5625rem 0rem;
-  box-shadow: 0.3125rem 0.3125rem 0.3125rem 0.1875rem rgba(0, 0, 0, 0.15);
-  border: 1px solid black;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.card-body {
-  padding: 0rem 0rem 0.125rem 0rem;
-  font-size: 0.9rem;
-  /* background-color: #3498DB; */
 }
 
 .gridBox {
