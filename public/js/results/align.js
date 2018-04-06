@@ -15,7 +15,6 @@
   objectCardHeader.classList.add('card-header')
   objectCardBody.classList.add('card-body')
 
-  objectCard.style.width = '95%'
 
   objectElement.style.width = '100%'
   objectElement.style.height = 'calc(100% - 1.25rem)'

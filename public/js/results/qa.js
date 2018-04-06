@@ -97,7 +97,7 @@ function makeDiv(id) {
   leftArrow.setAttribute('role', 'button')
   leftArrow.setAttribute('data-slide', 'prev')
   leftArrow.setAttribute('href', '#' + id)
-  leftArrow.innerHTML = `<span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="sr-only">Previous</span>`
+  leftArrow.innerHTML = `<i class="fas fa-arrow-left"></i><span class="sr-only">Previous</span>`
 
   // Right arrow button
   let rightArrow = document.createElement('a')
@@ -105,7 +105,7 @@ function makeDiv(id) {
   rightArrow.setAttribute('role', 'button')
   rightArrow.setAttribute('data-slide', 'next')
   rightArrow.setAttribute('href', '#' + id)
-  rightArrow.innerHTML = `<span class="carousel-control-next-icon" aria-hidden="true"></span><span class="sr-only">Next</span>`
+  rightArrow.innerHTML = `<i class="fas fa-arrow-right"></i><span class="sr-only">Next</span>`
 
   // Append divs to their respective parents
   colLeft.appendChild(leftArrow)

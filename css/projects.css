@@ -10,8 +10,10 @@ button[name='remove_project'] {
   cursor: pointer;
 }
 
+#results {
+  width: 95%;
+}
 
-/* Project details page - Card styling */
 .project-title {
   padding: 0rem 0rem 0rem 0rem;
   margin: 0rem 0rem 0.5rem 0rem;
@@ -28,15 +30,20 @@ button[name='remove_project'] {
   background-color: rgba(255, 255, 255, 0.85);
 }
 
-.arrowLeft {
-  float: left;
+/* 
+  This moves the arrows in carousels to the center so make 
+  sure to always use this syntax to define a carousel:
+  div.col-1
+  div.col-10
+  div.col-1
+*/
+.carousel > .row > .col-1 {
+  align-self: center;
+  justify-self: center;
 }
 
-.arrowRight {
-  float: right;
-}
-
-.logfile, .errorfile {
+.logfile,
+.errorfile {
   max-width: 95%;
   max-height: 50vh;
   overflow: auto;
@@ -48,8 +55,6 @@ button[name='remove_project'] {
   margin-top: 0.625rem;
 }
 
-
-
 @media only screen and (max-width: 600px) {
   .project-details-deck {
     display: grid;
@@ -57,6 +62,10 @@ button[name='remove_project'] {
     grid-gap: 0.85rem;
   }
 
-  .logfile { display: none }
-  .errorfile { display: none }
+  .logfile {
+    display: none;
+  }
+  .errorfile {
+    display: none;
+  }
 }
