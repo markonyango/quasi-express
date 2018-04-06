@@ -38,6 +38,25 @@ body * {
   width: 100%;
 }
 
+.row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr)
+}
+
+.col-1 { grid-column: auto / span 1 }
+.col-2 { grid-column: auto / span 2 }
+.col-3 { grid-column: auto / span 3 }
+.col-4 { grid-column: auto / span 4 }
+.col-5 { grid-column: auto / span 5 }
+.col-6 { grid-column: auto / span 6 }
+.col-7 { grid-column: auto / span 7 }
+.col-8 { grid-column: auto / span 8 }
+.col-9 { grid-column: auto / span 9 }
+.col-10 { grid-column: auto / span 10 }
+.col-11 { grid-column: auto / span 11 }
+.col-12 { grid-column: auto / span 12 }
+
+
 .list-group {
   padding: 0rem 0.125rem 0rem 1.35rem;
   margin: 0;
