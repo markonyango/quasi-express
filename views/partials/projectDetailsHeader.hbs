@@ -1,0 +1,42 @@
+<h2 class="project-title">{{project.projectname}}</h2>
+<h4>{{project.projecttype}}</h4>
+
+<div class="project-details-deck">
+  <div class="card">
+    <div class="card-header">Settings</div>
+    <div class="card-body">
+      <ul class="list-group">
+        {{#each project.settings}}
+        <li class="list-group-item">
+          <span>{{@key}}</span>
+          <span>{{this}}</span>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">Uploaded Files</div>
+    <div class="card-body">
+      <ul class="list-group" id="fileList">
+        {{#each project.files}}
+        <li class="list-group-item">
+          {{this}}
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">Result Files</div>
+    <div class="card-body">
+      <ul class="list-group" id="fileList">
+        {{#each project.AlignReport.resultFiles}}
+        <li class="list-group-item">
+          {{this}}
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+</div>

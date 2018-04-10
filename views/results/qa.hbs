@@ -1,57 +1,17 @@
-<h2 class="project-title">{{project.projectname}}</h2>
-<h4>{{project.projecttype}}</h4>
+{{>projectDetailsHeader}}
 
-<div class="project-details-deck">
-    <div class="card">
-        <div class="card-header">Settings</div>
-        <div class="card-body">
-            <ul class="list-group">
-                {{#each project.settings}}
-                <li class="list-group-item">
-                    {{@key}}
-                    <span>{{this}}</span>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">Uploaded Files</div>
-        <div class="card-body">
-            <ul class="list-group" id="fileList">
-                {{#each project.files}}
-                <li class="list-group-item">
-                    {{this}}
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-    </div>
-</div>
-
-<p>
-    Status: {{project.status}}
-    <button class="btn" id="getResultsButton" {{#if project.logfiles}}{{else}}disabled{{/if}}>Show Results</button>
-</p>
+{{#stringCompare project.status 'done'}}
+<button class="btn" id="getResultsButton">Show Results</button>
+{{else}}
+Project status: {{project.status}}
+{{/stringCompare}}
 
 {{#if project.logfiles}} {{!-- Put PDF viewer code here as it does only exist if --}}
 <div id="results">
 
 </div>
 
-{{#if project.logfiles.[1]}}
-<div class="card logfile">
-    <div class="card-header">Logfile</div>
-    <div class="card-body">
-        {{{html project.logfiles.[1]}}}
-    </div>
-</div>{{/if}} {{#if project.logfiles.[0]}}
-<div class="card errorfile">
-    <div class="card-header">Errors</div>
-    <div class="card-body">
-        {{{html project.logfiles.[0]}}}
-    </div>
-</div> {{/if}}
+{{>projectDetailsFooter}}
 
 <!-- (HandleBars) Save projects JSON data in the browsers window object -->
 <script>window.Report = {{{ json project }}}</script>

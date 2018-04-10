@@ -1,0 +1,13 @@
+{{#if project.logfiles.[1]}}
+<div class="card">
+  <div class="card-header">Logfile</div>
+  <div class="card-body logfile">
+    {{{html project.logfiles.[1]}}}
+  </div>
+</div>{{/if}} {{#if project.logfiles.[0]}}
+<div class="card">
+  <div class="card-header">Errors</div>
+  <div class="card-body errorfile">
+    {{{html project.logfiles.[0]}}}
+  </div>
+</div> {{/if}}
