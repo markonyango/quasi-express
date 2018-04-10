@@ -1,13 +1,16 @@
 :root {
-  --color1: rgba(230, 220, 237, 1);
-  --color2: rgba(234, 224, 252, 1);
-  --color3: rgba(216, 217, 252, 1);
-  --color4: rgba(198, 201, 232, 1);
-  --color5: rgba(182, 178, 204, 1);
-  --main-bg-color: var(--color1);
-  --main-txt-color: var(--color2);
-  --header-bg-color: var(--color3);
-  --header-txt-color: var(--color4);
+  --color1: #101b2a;
+  --color2: #d8d8d8;
+  --color3: rgb(36, 38, 41);
+  --color4: rgb(92, 102, 114);
+  --color5: rgb(108, 116, 127);
+  --main-bg-color: var(--color2);
+  --main-txt-color: var(--color3);
+  --header-bg-color: var(--color1);
+  --header-link-color: #cdd3db;
+  --header-txt-color: #fff;
+  --card-header-bg-color: rgb(100,100,100);
+  --card-header-txt-color: #fff;
   
 }
 
@@ -17,12 +20,11 @@ html {
 }
 
 body {
-  /* background: #2c3e50; */
+  background-color: var(--main-bg-color);
   font-size: 100%;
   font-family: 'Open Sans', sans-serif !important;
   padding: 0;
   margin: 0;
-  /* color: #ecf0f1; */
 }
 
 body * {
@@ -69,13 +71,12 @@ body * {
 }
 
 .gridBox {
-  /*width: 100%;*/
-  /* padding: 0 0.25rem 0 0.25rem; */
   margin: 0;
+  padding: 0;
   display: grid;
   grid-template-areas:
     'navbar navbar navbar navbar navbar navbar navbar navbar navbar navbar navbar navbar'
-    'gridSidebar gridSidebar gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent'
+    'gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent gridContent'
     'footer footer footer footer footer footer footer footer footer footer footer footer';
   grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 1fr;
@@ -87,7 +88,7 @@ body * {
   grid-area: gridSidebar;
 }
 .gridContent {
-  padding-right: 0.25rem;
+  padding: 0 2.5rem 0 2.5rem;
   grid-area: gridContent;
 }
 .gridFooter {

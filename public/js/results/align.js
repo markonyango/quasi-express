@@ -15,24 +15,17 @@
   objectCardHeader.classList.add('card-header')
   objectCardBody.classList.add('card-body')
 
-
-  objectElement.style.width = '100%'
-  objectElement.style.height = 'calc(100% - 1.25rem)'
-
   objectCardHeader.innerText = 'SAMstats'
 
   objectCard.appendChild(objectCardHeader)
-  objectCard.appendChild(objectElement)
+  objectCardBody.appendChild(objectElement)
+  objectCard.appendChild(objectCardBody)
   resultDiv.appendChild(objectCard)
 
-  samstatFileList.style.padding = '0'
-  samstatFileList.style.margin = '0'
   for (let file of samstatFiles) {
     let li = document.createElement('li')
     li.textContent = file.replace('.samstat.html', '')
     li.setAttribute('data-file', file)
-    li.style.display = 'inline'
-    li.style.marginRight = '5px'
     li.addEventListener('click', function(e) {
       if (!objectElement.data) objectCard.style.height = '50vh'
       objectElement.data = `${location}/${e.target.getAttribute('data-file')}`

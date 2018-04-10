@@ -1,7 +1,8 @@
 nav {
   display: grid;
-  grid-template-columns: repeat(6, 2fr);
-  /* background-color: #212529ad; */
+  grid-template-columns: repeat(12, 1fr);
+  background-color: var(--header-bg-color);
+  color: var(--header-txt-color);
   line-height: 2.125rem;
   margin: 0;
   margin-bottom: 1rem;
@@ -15,21 +16,15 @@ nav {
 
 .nav-link {
   text-decoration: none;
-  /* color: white; */
-  font-size: 1em;
-}
-
-.nav-link:hover {
-  color: red;
+  color: var(--header-link-color);
 }
 
 .nav-items {
-  margin-left: 0.125rem;
   grid-column: auto / span 1;
 }
 
 .logout {
-  grid-column: auto / span 1;
+  grid-column: 12 / span 1;
   margin-left: auto;
 }
 
@@ -42,7 +37,6 @@ nav {
   nav {
     display: grid;
     grid-template-columns: repeat(6, 2fr);
-    /* background-color: #212529ad; */
     line-height: 2.125rem;
     margin: 0;
     margin-bottom: 1rem;
@@ -56,9 +50,8 @@ nav {
   .logo { display: none }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 660px) {
     nav {
-      /* background-color: #212529ad; */
       grid-template-columns: repeat(4, 1fr);
       padding: 0;
       margin: 0;

@@ -10,10 +10,6 @@ button[name='remove_project'] {
   cursor: pointer;
 }
 
-#results {
-  width: 95%;
-}
-
 .project-title {
   padding: 0rem 0rem 0rem 0rem;
   margin: 0rem 0rem 0.5rem 0rem;
@@ -21,15 +17,52 @@ button[name='remove_project'] {
 
 .project-details-deck {
   display: grid;
-  max-width: 95%;
-  grid-template-columns: 4fr 4fr 4fr;
+  grid-template-columns: repeat(6, 2fr);
   grid-gap: 0.85rem;
+}
+
+.project-details-deck li {
+  display: flex;
+  justify-content: space-between;
+}
+.project-details-deck ul {
+  list-style: none !important;
+  padding: 0 ;
 }
 
 .project-details canvas {
   background-color: rgba(255, 255, 255, 0.85);
 }
 
+#samstatFileList li[data-file] {
+  cursor: pointer;
+}
+
+#samstatFileList {
+  margin: 0;
+  padding: 0;
+  list-style-image: none;
+}
+
+#samstatFileList li {
+  padding: 0 0.5rem;
+  margin-right: 0.05rem;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border: 1px solid rgba(127, 127, 127, 0.5);
+  display: inline;
+  background-color: var(--card-header-bg-color);
+  color: var(--card-header-txt-color);
+}
+
+#samstatFileList li:hover {
+  background-color: rgb(70, 70, 70);
+}
+
+#results > .card > .card-body > object {
+  width: 100%;
+  height: calc(50vh - 2.1rem);
+}
 /* 
   This moves the arrows in carousels to the center so make 
   sure to always use this syntax to define a carousel:
@@ -44,10 +77,7 @@ button[name='remove_project'] {
 
 .logfile,
 .errorfile {
-  max-width: 95%;
-  max-height: 50vh;
   overflow: auto;
-  margin-bottom: 1.5625rem;
 }
 
 #getResultsButton {
@@ -55,17 +85,14 @@ button[name='remove_project'] {
   margin-top: 0.625rem;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 990px) {
   .project-details-deck {
-    display: grid;
-    grid-template-columns: 6fr 6fr;
-    grid-gap: 0.85rem;
+    grid-template-columns: 4fr 4fr 4fr;
   }
+}
 
-  .logfile {
-    display: none;
-  }
-  .errorfile {
-    display: none;
+@media only screen and (max-width: 660px) {
+  .project-details-deck {
+    grid-template-columns: 1fr;
   }
 }
