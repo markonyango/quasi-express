@@ -63,21 +63,11 @@ button[name='remove_project'] {
   width: 100%;
   height: calc(50vh - 2.1rem);
 }
-/* 
-  This moves the arrows in carousels to the center so make 
-  sure to always use this syntax to define a carousel:
-  div.col-1
-  div.col-10
-  div.col-1
-*/
-.carousel > .row > .col-1 {
-  align-self: center;
-  justify-self: center;
-}
 
 .logfile,
 .errorfile {
   overflow: auto;
+  max-height: calc(50vh - 2.1rem);
 }
 
 #getResultsButton {

@@ -19,7 +19,13 @@ gulp.task('start', function() {
     script: './bin/www',
     tasks: ['css'],
     ext: 'hbs js css',
-    ignore: ['public/css/style.min.css', 'gulpfile.js', '*.txt', 'uploads/*', 'node-modules/*'],
+    ignore: [
+      'public/css/style.min.css',
+      'gulpfile.js',
+      '*.txt',
+      'uploads/*',
+      'node-modules/*'
+    ],
     verbose: false
   })
 })

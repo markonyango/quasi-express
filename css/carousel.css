@@ -1,0 +1,23 @@
+.carousel {
+  max-width: 100%;
+  height: auto;
+  align-self: center;
+  justify-self: center;
+}
+.carousel-inner {
+  height: 100%;
+  margin: auto;
+}
+.carousel-item {
+  display: none;
+}
+
+.carousel-item.active {
+  display: block;
+}
+
+.carousel-ctrl-left:hover,
+.carousel-ctrl-right:hover {
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+}

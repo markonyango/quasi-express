@@ -40,6 +40,9 @@ body * {
   width: 100%;
 }
 
+.align-self-center { align-self: center }
+.justify-self-center { justify-self: center }
+
 .row {
   display: grid;
   grid-template-columns: repeat(12, 1fr)

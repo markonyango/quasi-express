@@ -1,3 +1,5 @@
+import Carousel from '../carousel.js';
+
 (() => {
   let resultDiv = document.getElementById('results')
   let getResultsButton = document.getElementById('getResultsButton')
@@ -24,7 +26,11 @@
       .then(() => createLengthDistributionGraphs(lengthDistribution, maxLength))
       .then(() => createPhredDistributionGraphs(phredDistribution, maxLength))
       .then(() => createBoxplotGraphs(boxplotDistribution, maxLength))
-      .catch(error => console.log('Error while creating QAReport charts: ' + error))
+      .then(() => {
+        let carousels = document.querySelectorAll('.carousel')
+        carousels.forEach(carousel => new Carousel(carousel))
+      })
+      .catch(error => console.log('Error while creating QAReport charts: ' + error.message))
 
     getResultsButton.style.display = 'none'
   })
@@ -69,12 +75,13 @@
     let colLeft = document.createElement('div')
     let colMid = document.createElement('div')
     let colRight = document.createElement('div')
+    let carousel = document.createElement('div')
     let carouselInner = document.createElement('div')
 
     // Set up the rowDiv where the arrow buttons and the canvas will be shown
-    rowDiv.classList.add('row', 'align-items-center', 'justify-content-between')
-    colLeft.classList.add('col-1')
-    colRight.classList.add('col-1')
+    rowDiv.classList.add('row')
+    colLeft.classList.add('col-1', 'left', 'align-self-center', 'justify-self-center', 'carousel-ctrl-left')
+    colRight.classList.add('col-1', 'right', 'align-self-center', 'justify-self-center', 'carousel-ctrl-right')
     colMid.classList.add('col-10')
 
     // Set up the card itself
@@ -95,30 +102,20 @@
     cardHeader.classList.add('card-header')
     cardBody.id = id
     card.classList.add('card', 'project-details')
-    cardBody.classList.add('card-body', 'carousel', 'slide')
+    cardBody.classList.add('card-body')
+    carousel.classList.add('carousel')
     carouselInner.classList.add('carousel-inner')
 
     // Create carousel controls
     // Left arrow button
-    let leftArrow = document.createElement('a')
-    leftArrow.classList.add('arrowLeft') //carousel-control-prev')
-    leftArrow.setAttribute('role', 'button')
-    leftArrow.setAttribute('data-slide', 'prev')
-    leftArrow.setAttribute('href', '#' + id)
-    leftArrow.innerHTML = `<i class="fas fa-arrow-left"></i><span class="sr-only">Previous</span>`
+    colLeft.innerHTML = `<i class="fas fa-arrow-left"></i><span class="sr-only">Previous</span>`
 
     // Right arrow button
-    let rightArrow = document.createElement('a')
-    rightArrow.classList.add('arrowRight') //carousel-control-next')
-    rightArrow.setAttribute('role', 'button')
-    rightArrow.setAttribute('data-slide', 'next')
-    rightArrow.setAttribute('href', '#' + id)
-    rightArrow.innerHTML = `<i class="fas fa-arrow-right"></i><span class="sr-only">Next</span>`
+    colRight.innerHTML = `<i class="fas fa-arrow-right"></i><span class="sr-only">Next</span>`
 
     // Append divs to their respective parents
-    colLeft.appendChild(leftArrow)
-    colRight.appendChild(rightArrow)
-    colMid.appendChild(carouselInner)
+    carousel.appendChild(carouselInner)
+    colMid.appendChild(carousel)
 
     rowDiv.appendChild(colLeft)
     rowDiv.appendChild(colMid)
@@ -129,6 +126,7 @@
     card.appendChild(cardBody)
 
     resultDiv.appendChild(card)
+
     return carouselInner
   }
 
