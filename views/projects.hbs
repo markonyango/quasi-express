@@ -1,16 +1,16 @@
 {{#if projects}}
-<table>
+<table class="table-projects">
     <thead>
-        <th>Project Name</th>
+        <th></th>
+        <th name="projectname">Project Name</th>
         <th name="projecttype">Project Type</th>
         <th name="created_at">Created at</th>
         <th name="status">Status</th>
     </thead>
     {{#each projects}}
     <tr>
-        <td>
-            <a href="/projects/{{_id}}">{{this.projectname}}</a>
-        </td>
+        <td><a href="/projects/{{_id}}"><i class="fas fa-info-circle"></i></a></td>
+        <td>{{this.projectname}}</td>
         <td name="projecttype">{{this.projecttype}}</td>
         <td name="created_at">{{formatDatum this.created}}</td>
         <td name="status">{{status this.status this._id}}</td>
@@ -18,8 +18,8 @@
     {{/each}}
 </table>
 {{/if}}
-
+<button class="btn" id="addProjectButton">Add project</button>
 <!-- Modal -->
 {{> add_project}}
 
-<script src="/js/projects.js"></script>
+<script type="module" src="/js/projects.js"></script>
