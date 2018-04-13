@@ -76,7 +76,6 @@ import Carousel from '../carousel.js';
     let colMid = document.createElement('div')
     let colRight = document.createElement('div')
     let carousel = document.createElement('div')
-    let carouselInner = document.createElement('div')
 
     // Set up the rowDiv where the arrow buttons and the canvas will be shown
     rowDiv.classList.add('row')
@@ -104,7 +103,6 @@ import Carousel from '../carousel.js';
     card.classList.add('card', 'project-details')
     cardBody.classList.add('card-body')
     carousel.classList.add('carousel')
-    carouselInner.classList.add('carousel-inner')
 
     // Create carousel controls
     // Left arrow button
@@ -114,7 +112,6 @@ import Carousel from '../carousel.js';
     colRight.innerHTML = `<i class="fas fa-arrow-right"></i><span class="sr-only">Next</span>`
 
     // Append divs to their respective parents
-    carousel.appendChild(carouselInner)
     colMid.appendChild(carousel)
 
     rowDiv.appendChild(colLeft)
@@ -127,7 +124,7 @@ import Carousel from '../carousel.js';
 
     resultDiv.appendChild(card)
 
-    return carouselInner
+    return carousel
   }
 
   function createBaseDistributionGraphs(baseDistribution, maxLength) {

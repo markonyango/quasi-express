@@ -1,10 +1,9 @@
 export default class Carousel {
   constructor(e) {
-    let inner = e.children[0]; /* carousel-inner div containing the slides */
-    let slides = inner.children; /* HTML Collection of divs with class "slide" */
-    let parent = e.parentElement.parentElement; /* This is the row element */
-    let left = parent.children[0]; /* Left arrow navigation element */
-    let right = parent.children[2]; /* Right arrow navigation element */
+    let slides = e.children; /* HTML Collection of divs with class "slide" */
+    let row = e.parentElement.parentElement; /* This is the row element */
+    let left = row.children[0]; /* Left arrow navigation element */
+    let right = row.children[2]; /* Right arrow navigation element */
     let itemNumber = 0; /* Index of currently viewed slide */
     
     if (slides.length > 1) {
@@ -12,10 +11,10 @@ export default class Carousel {
       right.addEventListener('click', e => this.moveSlide(e));
     }
     else {
-      parent.removeChild(left);
-      parent.removeChild(right);
-      parent.children[0].classList.remove('col-10');
-      parent.children[0].classList.add('col-12');
+      row.removeChild(left);
+      row.removeChild(right);
+      row.children[0].classList.remove('col-10');
+      row.children[0].classList.add('col-12');
     }
     this.moveSlide = function (e) {
       slides[itemNumber].classList.remove('active');

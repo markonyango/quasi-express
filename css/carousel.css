@@ -1,19 +1,18 @@
 .carousel {
-  max-width: 100%;
-  height: auto;
   align-self: center;
   justify-self: center;
 }
-.carousel-inner {
-  height: 100%;
-  margin: auto;
-}
+
 .carousel-item {
   display: none;
 }
 
 .carousel-item.active {
   display: block;
+}
+
+.carousel-item.active canvas {
+  width: 100% !important;
 }
 
 .carousel-ctrl-left:hover,
