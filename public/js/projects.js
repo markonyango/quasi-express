@@ -1,4 +1,6 @@
 import Modal from './modal.js'
+import alignSettings from "./projects/align.js";
+import deaSettings from './projects/dea.js';
 
 (() => {
   // Was Alignment reference list loaded already? Null if no, array if yes.
@@ -19,36 +21,13 @@ import Modal from './modal.js'
       .selectedOptions[0].value
 
     if (selected_projecttype === 'dea') {
-      options_dea.style.display = 'block'
+      deaSettings()
     } else {
       options_dea.style.display = 'none'
     }
 
     if (selected_projecttype === 'align') {
-      if (!references) {
-        fetch('/projects/references', { credentials: 'include' })
-          .then(res => res.json())
-          .then(references => {
-            let referenceSelect = document.querySelector('select[name="settings[reference]"]')
-            references.map(ref => {
-              let child = document.createElement('option')
-              child.value = ref
-              child.text = ref
-              referenceSelect.appendChild(child)
-            })
-            options_align.style.display = 'block'
-          })
-          .catch(error => {
-            let referenceSelect = document.querySelector('select[name="settings[reference]"]')
-            let child = document.createElement('option')
-            child.text = 'Error retrieving references'
-            child.disabled = true
-            referenceSelect.appendChild(child)
-            options_align.style.display = 'block'
-          })
-      } else {
-        options_align.style.display = 'block'
-      }
+      alignSettings(references)
     } else {
       options_align.style.display = 'none'
     }
@@ -64,7 +43,7 @@ import Modal from './modal.js'
       .then(res => {
         window.location = '/projects'
       })
-      .catch(error => console.log)
+      .catch(error => console.log(error))
   })
 
   // Resetting form
@@ -90,7 +69,7 @@ import Modal from './modal.js'
             alert('Could not start project. Contact admin.')
           }
         })
-        .catch(error => console.log)
+        .catch(error => console.log(error))
     })
   }
 
@@ -107,7 +86,7 @@ import Modal from './modal.js'
             alert('Could not stop project. Contact admin.')
           }
         })
-        .catch(error => console.log)
+        .catch(error => console.log(error))
     })
   }
 
@@ -124,7 +103,7 @@ import Modal from './modal.js'
             alert('Could not remnove project. Contact admin.')
           }
         })
-        .catch(error => console.log)
+        .catch(error => console.log(error))
     })
   }
 

@@ -47,6 +47,7 @@ body * {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 1fr;
+  margin-bottom: 0.5rem;
 }
 
 .col-1 { grid-column: auto / span 1 }

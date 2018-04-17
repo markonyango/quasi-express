@@ -1,82 +1,120 @@
 <div class="modalBackground"></div>
 <div class="modal">
+  <div class="modal-header">Add new project</div>
   <form id="add_project_form">
-    <div>
-      <label>Name</label>
-      <input type="text" name="projectname" placeholder="Projectname..." required>
+    <div class="row">
+      <label class="col-2">Name</label>
+      <input class="col-8" type="text" name="projectname" placeholder="Projectname..." required>
     </div>
-    <div>
-      <label>Type</label>
-      <select type="select" name="projecttype">
+    <div class="row">
+      <label class="col-2">Type</label>
+      <select class="col-8" type="select" name="projecttype">
         <option value="" disabled selected>Select project type...</option>
         <option value="qa">Quality Assessment</option>
         <option value="dea">Differential Expression Analysis</option>
         <option value="align">Alignment</option>
       </select>
     </div>
-    <fieldset id="options_dea" style="display: none">
-      <div>
-        <label>Options</label>
-        <div>
+    <div class="row">
+      <div class="col-10">
+        <fieldset id="options_dea" style="display: none">
           <div>
-            <input type="checkbox" name="gridRadios" value="option1">
-            <label for="gridRadios1">
-              Options 1
-            </label>
+            <label>Options</label>
+            <div>
+              <label>R-package for Differential Expression Analysis</label>
+              <select type="select">
+                <option disabled selected>Select...</option>
+                <option value="deseq">DESeq</option>
+                <option value="deseq2">DESeq2</option>
+                <option value="edger">edgeR</option>
+              </select>
+            </div>
+            <div>
+              <label for="">Provide count matrix file</label>
+              <input type="file" name="settings[countMatrixFile]" id="countMatrixFile">
+            </div>
+            <div>
+              <label for="">Choose previous count matrix file</label>
+              <select name="settings[countMatrixFile]" id="countMatrixFile">
+                <option disabled selected>Projectname...</option>
+                {{!-- Load count matrices from users folder and subfolders --}}
+              </select>
+            </div>
+            <div>
+              <label for="">Significance Level</label>
+              <input type="number" placeholder="0.5">
+            </div>
+            <div>
+              <label for="">Correlate Samples with each other?</label>
+              <input type="checkbox" name="settings[correlate_samples]" id="correlate_samples">
+            </div>
+            <div>
+              <input type="checkbox" name="gridRadios" value="option1">
+              <label for="gridRadios1">
+                Options 1
+              </label>
+            </div>
+            <div>
+              <input type="checkbox" name="gridRadios" value="option2">
+              <label for="gridRadios2">
+                Options 2
+              </label>
+            </div>
           </div>
-          <div>
-            <input type="checkbox" name="gridRadios" value="option2">
-            <label for="gridRadios2">
-              Options 2
-            </label>
-          </div>
-        </div>
+        </fieldset>
       </div>
-    </fieldset>
-    <fieldset id="options_align" style="display: none">
-      <div>
-        <label>Options</label>
-        <div>
-          <div>
-            <label for="numCores">Number of cores</label>
-            <input type="text" name="settings[numCores]" placeholder="Automatic">
-          </div>
-          <div>
-            <label for="mismatches">How many mismatches will you allow?</label>
-            <input type="number" name="settings[mismatches]" placeholder="0">
-          </div>
-          <div>
-            <label for="preTrim">How many bases shall be trimmed from the 3' end?</label>
-            <input type="number" name="settings[preTrim]" placeholder="0">
-          </div>
-          <div>
-            <label for="postTrim">How many bases shall be trimmed from the 5' end?</label>
-            <input type="number" name="settings[postTrim]" placeholder="0">
-          </div>
-          <div>
-            <label for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
-            <input type="checkbox" name="settings[writeUnaligned]">
-          </div>
-          <div>
-            <label for="settings[reference]">Which reference should be used by Bowtie?</label>
-            <select name="settings[reference]">
-              <option value="" disabled selected>Select reference...</option>
-            </select>
-          </div>
-          <div>
-            <label for="settings[countMatrix]">Should a count matrix be created?</label>
-            <input type="checkbox" name="settings[countMatrix]">
-          </div>
-        </div>
-      </div>
-    </fieldset>
-    <div id="files">
-      <label>Files</label>
-      <input type="file" name="files" placeholder="Files..." accept=".fastq,.fq" multiple>
     </div>
-    <div>
-      <input type="submit" class="btn">
-      <button type="button" class="btn" id="resetForm">Reset</button>
+    <div class="row">
+      <div class="col-10">
+        <fieldset id="options_align" style="display: none">
+          <div>
+            <label>Options</label>
+            <div>
+              <div>
+                <label for="numCores">Number of cores</label>
+                <input type="text" name="settings[numCores]" placeholder="Automatic">
+              </div>
+              <div>
+                <label for="mismatches">How many mismatches will you allow?</label>
+                <input type="number" name="settings[mismatches]" placeholder="0">
+              </div>
+              <div>
+                <label for="preTrim">How many bases shall be trimmed from the 3' end?</label>
+                <input type="number" name="settings[preTrim]" placeholder="0">
+              </div>
+              <div>
+                <label for="postTrim">How many bases shall be trimmed from the 5' end?</label>
+                <input type="number" name="settings[postTrim]" placeholder="0">
+              </div>
+              <div>
+                <label for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
+                <input type="checkbox" name="settings[writeUnaligned]">
+              </div>
+              <div>
+                <label for="settings[reference]">Which reference should be used by Bowtie?</label>
+                <select name="settings[reference]">
+                  <option value="" disabled selected>Select reference...</option>
+                </select>
+              </div>
+              <div>
+                <label for="settings[countMatrix]">Should a count matrix be created?</label>
+                <input type="checkbox" name="settings[countMatrix]">
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <div id="files" class="row">
+      <label class="col-2">Files</label>
+      <input class="col-8" type="file" name="files" placeholder="Files..." accept=".fastq,.fq" multiple>
+    </div>
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <input type="submit" class="btn">
+        <button type="button" class="btn" id="resetForm">Reset</button>
+      </div>
     </div>
   </form>
 </div>

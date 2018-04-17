@@ -1,0 +1,12 @@
+select,
+input[type="text"],
+input[type="file"]
+ {
+  margin: 0px;
+  border-style: none;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+input[type="file"] {
+  border: none;
+}

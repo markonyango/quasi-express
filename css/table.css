@@ -15,6 +15,11 @@
   text-align: center;
 }
 
+.table-projects tr > td:nth-child(3),
+.table-projects tr > th:nth-child(3) {
+  text-align: start;
+}
+
 .table-projects tr > td:first-child {
   vertical-align: top;
 }

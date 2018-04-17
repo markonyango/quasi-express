@@ -15,6 +15,15 @@
   display: none;
 }
 
+.modal-header {
+  padding: 0px;
+  margin: 0px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  text-transform: capitalize;
+  font-size: 1.5em;
+}
+
 .modalBackground {
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
