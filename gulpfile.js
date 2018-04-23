@@ -26,7 +26,7 @@ gulp.task('start', function() {
       'uploads',
       '.git'
     ],
-    verbose: true
+    verbose: false
   })
   return stream
 })
