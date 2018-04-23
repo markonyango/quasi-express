@@ -1,0 +1,12 @@
+.muted {
+  color: #999;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.text-valign-center {
+  display: inline-flex;
+  align-items: center;
+}

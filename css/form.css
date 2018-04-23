@@ -1,6 +1,7 @@
 select,
 input[type="text"],
-input[type="file"]
+input[type="file"],
+input[type="password"]
  {
   margin: 0px;
   border-style: none;
@@ -9,4 +10,10 @@ input[type="file"]
 
 input[type="file"] {
   border: none;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  padding-left: 0.3rem;
 }
