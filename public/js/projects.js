@@ -1,123 +1,183 @@
 import Modal from './modal.js'
-import alignSettings from "./projects/align.js";
-import deaSettings from './projects/dea.js';
+import { alignSettings, validateAlign } from './projects/align.js'
+import { deaSettings, validateDEA } from './projects/dea.js'
 
-(() => {
-  // Was Alignment reference list loaded already? Null if no, array if yes.
-  let references = null
-  let projectType = document.querySelector('select[name="projecttype"]')
-  let projectForm = document.getElementById('add_project_form')
-  let startButtons = document.querySelectorAll('button[name="start_project"]')
-  let stopButtons = document.querySelectorAll('button[name="stop_project"]')
-  let removeButtons = document.querySelectorAll('button[name="remove_project"]')
+// Was Alignment reference list loaded already? Null if no, array if yes.
+let references = null /* not null if alignment refs have been loaded */
+let countMatrices = null /* not null if count matrices have been loaded */
 
-  let options_dea = document.getElementById('options_dea')
-  let options_align = document.getElementById('options_align')
+let projectType = document.querySelector('select[name="projecttype"]')
+let projectForm = document.getElementById('add_project_form')
+let startButtons = document.querySelectorAll('button[name="start_project"]')
+let stopButtons = document.querySelectorAll('button[name="stop_project"]')
+let removeButtons = document.querySelectorAll('button[name="remove_project"]')
 
-  // Form evaluation stuff
+let options_dea = document.getElementById('options_dea')
+let options_align = document.getElementById('options_align')
 
-  projectType.addEventListener('change', function() {
-    const selected_projecttype = document.querySelector('select[name="projecttype"]')
-      .selectedOptions[0].value
+let prevCountMatrix = document.getElementById('previousCountMatrix')
 
-    if (selected_projecttype === 'dea') {
-      deaSettings()
-    } else {
-      options_dea.style.display = 'none'
-    }
+// Form evaluation stuff
 
-    if (selected_projecttype === 'align') {
-      alignSettings(references)
-    } else {
-      options_align.style.display = 'none'
-    }
-  })
+projectType.addEventListener('change', function() {
+  const selected_projecttype = projectType.selectedOptions[0].value
 
-  // Form submission handling
+  if (selected_projecttype === 'dea') {
+    deaSettings()
+  } else {
+    options_dea.style.display = 'none'
+  }
 
-  projectForm.addEventListener('submit', function(event) {
-    event.preventDefault()
-    const formData = new FormData(projectForm)
-    fetch('/projects/upload', { body: formData, method: 'POST', credentials: 'include' })
+  if (selected_projecttype === 'align') {
+    alignSettings(references)
+  } else {
+    options_align.style.display = 'none'
+  }
+})
+
+// Form submission handling
+
+projectForm.addEventListener('submit', function(event) {
+  event.preventDefault()
+  validateForm()
+    .then(submitFormData)
+    .catch(error => console.log(error))
+})
+
+// Development Button
+
+devButton.addEventListener('click', function(event) {
+  event.preventDefault()
+  switch (projectType.value) {
+    case 'dea':
+      formValues()
+      break
+
+    default:
+      break
+  }
+})
+
+// Resetting form
+
+projectForm.addEventListener('reset', function() {
+  let fieldsets = projectForm.querySelectorAll('fieldset')
+  fieldsets.forEach(fieldset => (fieldset.style.display = 'none'))
+})
+
+// Starting and Stoping projects
+
+for (let node of startButtons) {
+  node.addEventListener('click', function() {
+    const pid = this.attributes.pid.value
+
+    fetch('/projects/' + pid + '/start', { method: 'PUT', credentials: 'include' })
       .then(res => res.json())
-      .then(res => {
-        window.location = '/projects'
+      .then(project => {
+        if (project.status === 'running') {
+          window.location = '/projects'
+        } else {
+          alert('Could not start project. Contact admin.')
+        }
       })
       .catch(error => console.log(error))
   })
+}
 
-  // Resetting form
+for (let node of stopButtons) {
+  node.addEventListener('click', function() {
+    const pid = this.attributes.pid.value
 
-  projectForm.addEventListener('reset', function(){
-    let fieldsets = add_project_form.querySelectorAll('fieldset')
-    fieldsets.forEach(fieldset => fieldset.style.display = 'none')
+    fetch('/projects/' + pid + '/stop', { method: 'PUT', credentials: 'include' })
+      .then(res => res.json())
+      .then(project => {
+        if (project.status === 'stopped') {
+          window.location = '/projects'
+        } else {
+          alert('Could not stop project. Contact admin.')
+        }
+      })
+      .catch(error => console.log(error))
   })
+}
 
+for (let node of removeButtons) {
+  node.addEventListener('click', function() {
+    const pid = this.attributes.pid.value
 
-  // Starting and Stoping projects
-
-  for (let node of startButtons) {
-    node.addEventListener('click', function() {
-      const pid = this.attributes.pid.value
-
-      fetch('/projects/' + pid + '/start', { method: 'PUT', credentials: 'include' })
-        .then(res => res.json())
-        .then(project => {
-          if (project.status === 'running') {
-            window.location = '/projects'
-          } else {
-            alert('Could not start project. Contact admin.')
-          }
-        })
-        .catch(error => console.log(error))
-    })
-  }
-
-  for (let node of stopButtons) {
-    node.addEventListener('click', function() {
-      const pid = this.attributes.pid.value
-
-      fetch('/projects/' + pid + '/stop', { method: 'PUT', credentials: 'include' })
-        .then(res => res.json())
-        .then(project => {
-          if (project.status === 'stopped') {
-            window.location = '/projects'
-          } else {
-            alert('Could not stop project. Contact admin.')
-          }
-        })
-        .catch(error => console.log(error))
-    })
-  }
-
-  for (let node of removeButtons) {
-    node.addEventListener('click', function() {
-      const pid = this.attributes.pid.value
-
-      fetch('/projects/' + pid + '/remove', { method: 'PUT', credentials: 'include' })
-        .then(res => res.json())
-        .then(project => {
-          if (project._id === pid) {
-            window.location = '/projects'
-          } else {
-            alert('Could not remnove project. Contact admin.')
-          }
-        })
-        .catch(error => console.log(error))
-    })
-  }
-
-  /* Adding another project to the list */
-  addProjectButton.addEventListener('click', () => {
-
-    let modal = document.querySelector('.modal')
-    let modalBackground = document.querySelector('.modalBackground')
-
-    new Modal(modal, modalBackground).modal()
+    fetch('/projects/' + pid + '/remove', { method: 'PUT', credentials: 'include' })
+      .then(res => res.json())
+      .then(project => {
+        if (project._id === pid) {
+          window.location = '/projects'
+        } else {
+          alert('Could not remnove project. Contact admin.')
+        }
+      })
+      .catch(error => console.log(error))
   })
+}
 
-  /* 'Reset Form' button */
-  resetForm.addEventListener('click', () => {
-    add_project_form.reset()
+/* Adding another project to the list */
+addProjectButton.addEventListener('click', () => {
+  let modal = document.querySelector('.modal')
+  let modalBackground = document.querySelector('.modalBackground')
+
+  new Modal(modal, modalBackground).modal()
+})
+
+/* 'Reset Form' button */
+resetForm.addEventListener('click', () => {
+  add_project_form.reset()
+})
+
+function formValues() {
+  let options = projectForm.querySelectorAll(
+    `fieldset[id="options_${projectType.value}"] input[name^=settings]:enabled, 
+     fieldset[id="options_${projectType.value}"] select:enabled`
+  )
+  let settings = {}
+  options.forEach(option => {
+    /* Get settings name */
+    let name = /\[(\w+)\]/.exec(option.name)[1]
+    if (option.type === 'select-multiple') {
+      settings[name] = Array.from(option.selectedOptions).map(x => x.value)
+    } else if (option.type === 'checkbox') {
+      settings[name] = option.checked
+    } else {
+      settings[name] = option.value
+    }
   })
-})()
+  return settings
+}
+
+function validateForm() {
+  console.log('validateForm')
+  return new Promise((resolve, reject) => {
+    let settings = formValues()
+    switch (projectType.value) {
+      case 'align':
+        validateAlign(settings)
+          .then(formData => resolve(formData))
+          .catch(reject)
+        break
+      case 'dea':
+        validateDEA(settings)
+          .then(formData => resolve(formData))
+          .catch(reject)
+        break
+      default:
+        reject('Project type error during validateForm()')
+        break
+    }
+  })
+}
+
+function submitFormData(formData) {
+  formData.append('projectname', projectForm.projectname.value)
+  formData.append('projecttype', projectForm.projecttype.value)
+
+  return fetch('/projects/upload', { body: formData, method: 'POST', credentials: 'include' })
+    .then(res => res.json())
+    .then(res => window.location = '/projects')
+}
