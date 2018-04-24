@@ -16,89 +16,95 @@
       </select>
     </div>
     <div class="row">
-      <div class="col-10">
+      <div class="col-12">
         <fieldset id="options_dea" style="display: none">
           <div>
-            <label>Options</label>
-            <div>
-              <label>R-package for Differential Expression Analysis</label>
-              <select type="select">
+            <div class="row">
+              <label class="col-6">R-package for Differential Expression Analysis</label>
+              <select type="select" multiple name="settings[package]" class="col-6">
                 <option disabled selected>Select...</option>
                 <option value="deseq">DESeq</option>
                 <option value="deseq2">DESeq2</option>
                 <option value="edger">edgeR</option>
+                <option value="bayseq">baySeq</option>
               </select>
             </div>
-            <div>
-              <label for="">Provide count matrix file</label>
-              <input type="file" name="settings[countMatrixFile]" id="countMatrixFile">
-            </div>
-            <div>
-              <label for="">Choose previous count matrix file</label>
-              <select name="settings[countMatrixFile]" id="countMatrixFile">
+            <div class="row">
+              <div class="col-6">
+                <label for="">Choose count matrix file</label>
+                <span class="muted small text-valign-center">(previously created:
+                  <input type="checkbox" name="previousCountMatrix" id="previousCountMatrix">)</span>
+              </div>
+              <select name="settings[countMatrixFile]" id="prevCountMatrixFile" disabled style="display: none" class="col-3">
                 <option disabled selected>Projectname...</option>
                 {{!-- Load count matrices from users folder and subfolders --}}
               </select>
+              <input type="file" name="settings[countMatrixFile]" id="newCountMatrixFile" class="col-3">
             </div>
-            <div>
-              <label for="">Significance Level</label>
-              <input type="number" placeholder="0.5">
+            <div class="row">
+              <label for="" class="col-6">Significance Level</label>
+              <input type="number" name="settings[significanceLevel]" step="0.01" min="0.01" max="0.99" list="defaultValues" placeholder="e.g. 0.05 for 5%"
+                class="col-6">
+              <datalist id="defaultValues">
+                <option value="0.01">
+                  <option value="0.05">
+                    <option value="0.10">
+              </datalist>
             </div>
-            <div>
-              <label for="">Correlate Samples with each other?</label>
-              <input type="checkbox" name="settings[correlate_samples]" id="correlate_samples">
+            <div class="row">
+              <label for="" class="col-6">Correlate Samples with each other?</label>
+              <input type="checkbox" name="settings[correlateSamples]" id="correlateSamples" class="col-6">
             </div>
-            <div>
-              <input type="checkbox" name="gridRadios" value="option1">
-              <label for="gridRadios1">
-                Options 1
+            <div class="row">
+              <label for="settings[conditions]" class="col-6">Conditions
+                <span class="muted small">(in order of count matrix files columns)</span>
               </label>
+              <input type="text" name="settings[conditions]" id="uniqueConditions" class="col-6" placeholder="e.g. treated treated untreated untreated">
             </div>
-            <div>
-              <input type="checkbox" name="gridRadios" value="option2">
-              <label for="gridRadios2">
-                Options 2
+            <div class="row">
+              <label for="settings[pairwise]" class="col-6">Pairwise DEA tests on conditions
+                <span class="muted small">( ; separated - e.g. A B;B C)</span>
               </label>
+              <input type="text" name="settings[pairwise]" id="pairwise" class="col-6">
             </div>
           </div>
         </fieldset>
       </div>
     </div>
     <div class="row">
-      <div class="col-10">
+      <div class="col-12">
         <fieldset id="options_align" style="display: none">
           <div>
-            <label>Options</label>
             <div>
-              <div>
-                <label for="numCores">Number of cores</label>
-                <input type="text" name="settings[numCores]" placeholder="Automatic">
+              <div class="row">
+                <label class="col-6" for="numCores">Number of cores</label>
+                <input class="col-6" type="text" name="settings[numCores]" placeholder="Automatic">
               </div>
-              <div>
-                <label for="mismatches">How many mismatches will you allow?</label>
-                <input type="number" name="settings[mismatches]" placeholder="0">
+              <div class="row">
+                <label class="col-6" for="mismatches">How many mismatches will you allow?</label>
+                <input class="col-6" type="number" name="settings[mismatches]" placeholder="0">
               </div>
-              <div>
-                <label for="preTrim">How many bases shall be trimmed from the 3' end?</label>
-                <input type="number" name="settings[preTrim]" placeholder="0">
+              <div class="row">
+                <label class="col-6" for="preTrim">How many bases shall be trimmed from the 3' end?</label>
+                <input class="col-6" type="number" min="0" name="settings[preTrim]" placeholder="0">
               </div>
-              <div>
-                <label for="postTrim">How many bases shall be trimmed from the 5' end?</label>
-                <input type="number" name="settings[postTrim]" placeholder="0">
+              <div class="row">
+                <label class="col-6" for="postTrim">How many bases shall be trimmed from the 5' end?</label>
+                <input class="col-6" type="number" min="0" name="settings[postTrim]" placeholder="0">
               </div>
-              <div>
-                <label for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
-                <input type="checkbox" name="settings[writeUnaligned]">
+              <div class="row">
+                <label class="col-6" for="settings[writeUnaligned]">Write unaligned reads to extra file?</label>
+                <input class="col-6" type="checkbox" name="settings[writeUnaligned]">
               </div>
-              <div>
-                <label for="settings[reference]">Which reference should be used by Bowtie?</label>
-                <select name="settings[reference]">
-                  <option value="" disabled selected>Select reference...</option>
+              <div class="row">
+                <label class="col-6" for="settings[reference]">Which reference should be used by Bowtie?</label>
+                <select class="col-6" name="settings[reference]">
+                  <option disabled selected>Select reference...</option>
                 </select>
               </div>
-              <div>
-                <label for="settings[countMatrix]">Should a count matrix be created?</label>
-                <input type="checkbox" name="settings[countMatrix]">
+              <div class="row">
+                <label class="col-6" for="settings[countMatrix]">Should a count matrix be created?</label>
+                <input class="col-6" type="checkbox" name="settings[countMatrix]">
               </div>
             </div>
           </div>
@@ -106,14 +112,17 @@
       </div>
     </div>
     <div id="files" class="row">
-      <label class="col-2">Files</label>
+      <label class="col-2">Files
+        <span class="small muted text-valign-center">(*.fastq; *.fq)</span>
+      </label>
       <input class="col-8" type="file" name="files" placeholder="Files..." accept=".fastq,.fq" multiple>
     </div>
     <div class="row">
       <div class="col-2"></div>
       <div class="col-8">
-        <input type="submit" class="btn">
-        <button type="button" class="btn" id="resetForm">Reset</button>
+        <input type="submit" class="btn btn-success">
+        <button type="button" class="btn btn-alert" id="resetForm">Reset</button>
+        <button type="button" class="btn btn-primary" id="devButton">Dev</button>
       </div>
     </div>
   </form>

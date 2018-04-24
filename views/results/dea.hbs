@@ -1,0 +1,11 @@
+{{>projectDetailsHeader}} {{#if project.logfiles}}
+<ul class="list-group" id="samstatFileList">
+
+</ul>
+<div id="results">
+
+</div>
+
+{{>projectDetailsFooter}} {{#if project.AlignReport}}
+<script>window.Report = {{{ json project.AlignReport }}}</script>
+<script defer src="/js/results/align.js"></script> {{/if}} {{/if}}
