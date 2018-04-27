@@ -17,11 +17,21 @@
     </div>
     <div class="row">
       <div class="col-12">
+        <fieldset id="options_qa" style="display: none">
+          <div class="row">
+            <label for="qaFiles" class="col-6">Files on which to perform QA</label>
+            <input type="file" name="files" id="qaFiles" class="col-6" multiple>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
         <fieldset id="options_dea" style="display: none">
           <div>
             <div class="row">
               <label class="col-6">R-package for Differential Expression Analysis</label>
-              <select type="select" multiple name="settings[package]" class="col-6">
+              <select type="select" multiple name="settings[packages]" class="col-6">
                 <option disabled selected>Select...</option>
                 <option value="deseq">DESeq</option>
                 <option value="deseq2">DESeq2</option>
@@ -35,11 +45,17 @@
                 <span class="muted small text-valign-center">(previously created:
                   <input type="checkbox" name="previousCountMatrix" id="previousCountMatrix">)</span>
               </div>
-              <select name="settings[countMatrixFile]" id="prevCountMatrixFile" disabled style="display: none" class="col-3">
+              <select name="settings[countMatrixFile]" id="prevCountMatrixFile" disabled style="display: none" class="col-6">
                 <option disabled selected>Projectname...</option>
                 {{!-- Load count matrices from users folder and subfolders --}}
               </select>
-              <input type="file" name="settings[countMatrixFile]" id="newCountMatrixFile" class="col-3">
+              <input type="file" name="files" id="newCountMatrixFile" class="col-6">
+            </div>
+            <div class="row">
+              <label for="countMatrixConditions" name="countMatrixConditions" style="display: none" class="col-6">Header from count matrix file</label>
+              <div name="countMatrixConditions" id="countMatrixConditions" style="display: none" class="col-6">
+                {{!-- Load conditions from self-provided count matrix file --}}
+              </div>
             </div>
             <div class="row">
               <label for="" class="col-6">Significance Level</label>
@@ -106,17 +122,21 @@
                 <label class="col-6" for="settings[countMatrix]">Should a count matrix be created?</label>
                 <input class="col-6" type="checkbox" name="settings[countMatrix]">
               </div>
+              <div class="row">
+                <label for="alignmentFiles" class="col-6">FASTQ files</label>
+                <input type="file" name="files" id="alignmentFiles" class="col-6" multiple placeholder="Choose FASTQ files">
+              </div>
             </div>
           </div>
         </fieldset>
       </div>
     </div>
-    <div id="files" class="row">
+    {{!-- <div id="files" class="row">
       <label class="col-2">Files
         <span class="small muted text-valign-center">(*.fastq; *.fq)</span>
       </label>
       <input class="col-8" type="file" name="files" placeholder="Files..." accept=".fastq,.fq" multiple>
-    </div>
+    </div> --}}
     <div class="row">
       <div class="col-2"></div>
       <div class="col-8">

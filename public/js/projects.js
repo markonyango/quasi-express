@@ -12,6 +12,7 @@ let startButtons = document.querySelectorAll('button[name="start_project"]')
 let stopButtons = document.querySelectorAll('button[name="stop_project"]')
 let removeButtons = document.querySelectorAll('button[name="remove_project"]')
 
+let options_qa = document.getElementById('options_qa')
 let options_dea = document.getElementById('options_dea')
 let options_align = document.getElementById('options_align')
 
@@ -29,9 +30,15 @@ projectType.addEventListener('change', function() {
   }
 
   if (selected_projecttype === 'align') {
-    alignSettings(references)
+    alignSettings(projectForm.querySelector('select[name="settings[reference]"]'))
   } else {
     options_align.style.display = 'none'
+  }
+
+  if (selected_projecttype === 'qa') {
+    options_qa.style.display = 'block'
+  } else {
+    options_qa.style.display = 'none'
   }
 })
 
@@ -134,19 +141,13 @@ resetForm.addEventListener('click', () => {
 function formValues() {
   let options = projectForm.querySelectorAll(
     `fieldset[id="options_${projectType.value}"] input[name^=settings]:enabled, 
-     fieldset[id="options_${projectType.value}"] select:enabled`
+     fieldset[id="options_${projectType.value}"] select:enabled, 
+     fieldset[id="options_${projectType.value}"] input[type=file]:enabled`
   )
   let settings = {}
   options.forEach(option => {
-    /* Get settings name */
-    let name = /\[(\w+)\]/.exec(option.name)[1]
-    if (option.type === 'select-multiple') {
-      settings[name] = Array.from(option.selectedOptions).map(x => x.value)
-    } else if (option.type === 'checkbox') {
-      settings[name] = option.checked
-    } else {
-      settings[name] = option.value
-    }
+    let name = option.type !== 'file' ? /\[(\w+)\]/.exec(option.name)[1] : option.name
+    settings[name] = option
   })
   return settings
 }
