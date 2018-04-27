@@ -83,6 +83,13 @@ ignore:
     - npm > npm-registry-client > ssri:
         reason: None given
         expires: '2018-04-11T08:58:43.891Z'
+  'npm:deep-extend:20180409':
+    - nodemon > update-notifier > latest-version > package-json > registry-auth-token > rc > deep-extend:
+        reason: None given
+        expires: '2018-05-27T18:29:15.855Z'
+    - nodemon > update-notifier > latest-version > package-json > registry-url > rc > deep-extend:
+        reason: None given
+        expires: '2018-05-27T18:29:15.855Z'
 # patches apply the minimum changes required to fix a vulnerability
 patch:
   'npm:debug:20170905':
