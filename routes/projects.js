@@ -47,7 +47,7 @@ router.get('/', function(req, res) {
   }
 })
 
-router.post('/upload', upload.array('files'), function(req, res, next) {
+router.post('/upload', upload.array('files'), function(req, res) {
   const files = req.files
   const projectname = req.body.projectname
   const projecttype = req.body.projecttype
@@ -57,31 +57,30 @@ router.post('/upload', upload.array('files'), function(req, res, next) {
 
   if (!files || !projectname || !projecttype || !uid) {
     console.error('Invalid POST request to project upload route!')
-    res.status(400).json('Invalid POST request!')
-    next()
-  }
-
-  const project = new Project({
-    projectname: projectname,
-    projecttype: projecttype,
-    settings: settings,
-    status: status,
-    files: [],
-    uid: uid,
-    created: Date.now()
-  })
-
-  for (let file of files) {
-    project.files.push(file.filename)
-  }
-
-  project
-    .save()
-    .then(result => res.status(200).json(result))
-    .catch(error => {
-      console.error(`Something went wrong while saving project ${project._id}: ${error}`)
-      res.status(500).json(error)
+    res.status(400).json({ message: 'Invalid POST request to project upload route', body: req.body })
+  } else {
+    const project = new Project({
+      projectname: projectname,
+      projecttype: projecttype,
+      settings: settings,
+      status: status,
+      files: [],
+      uid: uid,
+      created: Date.now()
     })
+    
+    for (let file of files) {
+      project.files.push(file.filename)
+    }
+
+    project
+      .save()
+      .then(result => res.status(200).json(result))
+      .catch(error => {
+        console.error(`${printOut(__filename)} Something went wrong while saving project ${project._id}: ${error}`.red)
+        res.status(500).json(error)
+      })
+  }
 })
 
 router.get('/references', function(req, res) {
@@ -89,9 +88,7 @@ router.get('/references', function(req, res) {
     if (err) {
       res.status(500).json(err)
     } else {
-      files = files.filter(file => {
-        return file.indexOf('.fasta') >= 0 ? true : false
-      })
+      files = files.filter(file => /\.fasta$/.test(file))
       res.status(200).json(files)
     }
   })
@@ -106,13 +103,14 @@ router.get('/countfiles', function(req, res) {
       res.status(500).json({ error, stderr })
     } else {
       let files = stdout.trim().split('\n')
-      let projectIDs = files.map(file => path.basename(path.dirname(file)))
+      let projectIDs = files
+        .map(file => path.basename(path.dirname(file)))
+        .filter(file => file !== '.')
       let projects = []
       projects = projectIDs.map(id => {
         return Project.findOne({ _id: id, uid: uid })
       })
-      Promise.all(projects)
-      .then(projectArray => res.status(200).json(projectArray))
+      Promise.all(projects).then(projectArray => res.status(200).json(projectArray))
     }
   })
 })
@@ -133,7 +131,10 @@ router.get('/:id', function(req, res) {
       .exec()
       .then(project => project.getData())
       .then(project =>
-        res.render(`results/${project.projecttype}`, { title: 'Project', project: project })
+        res.render(`results/${project.projecttype}`, {
+          title: 'Project',
+          project: project
+        })
       )
       .catch(error => {
         req.flash('error', error.message)
