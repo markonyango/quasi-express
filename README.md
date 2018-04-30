@@ -1,6 +1,6 @@
 # QUASI-Express
 
-[![Known Vulnerabilities](https://snyk.io/test/github/markonyango/quasi-express/badge.svg?style=flat-square)](https://snyk.io/test/github/markonyango/quasi-express)
+[![Known Vulnerabilities](https://snyk.io/test/github/markonyango/quasi-express/badge.svg?style=flat-square)](https://snyk.io/test/github/markonyango/quasi-express) [![Build Status](https://travis-ci.org/markonyango/quasi-express.svg?branch=master)](https://travis-ci.org/markonyango/quasi-express)
 
 ## Getting Started
 
