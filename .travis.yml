@@ -3,3 +3,5 @@ services:
   - mongodb
 node_js: 
   - "node"
+before_script:
+  - mkdir uploads
