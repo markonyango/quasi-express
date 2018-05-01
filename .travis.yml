@@ -7,5 +7,5 @@ before_script:
   - mkdir uploads
   - git clone https://github.com/markonyango/quasi-tools.git
   - sh ./quasi-tools/install.sh
-  - pwd
-  - bowtie-build -f ./public/test/testReference.fasta ~/references/testReference
+  - pwd && which bowtie-build
+  - `which bowtie-build` -f ./public/test/testReference.fasta ~/references/testReference
