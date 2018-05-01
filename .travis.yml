@@ -11,3 +11,5 @@ before_script:
   - git clone https://github.com/BenLangmead/bowtie.git
   - cd bowtie && make && sudo make install && cd ..
   - bowtie-build --verbose -f ~/references/testReference.fasta ~/references/testReference
+  - git clone https://git.code.sf.net/p/samstat/code samstat-code
+  - cd samstat-code/src && make && sudo make install
