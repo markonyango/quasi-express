@@ -5,3 +5,7 @@ node_js:
   - "node"
 before_script:
   - mkdir uploads
+  - mkdir ~/references
+  - git clone https://github.com/markonyango/quasi-tools.git
+  - sh ./quasi-tools/install.sh
+  - bowtie-build -f public/test/testReference.fasta ~/references/testReference
