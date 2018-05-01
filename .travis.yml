@@ -8,4 +8,4 @@ before_script:
   - mkdir ~/references
   - git clone https://github.com/markonyango/quasi-tools.git
   - sh ./quasi-tools/install.sh
-  - /home/travis/bin/bowtie-build -f /home/travis/build/markonyango/quasi-express/public/test/testReference.fasta /home/travis/references/testReference
+  - /home/travis/bin/bowtie-build --verbose -f /home/travis/build/markonyango/quasi-express/public/test/testReference.fasta /home/travis/references/testReference
