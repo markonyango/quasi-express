@@ -4,9 +4,10 @@ services:
 node_js: 
   - "node"
 before_script:
+  - sudo apt-get install libtbb-dev
   - mkdir uploads
   - mkdir ~/references
   - cp public/test/testReference.fasta ~/references/
-  - git clone https://github.com/markonyango/quasi-tools.git
-  - sh ./quasi-tools/install.sh
+  - git clone https://github.com/BenLangmead/bowtie.git
+  - cd bowtie && make && sudo make install && cd ..
   - bowtie-build --verbose -f ~/testReference.fasta ~/references/testReference
