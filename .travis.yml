@@ -8,4 +8,4 @@ before_script:
   - git clone https://github.com/markonyango/quasi-tools.git
   - sh ./quasi-tools/install.sh
   - pwd && which bowtie-build
-  - `which bowtie-build` -f ./public/test/testReference.fasta ~/references/testReference
+  - bowtie-build -f ./public/test/testReference.fasta ~/references/testReference
