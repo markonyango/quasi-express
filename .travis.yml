@@ -3,6 +3,7 @@ services:
   - mongodb
 node_js: 
   - "node"
+install: make get-deps
 before_script:
   - sudo apt-get install libtbb-dev
   - mkdir uploads
