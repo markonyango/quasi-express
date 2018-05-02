@@ -12,4 +12,6 @@ before_script:
   - cd bowtie && make && sudo make install && cd ..
   - bowtie-build --verbose -f ~/references/testReference.fasta ~/references/testReference
   - git clone https://git.code.sf.net/p/samstat/code samstat-code
-  - cd samstat-code/src && make && sudo make install
+  - cd samstat-code/src
+  - sed -r "s/(.?\(CC\)).?(.?\(CFLAGS\)).?(.?\(LD\)).?(.?\(OBJECTS\)).?(-o .?\(PROGS\))/\1 \2 \4 \5 \3/g" Makefile > Makefile
+  - make && sudo make install
