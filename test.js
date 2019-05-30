@@ -167,7 +167,7 @@ describe('App', function() {
           .field('settings[preTrim]', '0')
           .field('settings[postTrim]', '0')
           .field('settings[writeUnaligned]', true)
-          .field('settings[reference]', 'all_new.fasta')
+          .field('settings[reference]', 'testReference.fasta')
           .field('status', 'queued')
           .attach('files', './public/test/test.fastq', 'test.fastq')
           .attach('files', './public/test/test2.fastq', 'test2.fastq')
