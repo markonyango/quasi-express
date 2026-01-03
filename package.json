@@ -47,7 +47,7 @@
     "gulp-clean-css": "^3.9.3",
     "gulp-concat": "^2.6.1",
     "gulp-nodemon": "^2.4.2",
-    "mocha": "^10.2.0"
+    "mocha": "^10.8.2"
   },
   "nodemonConfig": {
     "ignore": [
